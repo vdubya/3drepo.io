@@ -14,35 +14,23 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+exports.route = function(router)
+{
+    router.get('jpg', '/:account/:project/:uid', function(res, params) {
+        router.dbInterface.getObject(params.project, params.uid, null, null, function(err, type, uid, obj)
+        {
+            if(err) throw err;
 
-var passport = require('passport');
-var LocalStrategy = require('passport-local').Strategy;
-var bCrypt = require('bcrypt-nodejs');
-var dbInterface = require('./db_interface.js');
+            if (type == "texture")
+            {
+              res.write(obj.textures[uid].data.buffer);
+			  res.end();
+            } else {
+                throw new Error("Type of object not supported");
+            }
+        });
+    });
 
-module.exports = function(passport) {
-	passport.use('login', new LocalStrategy(
-		{
-			passReqToCallback: true
-		},
-		function(req, username, password, done) {
-			dbInterface.authenticate(username, password, function(err, user)
-			{
-				if (err)
-					return done(null, false, req.flash('message', err));
+};
 
-				console.log("USER: " + JSON.stringify(user));
-				done(null, user);
-			});
-		}
-	));
-
-	passport.serializeUser(function(user, done) {
-		done(null, user);
-	});
-
-	passport.deserializeUser(function(obj, done) {
-		done(null, obj);
-	});
-}
 
