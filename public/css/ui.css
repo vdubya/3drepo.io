@@ -665,10 +665,6 @@ hr {
 	overflow: hidden;
 }
 
-#projects-thumbnails .item-masonry, .grid-sizer {
-	width: calc(33.333% + 0px);
-}
-
 #projects-thumbnails .item-masonry-description {
 	height: 22%;
 }
@@ -1116,6 +1112,7 @@ header button.btn {
 	background-color: rgba(255, 255, 255, 0.5);
 	-webkit-transition: all linear 0.05s;
 	transition: all linear 0.05s;
+	z-index: 20000;
 }
 
 #ui2-treeview.collapsed {
@@ -1147,6 +1144,7 @@ header button.btn {
 
 .collapsed #ui2-treeview-collapse-btn {
 	right: -40px;
+	z-index: 20000;
 }
 
 #ui2-treeview-collapse-btn i {
@@ -1162,6 +1160,7 @@ header button.btn {
 	background-color: rgba(255, 255, 255, 0.5);
 	-webkit-transition: all linear 0.05s;
 	transition: all linear 0.05s;
+	z-index: 20000;
 }
 
 #metadata {
@@ -1190,6 +1189,7 @@ header button.btn {
 
 .collapsed #ui2-metadata-collapse-btn {
 	left: -40px;
+	z-index: 20000;
 }
 
 #oculus-mode-icon {
@@ -1241,20 +1241,26 @@ header button.btn {
 	top: -22px;
 }
 
+/* Bottom panel: (default state) both the tree panel and the metadata collapsed */
 #bottom-panel {
 	background-color: #ffffff;
 	position: fixed;
 	top: 60px;
-	left: 25%;
-	width: 50%;
-	height: 100%;
+	left: 0;
+	width: 100%;
+	height: calc(100% - 60px);
 	max-width: none;
 	-webkit-transition: all linear 0.1s;
 	transition: all linear 0.1s;
+	padding-left: 40px;
+	padding-right: 40px;
+	overflow-y: scroll;
+	margin-bottom: 500px;
 }
 
 #bottom-panel.collapsed {
-	top: 100%
+	top: 100%;
+	overflow: visible;
 }
 
 .bottom-tabs {
@@ -1262,16 +1268,49 @@ header button.btn {
 	border: none;
 	font-size: 8pt;
 	top: 0;
-	height: 35px;
-	width: 80%;
-	left: 10%;
+	height: 51px;
+	width: 50%;
+	left: 25%;
 	-webkit-transition: all linear 0.1s;
 	transition: all linear 0.1s;
+}
 
+/* Bottom panel: both tree and metadata expanded */
+#bottom-panel.with-tree.with-metadata {
+	left: 25%;
+	width: 50%;
+}
+
+#bottom-panel.with-tree.with-metadata .bottom-tabs {
+	width: 80%;
+	left: 10%;
+}
+
+/* Bottom panel: tree expanded, but metadata collapsed */
+#bottom-panel.with-tree {
+	width: 75%;
+	left: 25%;
+	padding-left: 0;
+}
+
+#bottom-panel.with-tree .bottom-tabs {
+	width: 53%;
+	left: 23.5%;
+}
+
+/* Bottom panel: tree collapsed, but metadata expanded */
+#bottom-panel.with-metadata {
+	width: 75%;
+	padding-right: 0;
+}
+
+#bottom-panel.with-metadata .bottom-tabs {
+	width: 53%;
+	left: 23.5%;
 }
 
 .collapsed .bottom-tabs {
-	top: -35px;
+	top: -51px;
 }
 
 .bottom-tabs > li {
@@ -1287,6 +1326,7 @@ header button.btn {
 	color: #ffffff;
 	margin-left: 0;
 	margin-right: 0;
+	padding: 10px 5px;
 }
 
 .bottom-tabs > li.active::after {
@@ -1301,7 +1341,7 @@ header button.btn {
 }
 
 .bottom-info {
-	padding-top: 20px;
+	padding-top: 51px;
 }
 
 .block-header-project-name {
@@ -1453,6 +1493,24 @@ ul.fancytree-container li {
 }
 
 .item-masonry.w2 {
+	width: calc(50% - 2px);
+	padding-bottom: 25%;
+	float: left;
+	height: 0px;
+}
+
+.item-masonry.h2 {
+	padding-bottom: 50%;
+	height: 0;
+	float: left;
+	margin-top: 0;
+}
+
+.item-masonry.h2 img.img-responsive{
+	max-width: 200%;
+}
+
+.item-masonry.wh2 {
 	width: calc(50% - 2px);
 }
 
