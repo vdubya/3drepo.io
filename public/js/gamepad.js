@@ -23,20 +23,20 @@ var Gamepad = function() {
 	this.timestamp = null;
 
 	this.connected = function(event) {
-		this.gamepad = event.gamepad;	// Only support one gamepad
-		this.startPolling();
+		self.gamepad = event.gamepad;	// Only support one gamepad
+		self.startPolling();
 	};
 
 	this.disconnected = function(event) {
-		this.gamepad = null;
-		this.stopPolling();
+		self.gamepad = null;
+		self.stopPolling();
 	};
 
 	this.startPolling = function() {
-		if(!this.enabled)
+		if(!self.enabled)
 		{
-			this.enabled = true;
-			this.tick();
+			self.enabled = true;
+			self.tick();
 		}
 	};
 
@@ -51,7 +51,8 @@ var Gamepad = function() {
 				return;
 
 		self.timestamp = self.gamepad.timestamp;
-
+/*
+ * Chrome Linux
 		$.event.trigger("gamepadMove",
 			{
 				xaxis: self.gamepad.axes[0],
@@ -59,22 +60,41 @@ var Gamepad = function() {
 				button: self.gamepad.buttons[0]
 			}
 		);
+*/
+
+		/* Chrome Canary Windows
+		$.event.trigger("gamepadMove",
+			{
+				xaxis: self.gamepad.buttons[15].value - self.gamepad.buttons[14].value,
+				yaxis: self.gamepad.buttons[13].value - self.gamepad.buttons[12].value,
+				button: self.gamepad.buttons[3]
+			}
+		);
+*/
+
+		$.event.trigger("gamepadMove",
+			{
+				xaxis: self.gamepad.axes[4],
+				yaxis: self.gamepad.axes[5],
+				button: self.gamepad.buttons[0]
+			}
+		);
 
 		if (self.gamepad.buttons[0].pressed)
-			if (!this.oldButton) {
+			if (!self.oldButton) {
 				viewer.reset();
 				viewer.setNavMode('NONE');
 				viewer.disableClicking();
 			}
 
-		this.oldButton = self.gamepad.buttons[0].pressed;
+		self.oldButton = self.gamepad.buttons[0].pressed;
 	};
 
 	this.tick = function() {
 		if(navigator.getGamepads()[0])
 			self.gamepad = navigator.getGamepads()[0];
 
-		if(!this.gamepad)
+		if(!self.gamepad)
 			viewer.setNavMode('TURNTABLE'); // Manually override navigation
 		else
 			self.checkStatus();
@@ -99,7 +119,7 @@ var Gamepad = function() {
 	};
 
 	this.stopPolling = function() {
-		this.enabled = false;
+		self.enabled = false;
 	};
 
 	this.init = function() {
