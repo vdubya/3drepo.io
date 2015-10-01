@@ -15,28 +15,17 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var config = require('app-config').config;
-var frontend_scripts = require('../../common_public_files.js');
+var config = require("app-config").config;
+var utils  = require("./utils.js");
+
+var frontend_scripts = require("../../common_public_files.js");
 
 var default_http_port  = 80;
 var default_https_port = 443;
 var default_mongo_port = 27017;
 
-var default_cookie_secret        = 'cookie secret';
-var default_cookie_parser_secret = 'another cookie secret';
-
-/*******************************************************************************
-  * Coalesce function
-  * @param {Object} variable - variable to coalesce
-  * @param {Object} value - value to return if object is null or undefined
-  *******************************************************************************/
-var coalesce = function(variable, value)
-{
-	if (variable === null || variable === undefined)
-		return value;
-	else
-		return variable;
-}
+var default_cookie_secret        = "cookie secret";
+var default_cookie_parser_secret = "another cookie secret";
 
 /*******************************************************************************
   * Function to check whether or not a string is an IP address
@@ -67,6 +56,7 @@ var checkIP = function(str)
  *******************************************************************************/
 var fillInServerDetails = function(serverObject, name, usingIP, using_ssl, host, applyName)
 {
+<<<<<<< Updated upstream
 	serverObject                   = coalesce(serverObject, {});
 	serverObject.name              = coalesce(serverObject.name, name);
 	serverObject.sub_domain_or_dir = coalesce(serverObject.sub_domain_or_dir, 1);
@@ -75,6 +65,15 @@ var fillInServerDetails = function(serverObject, name, usingIP, using_ssl, host,
 	serverObject.port              = coalesce(serverObject.port, using_ssl ? serverObject.https_port : serverObject.http_port);
 	serverObject.public_port       = coalesce(serverObject.public_port, serverObject.port);
 	serverObject.public_protocol   = coalesce(serverObject.public_protocol, using_ssl ? "https" : "http");
+=======
+	serverObject                   = utils.coalesce(serverObject, {});
+	serverObject.name              = utils.coalesce(serverObject.name, name);
+	serverObject.sub_domain_or_dir = utils.coalesce(serverObject.sub_domain_or_dir, 1);
+	serverObject.http_port         = utils.coalesce(serverObject.http_port, default_http_port);
+	serverObject.https_port        = utils.coalesce(serverObject.https_port, default_https_port);
+	serverObject.public_port       = utils.coalesce(serverObject.public_port, using_ssl ? serverObject.https_port : serverObject.http_port);
+	serverObject.public_protocol   = utils.coalesce(serverObject.public_protocol, using_ssl ? "https" : "http");
+>>>>>>> Stashed changes
 
 	// Have to use subdirectory with an IP address
 	if (usingIP) {
@@ -85,6 +84,12 @@ var fillInServerDetails = function(serverObject, name, usingIP, using_ssl, host,
 		}
 	}
 
+<<<<<<< Updated upstream
+=======
+	// Are we using ssl
+	serverObject.port = using_ssl ? utils.coalesce(serverObject.https_port, default_https_port) : utils.coalesce(serverObject.http_port, default_http_port);
+
+>>>>>>> Stashed changes
 	if (applyName)
 	{
 		// Is this a subdomain or a directory
@@ -117,17 +122,17 @@ var fillInServerDetails = function(serverObject, name, usingIP, using_ssl, host,
 }
 
 // Check for hostname and ip here
-config.host        = coalesce(config.host, "127.0.0.1");
-default_http_port  = coalesce(config.http_port, default_http_port);
-default_https_port = coalesce(config.https_port, default_https_port);
+config.host        = utils.coalesce(config.host, "127.0.0.1");
+default_http_port  = utils.coalesce(config.http_port, default_http_port);
+default_https_port = utils.coalesce(config.https_port, default_https_port);
 
 config.using_ip  = checkIP(config.host);
-config.using_ssl = ('ssl' in config);
+config.using_ssl = ("ssl" in config);
 
 fillInServerDetails(config.api_server, "api", config.using_ip, config.using_ssl, config.host, true);
-config.api_server.external     = coalesce(config.api_server.external, false); // Do we need to start an API server, or just link to an external one.
-config.api_server.chat_subpath = coalesce(config.api_server.chat_subpath, 'chat');
-config.api_server.chat_path    = '/' + config.api_server.host_dir + '/' + config.api_server.chat_subpath;
+config.api_server.external     = utils.coalesce(config.api_server.external, false); // Do we need to start an API server, or just link to an external one.
+config.api_server.chat_subpath = utils.coalesce(config.api_server.chat_subpath, "chat");
+config.api_server.chat_path    = "/" + config.api_server.host_dir + "/" + config.api_server.chat_subpath;
 config.api_server.chat_host    = config.api_server.base_url;
 
 // Set up other servers
@@ -139,20 +144,25 @@ for(i in config.servers)
 // If the API server is running on a subdirectory, config.subdirectory will be true
 // If the API server is running different subdomain it will require virtual hosts
 // If both these are set to false then you enter advanced mode (see 3drepo.js)
+<<<<<<< Updated upstream
 config.subdirectory = coalesce(config.subdirectory, config.api_server.sub_domain_or_dir === 1);
 config.vhost        = coalesce(config.vhost, config.api_server.sub_domain_or_dir === 0);
+=======
+config.subdirectory = utils.coalesce(config.crossOrigin, config.api_server.sub_domain_or_dir === 1);
+config.vhost        = utils.coalesce(config.vhost, config.api_server.sub_domain_or_dir === 0);
+>>>>>>> Stashed changes
 
 // Database configuration
-config.db          = coalesce(config.db, {});
-config.db.host     = coalesce(config.db.host, config.host);
-config.db.port     = coalesce(config.db.port, default_mongo_port);
-config.db.username = coalesce(config.db.username, "username");
-config.db.password = coalesce(config.db.password, "password");
+config.db          = utils.coalesce(config.db, {});
+config.db.host     = utils.coalesce(config.db.host, config.host);
+config.db.port     = utils.coalesce(config.db.port, default_mongo_port);
+config.db.username = utils.coalesce(config.db.username, "username");
+config.db.password = utils.coalesce(config.db.password, "password");
 
 // Other options
-config.js_debug_level       = coalesce(config.js_debug_level, 'debug'); // Loading prod or debug scripts
-config.cookie_secret        = coalesce(config.cookie_secret, config.default_cookie_secret);
-config.cookie_parser_secret = coalesce(config.cookie_parser_secret, config.default_cookie_parser_secret);
+config.js_debug_level       = utils.coalesce(config.js_debug_level, "debug"); // Loading prod or debug scripts
+config.cookie_secret        = utils.coalesce(config.cookie_secret, config.default_cookie_secret);
+config.cookie_parser_secret = utils.coalesce(config.cookie_parser_secret, config.default_cookie_parser_secret);
 
 // Check whether the secret have been set in the file or not
 if ((config.cookie_secret === config.default_cookie_secret) || (config.cookie_parser_secret === config.default_cookie_parser_secret))
@@ -161,13 +171,13 @@ if ((config.cookie_secret === config.default_cookie_secret) || (config.cookie_pa
 	process.exit(1);
 }
 
-config.default_format = coalesce(config.default_format, "html");
-config.external       = (config.js_debug_level === 'debug') ? frontend_scripts.debug_scripts : frontend_scripts.prod_scripts;
+config.default_format = utils.coalesce(config.default_format, "html");
+config.external       = (config.js_debug_level === "debug") ? frontend_scripts.debug_scripts : frontend_scripts.prod_scripts;
 
 // Log file options
-config.logfile               = coalesce(config.logfile, {});
-config.logfile.filename      = coalesce(config.logfile.filename, "/var/log/3drepo.org");
-config.logfile.console_level = coalesce(config.logfile.console_level, "info");
-config.logfile.file_level    = coalesce(config.logfile.file_level, "info");
+config.logfile               = utils.coalesce(config.logfile, {});
+config.logfile.filename      = utils.coalesce(config.logfile.filename, "/var/log/3drepo.org");
+config.logfile.console_level = utils.coalesce(config.logfile.console_level, "info");
+config.logfile.file_level    = utils.coalesce(config.logfile.file_level, "info");
 
 module.exports = config;

@@ -202,10 +202,16 @@ var Oculus = function(viewer) {
 
 			if (h)
 			{
+<<<<<<< Updated upstream
 				var vp = self.viewer.getCurrentViewpoint()._x3domNode;
 				var flyMat	= vp.getViewMatrix().inverse();
 				var q	= new x3dom.fields.Quaternion(h.x, h.y, h.z, h.w);
 
+=======
+				var flyMat = self.viewer.getCurrentViewpoint()._x3domNode.getViewMatrix().inverse();	
+				var q	= new x3dom.fields.Quaternion(h.x, h.y, h.z, h.w);
+				
+>>>>>>> Stashed changes
 				flyMat.setRotate(q);
 				vp.setView(flyMat.inverse());
 			}

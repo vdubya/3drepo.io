@@ -14,7 +14,7 @@
  *	You should have received a copy of the GNU Affero General Public License
  *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-var log_iface = require('./logger.js');
+var log_iface = require("./logger.js");
 var logger = log_iface.logger;
 
 var responseCodes = {
@@ -57,27 +57,31 @@ var responseCodes = {
 
 	ERROR_RENDERING_OBJECT:	 {value : 22, message: "Error rendering object", status: 500},
 
-	MISSING_SCHEMA: { value: 23, message: 'Trying to process request with missing schema', status: 500 },
+	MISSING_SCHEMA: { value: 23, message: "Trying to process request with missing schema", status: 500 },
 
-	SETTINGS_ERROR: { value: 24, message: 'Error in the settings collection', status: 500},
+	SETTINGS_ERROR: { value: 24, message: "Error in the settings collection", status: 500},
 
-	OBJECT_NOT_FOUND: { value: 25, message: 'Object not found', status: 404},
+	OBJECT_NOT_FOUND: { value: 25, message: "Object not found", status: 404},
 
-	ROOT_NODE_NOT_FOUND: { value: 26, message: 'No root node found for revision', status: 500},
+	ROOT_NODE_NOT_FOUND: { value: 26, message: "No root node found for revision", status: 500},
 
-	ISSUE_NOT_FOUND: { value: 27, message: 'Issue not found', status: 404},
+	ISSUE_NOT_FOUND: { value: 27, message: "Issue not found", status: 404},
 
-	HEAD_REVISION_NOT_FOUND: { value: 28, message: 'Head revision not found', status: 404 },
+	HEAD_REVISION_NOT_FOUND: { value: 28, message: "Head revision not found", status: 404 },
 
 	DB_ERROR: function(mongoErr) {
+		"use strict";
+
 		return {
 			value: 1000,
-			message: mongoErr.toString(), //'[' + mongoErr["code"] + '] @ ' + mongoErr["err"],
+			message: mongoErr.toString(), //"[" + mongoErr["code"] + "] @ " + mongoErr["err"],
 			status: 500
 		};
 	},
 
 	EXTERNAL_ERROR: function(message) {
+		"use strict";
+
 		return {
 			value: 2000,
 			message: JSON.stringify(message),
@@ -86,6 +90,8 @@ var responseCodes = {
 	},
 
 	VALIDATION_ERROR: function(validErrors) {
+		"use strict";
+
 		return {
 			value: 3000,
 			message: JSON.stringify(validErrors),
@@ -99,49 +105,58 @@ var valid_values = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17, 18, 19, 20, 21,
 
 responseCodes.respond = function(place, resCode, res, extraInfo)
 {
-	if (valid_values.indexOf(resCode.value) == -1) {
-		throw Error("Unspecified error code [VALUE: " + resCode.value + "]");
+	"use strict";
+
+	if (valid_values.indexOf(resCode.value) === -1) {
+		throw Error("Unspecified error code [ VALUE: " + resCode.value + " ]");
 	}
 
 	if (resCode.value) // Prepare error response
 	{
-		if (!extraInfo)
-			var responseObject = {};
-		else
-			var responseObject = extraInfo;
+		var responseObject = {};
+
+		if (!extraInfo) {
+			responseObject = {};
+		} else {
+			responseObject = extraInfo;
+		}
 
 		responseObject.place   = place;
 		responseObject.status  = resCode.status;
 		responseObject.message = resCode.message;
 
-		if (resCode.value)
-			logger.log('error', JSON.stringify(responseObject));
+		logger.logError(JSON.stringify(responseObject));
 
 		res.status(resCode.status).send(JSON.stringify(responseObject));
 	} else {
+		// If there is no error then send the data (in extraInfo)
 		if(Buffer.isBuffer(extraInfo))
 		{
 			res.status(resCode.status);
-			res.write(extraInfo, 'binary');
+			res.write(extraInfo, "binary");
 			res.end();
 		} else {
 			res.status(resCode.status).send(extraInfo);
 		}
 	}
-}
+};
 
 // On error respond with error code and errInfo (containing helpful information)
 // On OK, response with OK status and extraInfo
 responseCodes.onError = function(place, err, res, extraInfo, errInfo)
 {
-	if(!errInfo)
-		errInfo = {};
+	"use strict";
 
-	if(err.value)
+	if(!errInfo) {
+		errInfo = {};
+	}
+
+	if(err.value) {
 		responseCodes.respond(place, err, res, errInfo);
-	else
+	} else { 
 		responseCodes.respond(place, responseCodes.OK, res, extraInfo);
-}
+	}
+};
 
 module.exports = Object.freeze(responseCodes);
 

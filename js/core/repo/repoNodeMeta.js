@@ -15,22 +15,20 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Corresponds to repoNodeMesh in C++ definition of 3D Repo
-var mongodb = require('mongodb');
-var assert = require('assert');
-var UUID = require('node-uuid');
-var C = require('./constants');
+// Corresponds to repoNodeMeta in C++ definition of 3D Repo
+var RepoNode = require("./repoNode.js");
+var C        = require("../constants");
 
-exports.decode = function(bson, meta) {
-	if (bson["mime"])
-	{
-		bson["data"] = {};
-		bson["data"].buffer = new Buffer(bson["metadata"]["data"].buffer.length);
-		bson["metadata"]["data"].buffer.copy(bson["data"].buffer);
+/*******************************************************************************
+* Class that wraps the mesh object
+* @param {BSON} bson - Database BSON object
+*******************************************************************************/
+var RepoNodeMeta = function(bson) {
+    "use strict";
+    RepoNode.call(this, bson);
 
-		delete bson["metadata"];
-	}
+    this[C.REPO_NODE_LABEL_TYPE] = C.REPO_NODE_TYPE_META;
+};
 
-	return bson;
-}
-
+RepoNodeMeta.prototype = Object.create(RepoNode.prototype);
+module.exports = RepoNodeMeta;

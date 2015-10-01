@@ -1,3 +1,4 @@
+
 /**
  *	Copyright (C) 2014 3D Repo Ltd
  *
@@ -33,8 +34,6 @@ var googleMaps	 = require('./helper/googleMap.js');
 var responseCodes = require('../response_codes.js');
 
 var jsonCache = {};
-
-var mathjs		= require('mathjs');
 
 function getChild(parent, type, n) {
 	if ((parent == null) || !('children' in parent))
@@ -99,154 +98,6 @@ function X3D_CreateScene(xmlDoc, rootNode) {
 
 	return {scene: scene, root: rootGroup};
 }
-
-function scale(v, s)
-{
-	return [v[0] * s, v[1] * s, v[2] * s];
-}
-
-function length(v)
-{
-	return Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
-}
-
-function normalize(v)
-{
-	var sz = length(v);
-	return scale(v, 1 / sz);
-}
-
-function dotProduct(a,b)
-{
-	return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-}
-
-function crossProduct(a,b)
-{
-	var x = a[1] * b[2] - a[2] * b[1];
-	var y = a[2] * b[0] - a[0] * b[2];
-	var z = a[0] * b[1] - a[1] * b[0];
-
-	return [x,y,z];
-}
-
-function vecAdd(a,b)
-{
-	return [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
-}
-
-function vecSub(a,b)
-{
-	return vecAdd(a, scale(b,-1));
-}
-
-function quatLookAt(up, forward)
-{
-	forward = normalize(forward);
-	up = normalize(up);
-
-	var right = crossProduct(forward, up);
-
-	up = crossProduct(right, forward);
-
-	var w = Math.sqrt(1 + right[0] + up[1] + forward[2]) * 0.5;
-
-	var recip = 1 / (4 * w);
-	var x = (forward[1] - up[2]) * recip;
-	var y = (right[2] - forward[1]) * recip;
-	var z = (up[0] - right[1]) * recip;
-
-	return [x,y,z,w];
-}
-
-function axisangle(mat)
-{
-	var tmpMat = mat.clone();
-	tmpMat = tmpMat.transpose();
-
-	var right = mathjs.subset(tmpMat, mathjs.index(0,[0,3]))._data[0];
-	right = normalize(right);
-
-	var up = mathjs.subset(tmpMat, mathjs.index(1,[0,3]))._data[0];
-	up = normalize(up);
-
-	var forward = mathjs.subset(tmpMat, mathjs.index(2,[0,3]))._data[0];
-	forward = normalize(forward);
-
-	var eps = 0.0001;
-
-	var a = up[0] - right[1];
-	var b = forward[0] - right[2];
-	var c = forward[1] - up[2];
-	var tr = right[0] + up[1] + forward[2];
-
-	var x = 0;
-	var y = 0;
-	var z = 0;
-	var angle = 1;
-
-	if ((Math.abs(a) < eps) && (Math.abs(b) < eps) && (Math.abs(c) < eps))
-	{
-		var d = up[0] + right[1];
-		var e = forward[0] + right[2];
-		var f = forward[1] + up[2];
-
-		if (!((Math.abs(d) < eps) && (Math.abs(e) < eps) && (Math.abs(f) < eps) && (Math.abs(tr - 3) < eps)))
-		{
-			angle = Math.PI;
-
-			var xx = (right[0] + 1) / 2;
-			var yy = (up[1] + 1) / 2;
-			var zz = (forward[2] + 1) / 2;
-
-			var xy = d / 4;
-			var xz = e / 4;
-			var yz = f / 4;
-
-			if (((xx - yy) > eps) && ((xx - zz) > eps)) {
-				if (xx < eps) {
-					x = 0; y = Math.SQRT1_2; z = Math.SQRT1_2;
-				} else {
-					x = Math.sqrt(xx); y = xy/x; z = xz / x;
-				}
-			} else if ((yy - zz) > eps) {
-				if (yy < eps) {
-					x = Math.SQRT1_2; y = 0; z = Math.SQRT1_2;
-				} else {
-					y = Math.sqrt(yy); x = xy / y; z = yz / y;
-				}
-			} else {
-				if (zz < eps) {
-					x = Math.SQRT1_2; y = Math.SQRT1_2; z = 0;
-				} else {
-					z = Math.sqrt(zz); x = xz / z; y = yz / z;
-				}
-			}
-		}
-	} else {
-		var s = Math.sqrt(a * a + b * b + c * c);
-
-		if (s < eps) s = 1;
-
-		x = -c / s;
-		y = b / s;
-		z = -a / s;
-
-		angle = Math.acos((tr - 1) / 2);
-	}
-
-	return [x, y, z, angle]; // Right-handed system
-}
-
-/*
-function det(mat) {
-	console.log(mat);
-	console.log(mat[0,0]);
-
-	return mat[0,0] * (mat[1,1] * mat[2,2] - mat[1,2] * mat[2,1])
-		- mat[0,1] * (mat[1,0] * mat[2,2] - mat[1,2] * mat[2,0])
-		- mat[0,2] * (mat[1,0] * mat[2,1] - mat[1,1] * mat[2,0]);
-}*/
 
 
 /*******************************************************************************

@@ -163,8 +163,6 @@ module.exports = function(router, dbInterface, checkAccess){
 		this.dbInterface.getRootNode(req.params["account"], req.params["project"], req.params["branch"], null, function(err, root) {
 			if (err.value) return callback(err);
 
-			console.log(JSON.stringify(root));
-
 			this.dbInterface.storeViewpoint(req.params["account"], req.params["project"], req.params["branch"], req.session.user, this.dbInterface.uuidToString(root["shared_id"]), data, function(err) {
 				responseCodes.onError(responsePlace, err, res, {});
 			});

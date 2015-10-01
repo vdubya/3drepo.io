@@ -15,8 +15,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var winston = require('winston');
-var config = require('./config.js');
+var winston = require("winston");
+var config = require("./config.js");
 
 // Custom logging levels for logger
 var myCustomLevels = {
@@ -27,10 +27,10 @@ var myCustomLevels = {
         error: 3
     },
     colors: {
-        debug: 'white',
-        info: 'yellow',
-        warn: 'orange',
-        error: 'red'
+        debug: "white",
+        info: "yellow",
+        warn: "orange",
+        error: "red"
     }
 };
 
@@ -49,8 +49,54 @@ var logger = new(winston.Logger)({
     })]
 });
 
-module.exports.logger = logger;
-module.exports.onError = function(err) {
-	logger.log('error', err.stack);
-}
+/*******************************************************************************
+* Log an error message
+* @param {string} msg - Error message
+*******************************************************************************/
+module.exports.logError = function(msg) { 
+    "use strict";
 
+    logger.log("error", msg); 
+};
+
+/*******************************************************************************
+* Log a debug message
+* @param {string} msg - Debug message
+*******************************************************************************/
+module.exports.logDebug = function(msg) { 
+    "use strict";
+
+    logger.log("debug", msg); 
+};
+
+/*******************************************************************************
+* Log a information message
+* @param {string} msg - Information message
+*******************************************************************************/
+module.exports.logInfo  = function(msg) { 
+    "use strict";
+
+    logger.log("info",  msg); 
+};
+
+/*******************************************************************************
+* Log a warning message
+* @param {string} msg - Warning message
+*******************************************************************************/
+module.exports.logWarning = function(msg) { 
+    "use strict";
+
+    logger.log("warn",  msg); 
+};
+
+/*******************************************************************************
+* Helper function that on error
+* @param {string} username - Username 
+* @param {string} password - Password
+* @param {function} callback - Callback function
+*******************************************************************************/
+module.exports.onError = function(err) {
+    "use strict";
+
+    this.logError(err.stack);
+};
