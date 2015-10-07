@@ -56,16 +56,6 @@ var checkIP = function(str)
  *******************************************************************************/
 var fillInServerDetails = function(serverObject, name, usingIP, using_ssl, host, applyName)
 {
-<<<<<<< Updated upstream
-	serverObject                   = coalesce(serverObject, {});
-	serverObject.name              = coalesce(serverObject.name, name);
-	serverObject.sub_domain_or_dir = coalesce(serverObject.sub_domain_or_dir, 1);
-	serverObject.http_port         = coalesce(serverObject.http_port, default_http_port);
-	serverObject.https_port        = coalesce(serverObject.https_port, default_https_port);
-	serverObject.port              = coalesce(serverObject.port, using_ssl ? serverObject.https_port : serverObject.http_port);
-	serverObject.public_port       = coalesce(serverObject.public_port, serverObject.port);
-	serverObject.public_protocol   = coalesce(serverObject.public_protocol, using_ssl ? "https" : "http");
-=======
 	serverObject                   = utils.coalesce(serverObject, {});
 	serverObject.name              = utils.coalesce(serverObject.name, name);
 	serverObject.sub_domain_or_dir = utils.coalesce(serverObject.sub_domain_or_dir, 1);
@@ -73,7 +63,6 @@ var fillInServerDetails = function(serverObject, name, usingIP, using_ssl, host,
 	serverObject.https_port        = utils.coalesce(serverObject.https_port, default_https_port);
 	serverObject.public_port       = utils.coalesce(serverObject.public_port, using_ssl ? serverObject.https_port : serverObject.http_port);
 	serverObject.public_protocol   = utils.coalesce(serverObject.public_protocol, using_ssl ? "https" : "http");
->>>>>>> Stashed changes
 
 	// Have to use subdirectory with an IP address
 	if (usingIP) {
@@ -84,12 +73,9 @@ var fillInServerDetails = function(serverObject, name, usingIP, using_ssl, host,
 		}
 	}
 
-<<<<<<< Updated upstream
-=======
 	// Are we using ssl
 	serverObject.port = using_ssl ? utils.coalesce(serverObject.https_port, default_https_port) : utils.coalesce(serverObject.http_port, default_http_port);
 
->>>>>>> Stashed changes
 	if (applyName)
 	{
 		// Is this a subdomain or a directory
@@ -144,13 +130,8 @@ for(i in config.servers)
 // If the API server is running on a subdirectory, config.subdirectory will be true
 // If the API server is running different subdomain it will require virtual hosts
 // If both these are set to false then you enter advanced mode (see 3drepo.js)
-<<<<<<< Updated upstream
-config.subdirectory = coalesce(config.subdirectory, config.api_server.sub_domain_or_dir === 1);
-config.vhost        = coalesce(config.vhost, config.api_server.sub_domain_or_dir === 0);
-=======
 config.subdirectory = utils.coalesce(config.crossOrigin, config.api_server.sub_domain_or_dir === 1);
 config.vhost        = utils.coalesce(config.vhost, config.api_server.sub_domain_or_dir === 0);
->>>>>>> Stashed changes
 
 // Database configuration
 config.db          = utils.coalesce(config.db, {});
