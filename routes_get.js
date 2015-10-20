@@ -40,7 +40,7 @@ var repoGetHandler = function(router, checkAccess){
 	self.checkAccess = checkAccess; // Store access checking function
 
 	// Checks whether or not the user is logged in.
-	self.router.get("/login", function(req, res, next) {
+	self.getInternal("/login", function(req, res, next) {
 		if (!req.session.user) {
 			responseCodes.respond("/login GET", req, res, next, responseCodes.NOT_LOGGED_IN, {});
 		} else {
@@ -49,7 +49,7 @@ var repoGetHandler = function(router, checkAccess){
 	});
 
 	// TODO: Move these two functions to the JSON encoder
-	self.router.get("/:account/:project/wayfinder.:format", checkAccess, function(req, res, next) {
+	self.getInternal("/:account/:project/wayfinder.:format", checkAccess, function(req, res, next) {
 		// If there has been an error where checking access skip this middleware
 		if (req.accessError.value)
 		{
@@ -67,7 +67,7 @@ var repoGetHandler = function(router, checkAccess){
 		}
 	});
 
-	self.router.get("/:account/:project/wayfinder/record.:format", checkAccess, function(req, res, next) {
+	self.getInternal("/:account/:project/wayfinder/record.:format", function(req, res, next) {
 		// If there has been an error where checking access skip this middleware
 		if (req.accessError.value)
 		{
@@ -256,22 +256,22 @@ repoGetHandler.prototype.getInternal = function(regex, queryDefaults, customCall
 			regex = regex.replace(".:format", "");
 			regex = regex.replace(".:subformat?", "");
 
-			self.transRouter(format, regex, res, req, next, params);
+			self.transRouter(format, regex, req, res, next, params);
 		});
 	} else {
-		self.router.get(regex, this.checkAccess, function(res, req, next) {
+		self.router.get(regex, this.checkAccess, function(req, res, next) {
 			if (req[C.REQ_REPO].processed) {
 				next();
 			} else {
 				req[C.REQ_REPO].processed = true;
 			}
 
-			customCallback(res, req, next);
+			customCallback(req, res, next);
 		});
 	}
 };
 
-repoGetHandler.prototype.transRouter = function(format, regex, res, req, next, params)
+repoGetHandler.prototype.transRouter = function(format, regex, req, res, next, params)
 {
 	"use strict";
 
@@ -294,7 +294,7 @@ repoGetHandler.prototype.transRouter = function(format, regex, res, req, next, p
 			} else if (!(regex in self.getMap[format])) {
 				responseCodes.respond(responsePlace, req, res, next, responseCodes.FUNCTION_NOT_SUPPORTED, {params: params});
 			} else {
-				self.getMap[format][regex](res, req, params, function(err, data) {
+				self.getMap[format][regex](req, res, params, function(err, data) {
 					responseCodes.onError(responsePlace, req, res, next, err, data, {params: params});
 				});
 			}
@@ -306,7 +306,7 @@ repoGetHandler.prototype.transRouter = function(format, regex, res, req, next, p
 			} else if (!(regex in self.getMap[format])) {
 				responseCodes.respond(responsePlace, req, res, next, responseCodes.FUNCTION_NOT_SUPPORTED, {params: params});
 			} else {
-				self.getMap[format][regex](res, req, params, function(err, data) {
+				self.getMap[format][regex](req, res, params, function(err, data) {
 					responseCodes.onError(responsePlace, req, res, next, err, data, {params: params});
 				});
 			}
@@ -317,7 +317,7 @@ repoGetHandler.prototype.transRouter = function(format, regex, res, req, next, p
 			} else if (!(regex in self.getMap[format])) {
 				responseCodes.respond(responsePlace, req, res, next, responseCodes.FUNCTION_NOT_SUPPORTED, {params: params});
 			} else {
-				self.getMap[format][regex](res, req, params, function(err, data) {
+				self.getMap[format][regex](req, res, params, function(err, data) {
 					responseCodes.onError(responsePlace, req, res, next, err, data, {params: params});
 				});
 			}
