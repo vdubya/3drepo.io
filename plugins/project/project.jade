@@ -15,8 +15,13 @@
 			if ui.viewport
 				each uicomp in ui.viewport
 					!= renderMe(uicomp["template"], locals)
+				
+	if ui.newTree
+		each uicomp in ui.newTree
+			!= renderMe(uicomp["template"], locals)
+
 	.ui2
-		#ui2-left
+		//#ui2-left
 			if ui.left
 				each uicomp in ui.left
 					!= renderMe(uicomp["template"], locals)

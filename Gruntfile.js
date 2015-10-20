@@ -26,7 +26,8 @@ module.exports = function(grunt) {
                     'public/plugins/view/*.js',
                     'public/plugins/sid/*.js',
                     'public/plugins/walkthrough/*.js',
-                    'public/plugins/viewing/*.js'
+                    'public/plugins/viewing/*.js',
+                    'public/plugins/newTree/*.js'
                 ],
                 dest: 'public/dist/plugins.concat.js'
             }

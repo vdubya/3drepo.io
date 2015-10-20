@@ -232,9 +232,9 @@ function getFullTree(dbInterface, account, project, branch, revision, callback) 
 	});
 };
 
-function walkthrough(dbInterface, account, index, callback) {
+function walkthrough(dbInterface, account, project, index, callback) {
 
-    dbInterface.searchTree(account, project, index, function(err, data) {
+    dbInterface.getWalkthroughInfo(account, project, index, function(err, data) {
         if (err.value) {
             return callback(err);
         }
@@ -464,12 +464,12 @@ exports.route = function(router)
 		});
 	});
 
-	router.get("json", "/:account/:project/revision/:branch/head/fulltree", function(res, params, err_callback) {
-		getFullTree(dbInterface, params.account, params.project, params.branch, null, err_callback);
+	router.get("json", "/:account/:project/revision/:branch/head/fulltree", function(res, req, params, err_callback) {
+		getFullTree(dbInterface(req[C.REQ_REPO].logger), params.account, params.project, params.branch, null, err_callback);
 	});
 
-	router.get("json", "/:account/:project/revision/:rid/fulltree", function(res, params, err_callback) {
-		getFullTree(dbInterface, params.account, params.project, null, params.rid, err_callback);
+	router.get("json", "/:account/:project/revision/:rid/fulltree", function(res, req, params, err_callback) {
+		getFullTree(dbInterface(req[C.REQ_REPO].logger), params.account, params.project, null, params.rid, err_callback);
 	});
 
 	router.get("json", "/:account/:project/revision/:branch/head/map", function(res, req, params, err_callback) {
@@ -628,8 +628,8 @@ exports.route = function(router)
 		}
 	});
 
-    router.get('json', '/:account/:project/:index/walkthrough', function(res, params, err_callback) {
-        searchTree(dbInterface, params.account, params.project, params.index, err_callback);
+    router.get('json', '/:account/:project/:index/walkthrough', function(res, req, params, err_callback) {
+        walkthrough(dbInterfacereq[C.REQ_REPO].logger, params.account, params.project, params.index, err_callback);
     });
 };
 

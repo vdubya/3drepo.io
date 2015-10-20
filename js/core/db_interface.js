@@ -1771,7 +1771,9 @@ DBInterface.prototype.getUnoptimizedScene = function(dbName, project, branch, re
 		};
 	}
 
-	dbConn(self.logger).getLatest(dbName, project + '.history', historyQuery, null, function(err, docs)
+    var self = this;
+
+    dbConn(self.logger).getLatest(dbName, project + '.history', historyQuery, null, function(err, docs)
 	{
 		if (err.value) return callback(err);
 
@@ -1789,7 +1791,7 @@ DBInterface.prototype.getUnoptimizedScene = function(dbName, project, branch, re
 			if (!doc.length)
 				return callback(responseCodes.ROOT_NODE_NOT_FOUND);
 
-			callback(responseCodes.OK, repoGraphScene.decode(doc));
+			callback(responseCodes.OK, repoGraphScene(self.logger).decode(doc));
 		});
 	});
 }

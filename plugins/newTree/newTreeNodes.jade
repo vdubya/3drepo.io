@@ -1,0 +1,3 @@
+ol(ui-tree-nodes, ng-model="tc.collection")
+	li(ng-repeat="node in tc.collection", ui-tree-node)
+		new-tree-node(node="node", show-children="tc.showChildren")
