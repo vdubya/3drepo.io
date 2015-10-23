@@ -1,6 +1,6 @@
-div(ui-tree-handle class="tree-node tree-node-content")
-	a(class="btn btn-primary btn-xs", ng-if="tn.showCollapseButton", ng-click="tn.toggle()")
-		span(class="glyphicon", ng-class="{'glyphicon-chevron-right': tn.collapsed, 'glyphicon-chevron-down': !tn.collapsed}")
-	label {{tn.node.name}}
-	a(class="pull-right btn btn-off btn-xs", style="margin-right: 8px;")
-		span(class="glyphicon glyphicon-off")
+div(ui-tree-handle class="tree-node tree-node-content" ng-class="tn.selectedClass")
+	a(class="btn btn-primary btn-xs", ng-if="tn.showCollapseButton", ng-click="tn.collapse()")
+		span(class="fa", ng-class="{'fa-chevron-right': tn.collapsed, 'fa-chevron-down': !tn.collapsed}")
+	a(ng-class="tn.toggleButtonClass", ng-click="tn.nodeToggled(tn.node._id)")
+		span(class="fa fa-power-off")
+	label(ng-click="tn.nodeSelected(tn.node._id)") {{tn.node.name}}

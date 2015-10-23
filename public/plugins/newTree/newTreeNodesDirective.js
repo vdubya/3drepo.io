@@ -26,15 +26,20 @@
             restrict: 'E',
             templateUrl: 'newTreeNodes.html',
             scope: {
-                collection: "=",
-                showChildren: "="
+                nodes: "=",
+                showChildren: "=",
+                onNodeSelected: "&onNodeSelected",
+                onNodeToggled: "&onNodeToggled",
+                selectedNode: "=",
+                toggledNode: "="
             },
             controller: NewTreeNodesCtrl,
-            controllerAs: 'tc',
+            controllerAs: 'tns',
             bindToController: true
         };
     }
 
-    function NewTreeNodesCtrl() {
+    function NewTreeNodesCtrl () {
+        var tns = this;
     }
 }());

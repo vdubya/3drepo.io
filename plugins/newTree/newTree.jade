@@ -1,8 +1,25 @@
 .newTree(ng-controller="NewTreeCtrl as nt")
 	.newTreeInput
-		input(type="text", class="form-control", placeholder="{{nt.placeholderText}}" ng-model="nt.searchText", ng-mouseenter="nt.mouseEnter()", ng-mouseleave="nt.mouseLeave()")
+		input(
+			type="text"
+			class="form-control"
+			placeholder="{{nt.placeholderText}}"
+			ng-model="nt.searchText"
+			ng-mouseenter="nt.mouseEnter()"
+			ng-mouseleave="nt.mouseLeave()")
 		img.loading(src='/public/images/ajax-loader.gif', width='20', height='20', ng-if="nt.showSearchingIcon")
 	.newTreeDataIndicator(ng-mouseenter="nt.mouseEnter()", ng-mouseleave="nt.mouseLeave()" ng-if="nt.showDataIndicator")
 		span(class="fa fa-bars")
-	.newTreeView(ng-show="nt.showView", ui-tree, data-nodrop-enabled="true", data-nodrag="true", ng-mouseenter="nt.mouseEnter()", ng-mouseleave="nt.mouseLeave()")
-		new-tree-nodes(collection="nt.nodes", show-children="nt.showChildren", collapsed=true)
+	.newTreeView(
+		ng-show="nt.showView", ui-tree, data-nodrop-enabled="true"
+		data-nodrag="true"
+		ng-mouseenter="nt.mouseEnter()"
+		ng-mouseleave="nt.mouseLeave()")
+		new-tree-nodes(
+			nodes="nt.nodes"
+			show-children="nt.showChildren"
+			collapsed=true
+			on-node-selected="nt.nodeSelected(nodeId)"
+			on-node-toggled="nt.nodeToggled(nodeId)"
+			selected-node="nt.selectedNode"
+			toggled-node="nt.toggledNode")

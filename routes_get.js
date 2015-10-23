@@ -100,6 +100,10 @@ var repoGetHandler = function(router, checkAccess){
         }
     });
 
+    // Retrieve all tree elements with a name containing the search string
+    self.getInternal("/:account/:project/revision/:branch/head/:searchstring/searchtree.:format");
+    self.getInternal("/:account/:project/revision/:rid/:searchstring/searchtree.:format?.:subformat?");
+
 	// Account information
 	self.getInternal("/search.:format");
 	self.getInternal("/:account.:format.:subformat?");

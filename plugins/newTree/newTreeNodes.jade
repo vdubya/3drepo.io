@@ -1,3 +1,9 @@
-ol(ui-tree-nodes, ng-model="tc.collection")
-	li(ng-repeat="node in tc.collection", ui-tree-node)
-		new-tree-node(node="node", show-children="tc.showChildren")
+ol(ui-tree-nodes, ng-model="tns.nodes")
+	li(ng-repeat="node in tns.nodes", ui-tree-node)
+		new-tree-node(
+			node="node"
+			show-children="tns.showChildren"
+			on-node-selected="tns.onNodeSelected({nodeId: nodeId})"
+			on-node-toggled="tns.onNodeToggled({nodeId: nodeId})"
+			selected-node="tns.selectedNode"
+			toggled-node="tns.toggledNode")

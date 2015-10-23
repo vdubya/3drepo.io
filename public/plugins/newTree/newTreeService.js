@@ -24,10 +24,10 @@
     NewTreeService.$inject = ["$http", "$q", "StateManager", "serverConfig"];
 
     function NewTreeService($http, $q, StateManager, serverConfig) {
-        var init = function() {
-            var deferred = $q.defer();
+        var state = StateManager.state;
 
-            var state = StateManager.state,
+        var init = function () {
+            var deferred = $q.defer(),
                 url = "/" + state.account + "/" + state.project + "/revision/" + state.branch + "/head/fulltree.json";
 
             $http.get(serverConfig.apiUrl(url))
@@ -39,9 +39,8 @@
             return deferred.promise;
         };
 
-        var search = function(searchString) {
+        var search = function (searchString) {
             var deferred = $q.defer(),
-                state = StateManager.state,
                 url = "/" + state.account + "/" + state.project + "/revision/" + state.branch + "/head/" + searchString + "/searchtree.json";
 
             $http.get(serverConfig.apiUrl(url))
@@ -53,9 +52,21 @@
             return deferred.promise;
         };
 
+        var showElement = function (nodeId) {
+            var rootObj = document.getElementById("model__" + nodeId);
+            $(document).trigger("objectSelected", [rootObj, true]);
+        };
+
+        var toggleNode = function (nodeId) {
+            var rootObj = document.getElementById("model__" + nodeId);
+            rootObj.setAttribute("render", (rootObj.getAttribute("render") === "false"));
+        };
+
         return {
             init: init,
-            search: search
+            search: search,
+            showElement: showElement,
+            toggleNode: toggleNode
         };
     }
 }());

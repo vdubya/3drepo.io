@@ -41,7 +41,7 @@
             nt.nodes = nt.allNodes;
             nt.showSearchingIcon = false;
             nt.showDataIndicator = true;
-            nt.placeholderText = "Search";
+            nt.placeholderText = "Filter";
         });
 
         $scope.$watch("nt.searchText", function (newValue) {
@@ -79,27 +79,14 @@
             nt.showDataIndicator = (nt.nodes.length > 0);
         };
 
-        function getElementsStartsWithId (id) {
-            var children = document.body.getElementsByTagName('*'),
-                elements = [],
-                child,
-                i = 0,
-                length = 0;
-            console.log(children);
+        nt.nodeSelected = function (nodeId) {
+            nt.selectedNode = nodeId;
+            NewTreeService.showElement(nodeId);
+        };
 
-            for (i = 0, length = children.length; i < length; i += 1) {
-                child = children[i];
-                if (child.id.search(id) !== -1) {
-                    elements.push(child);
-                }
-            }
-            return elements;
-        }
-
-        nt.find = function () {
-            //var root = angular.element(document.querySelector("#scenetree"));
-            var elements = getElementsStartsWithId("cenetree");
-            console.log(elements);
+        nt.nodeToggled = function (nodeId) {
+            nt.toggledNode = nodeId;
+            NewTreeService.toggleNode(nodeId);
         };
     }
 }());

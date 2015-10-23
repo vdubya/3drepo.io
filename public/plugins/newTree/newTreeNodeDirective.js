@@ -28,7 +28,11 @@
             link: link,
             scope: {
                 node: "=",
-                showChildren: "="
+                showChildren: "=",
+                onNodeSelected: "&onNodeSelected",
+                onNodeToggled: "&onNodeToggled",
+                selectedNode: "=",
+                toggledNode: "="
             },
             controller: NewTreeNodeCtrl,
             controllerAs: 'tn',
@@ -37,7 +41,7 @@
 
         function link(scope, element) {
             if (angular.isArray(scope.tn.node.children)) {
-                $compile('<new-tree-nodes collection="tn.node.children" show-children="tn.showCollapseButton" ng-if="!tn.collapsed"></new-tree-nodes>')(scope, function(cloned){
+                $compile('<new-tree-nodes nodes="tn.node.children" show-children="tn.showCollapseButton" ng-if="!tn.collapsed" on-node-selected="tn.onNodeSelected({nodeId: nodeId})" on-node-toggled="tn.onNodeToggled({nodeId: nodeId})" selected-node="tn.selectedNode" toggled-node="tn.toggledNode"></new-tree-nodes>')(scope, function(cloned){
                     element.append(cloned);
                 });
             }
@@ -46,10 +50,14 @@
 
     NewTreeNodeCtrl.$inject = ['$scope'];
 
-    function NewTreeNodeCtrl($scope) {
+    function NewTreeNodeCtrl ($scope) {
         var tn = this;
         tn.collapsed = true;
         tn.showCollapseButton = false;
+        tn.toggleButtonClass = "btn btn-primary btn-xs";
+        tn.toggleState = true;
+        tn.selected = false;
+        tn.selectedClass = "tree-node-unselected";
 
         $scope.$watchGroup(["tn.node", "tn.showChildren"], function (newValues) {
             if (angular.isDefined(newValues[0]) && angular.isDefined(newValues[1])) {
@@ -57,8 +65,34 @@
             }
         });
 
-        tn.toggle = function() {
+        $scope.$watch("tn.selectedNode", function (newValue) {
+            if (angular.isDefined(newValue) && (newValue !== tn.node._id)) {
+                tn.selectedClass = "tree-node-unselected";
+                tn.selected = false;
+            }
+        });
+
+        $scope.$watch("tn.toggledNode", function (newValue) {
+            if (angular.isDefined(newValue) && (newValue !== tn.node._id)) {
+                tn.toggleButtonClass = "btn btn-primary btn-xs";
+                tn.toggleState = true;
+            }
+        });
+
+        tn.collapse = function () {
             tn.collapsed = !tn.collapsed;
+        };
+
+        tn.nodeSelected = function (nodeId) {
+            tn.onNodeSelected({nodeId: nodeId});
+            tn.selected = !tn.selected;
+            tn.selectedClass = tn.selected ? "tree-node-selected" : "tree-node-unselected";
+        };
+
+        tn.nodeToggled = function (nodeId) {
+            tn.onNodeToggled({nodeId: nodeId});
+            tn.toggleState = !tn.toggleState;
+            tn.toggleButtonClass = tn.toggleState ? "btn btn-primary btn-xs" : "btn btn-danger btn-xs";
         };
     }
 }());

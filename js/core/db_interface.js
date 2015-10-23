@@ -322,6 +322,31 @@ DBInterface.prototype.storeWalkthroughInfo = function(dbName, project, data, cal
     });
 };
 
+DBInterface.prototype.searchTree = function(dbName, project, branch, revision, searchstring, callback) {
+    "use strict";
+
+    var i,
+        length,
+        searchStringChars = searchstring.split(""),
+        regex = "",
+        regexStr = "",
+        filter = {};
+
+    for (i = 0, length = searchStringChars.length; i < length; i += 1) {
+        regexStr += "[" + searchStringChars[i] + searchStringChars[i].toUpperCase() + "]";
+    }
+    regex = new RegExp(regexStr);
+    filter = {
+        name: regex
+    };
+
+    dbConn(this.logger).filterColl(dbName, project + ".scene", filter, null, function(err, docs) {
+        if (err.value) return callback(err);
+
+        callback(responseCodes.OK, docs);
+    });
+};
+
 // TODO: Remove this, as it shouldn"t exist
 DBInterface.prototype.addToCurrentList = function(dbName, project, branch, objUUID, callback) {
 	"use strict";
