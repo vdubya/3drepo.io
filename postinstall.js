@@ -44,6 +44,7 @@ var public_files = {
 		sliderjs: '/public/js/external/bootstrap-slider.js',
 		angularsliderjs: '/public/js/external/slider.js',
 		socketio: '/public/js/external/socket.io.js',
+        uitree: '/public/js/external/angular-ui-tree.min.js',
 
 		// QR Code stuff
 		qrgrid: '/public/js/external/qrcode/grid.js',
@@ -72,7 +73,8 @@ var public_files = {
 		bootstrapcss: '/public/css/external/bootstrap.min.css',
 		jqueryuicss: '/public/css/external/jquery-ui.css',
 		repouicss : '/public/css/ui.css',
-		slidercss: '/public/css/external/bootstrap-slider.css'
+        slidercss: '/public/css/external/bootstrap-slider.css',
+        uitreecss: '/public/css/external/angular-ui-tree.min.css'
 	}
 }
 
