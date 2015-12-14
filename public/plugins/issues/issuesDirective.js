@@ -290,8 +290,8 @@
 		});
 		*/
 
+/*
 		$(document).on("partSelected", function(event, part, zoom) {
-			$scope.IssuesService.mapPromise.then(function () {
 				var projectParts = part.part.multiPart._xmlNode.id.split("__");
 
 				if (projectParts[0] === "model")
@@ -308,6 +308,7 @@
 				vm.selectedObjectId = projectParts[projectParts.length - 1];
 			});
 		});
+*/
 
 		/*
 		 * When a pin is clicked that make sure the issue sidebar

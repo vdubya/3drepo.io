@@ -15,131 +15,176 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var winston  = require("winston");
-var config   = require("./config.js");
-var shortid  = require("shortid");
-var C        = require("./constants");
-
-// Custom logging levels for logger
-var myCustomLevels = {
-    levels: {
-		error: 0,
-		warn: 1,
-		info: 2,
-		debug: 3,
-		trace: 4
-    },
-    colors: {
-        trace: "magenta",
-        debug: "white",
-        info: "yellow",
-        warn: "orange",
-        error: "red"
-    }
-};
-
-// Creates logger which outputs to both the console
-// and a log file simultaneously
-// Levels are set separately in the config.
-var logger = new(winston.Logger)({
-    levels: myCustomLevels.levels,
-    colors: myCustomLevels.colors,
-    transports: [
-
-    new(winston.transports.Console)({
-        colorize: true,
-        level: config.logfile.console_level,
-    }),
-
-    new(winston.transports.File)
-    ({
-        level: config.logfile.file_level,
-        filename: config.logfile.filename
-    })]
-
-});
-
-var repoLogger = function(req, id) {
-    "use strict";
-
-    var self = this instanceof repoLogger ? this : Object.create(repoLogger.prototype);
-
-    if (id === undefined)
-    {
-        self.uid = shortid.generate();
-    } else {
-        self.uid = id;
-    }
-
-    if (req)
-    {
-        self.session        = req.session;
-    }
-
-    self.logger = logger;
-    self.startTime = (new Date()).getTime();
-
-    return self;
-};
-
-repoLogger.prototype.logMessage = function(type, msg)
-{
+module.exports = (() => {
 	"use strict";
 
-    //console.log(type + ": " + (new Date()).toString() + "\t" + this.uid + "\t" + msg);
+	// Winston logger and Short ID imports
+	const winston = require("winston");
+	const shortid = require("shortid");
 
-    var currentTime  = (new Date()).getTime();
-    var timeDiff     = currentTime - this.startTime;
+	// 3D Repo config and constants
+	const C = require("./constants");
 
-    this.logger.log(type, (new Date()).toString() + "\t" + this.uid + "\t" + msg + " [" + timeDiff + " ms]");
-};
+	/**
+	 * [RepoCustomLevels List of logging levels: error, warn, info, debug, trace]
+	 * @type {Object}
+	 */
+	const RepoCustomLevels = {
+		levels: {},
+		colors: {}
+	};
 
-repoLogger.prototype.logInfo = function(msg) {
-	"use strict";
+	RepoCustomLevels.levels[C.LOG_ERROR] = 0;
+	RepoCustomLevels.levels[C.LOG_WARN] = 1;
+	RepoCustomLevels.levels[C.LOG_INFO] = 2;
+	RepoCustomLevels.levels[C.LOG_DEBUG] = 3;
+	RepoCustomLevels.levels[C.LOG_TRACE] = 4;
 
-	this.logMessage("info", msg);
-};
+	RepoCustomLevels.colors[C.LOG_ERROR] = "red";
+	RepoCustomLevels.colors[C.LOG_TRACE] = "magenta";
+	RepoCustomLevels.colors[C.LOG_INFO] = "yellow";
+	RepoCustomLevels.colors[C.LOG_WARN] = "blue";
+	RepoCustomLevels.colors[C.LOG_DEBUG] = "white";
 
-repoLogger.prototype.logError = function(msg) {
-	"use strict";
+	/**
+	 * [RepoLogger Internal logger factory]
+	 * @param {Request} req [Express request object]
+	 * @param {String} consoleLevel [Level of console logging]
+	 * @param {String} fileLevel [Level of file logging (null disables file logging)]
+	 * @param {String} fileName [File name to log to]
+	 * @param {String}  id  [Unique logging ID, if omitted a short ID is generated]
+	 */
+	var RepoLogger = function (req, consoleLevel, fileLevel, fileName, id) {
+		var self = this instanceof RepoLogger ? this : Object.create(RepoLogger.prototype);
 
-    this.logMessage("error", msg);
-};
+		// If an ID is provided then use it, otherwise generate one.
+		if (id === undefined) {
+			self.uid = shortid.generate();
+		} else {
+			self.uid = id;
+		}
 
-repoLogger.prototype.logDebug = function(msg) {
-	"use strict";
+		// Set-up logging transports (console and/or file)
+		const transports = [];
 
-	this.logMessage("debug", msg);
-};
+		transports.push(new(winston.transports.Console)({
+			colorize: true,
+			level: consoleLevel,
+		}));
 
-repoLogger.prototype.logWarning = function(msg) {
-	"use strict";
+		if (fileLevel) {
+			transports.push(new(winston.transports.File)
+				({
+					level: fileLevel,
+					filename: fileName
+				})
+			);
+		}
 
-    this.logMessage("warn", msg);
-};
+		self.logger = new(winston.Logger)({
+			levels: RepoCustomLevels.levels,
+			colors: RepoCustomLevels.colors,
+			transports: transports
+		});
 
-repoLogger.prototype.logTrace = function(msg) {
-    "use strict";
+		// Set the time the object is initialized
+		self.startTime = (new Date()).getTime();
 
-    this.logMessage("trace", msg);
-};
+		return self;
+	};
 
-module.exports.startRequest = function(req, res, next)
-{
-	"use strict";
+	/**
+	 * [logMessage Generic message logging function with timing function ]
+	 * @param  {String} type [Type of log matching one of defined error levels]
+	 * @param  {String} msg  [Message to be logged]
+	 */
+	RepoLogger.prototype.logMessage = function (type, msg) {
+		var currentTime = (new Date()).getTime();
+		var timeDiff = currentTime - this.startTime;
 
-    req[C.REQ_REPO] = {};
-	req[C.REQ_REPO].logger = new repoLogger(req); // Create logger for this request
-    req[C.REQ_REPO].logger.logInfo("BEGIN " + req.method + " " + req.url);
+		this.logger.log(type, (new Date()).toString() + "\t" + this.uid + "\t" + msg + " [" + timeDiff + " ms]");
+	};
 
-    next();
-};
+	/**
+	 * [logInfo Log an information message ]
+	 * @param  {String} msg  [Message to be logged]
+	 */
+	RepoLogger.prototype.logInfo = function (msg) {
+		this.logMessage(C.LOG_INFO, msg);
+	};
 
-module.exports.endRequest = function(req)
-{
-	"use strict";
-    req[C.REQ_REPO].logger.logInfo("END " + req.method + " " + req.url);
-};
+	/**
+	 * [logError Log an error message ]
+	 * @param  {String} msg  [Message to be logged]
+	 */
+	RepoLogger.prototype.logError = function (msg) {
+		this.logMessage(C.LOG_ERROR, msg);
+	};
 
-module.exports.systemLogger = new repoLogger(null, "system");
+	/**
+	 * [logDebug Log a debug message ]
+	 * @param  {String} msg  [Message to be logged]
+	 */
+	RepoLogger.prototype.logDebug = function (msg) {
+		this.logMessage(C.LOG_DEBUG, msg);
+	};
 
+	/**
+	 * [logWarning Log a warning message ]
+	 * @param  {String} msg [Message to be logged]
+	 */
+	RepoLogger.prototype.logWarning = function (msg) {
+		this.logMessage(C.LOG_WARN, msg);
+	};
+
+	/**
+	 * [logTrace Log a trace message ]
+	 * @param  {String} msg  [Message to be logged]
+	 */
+	RepoLogger.prototype.logTrace = function (msg) {
+		this.logMessage(C.LOG_TRACE, msg);
+	};
+
+	/**
+	 * [LoggerObject Returned from the logger constructor]
+	 * @type {Object}
+	 */
+	var LoggerObject = {};
+
+	// Middleware exposure of logger 
+
+	/**
+	 * [startRequest Called at the start of a request to initialize a personal logger]
+	 * @param  {Request}   req  [Express request object]
+	 * @param  {Response}  res  [Express response object]
+	 * @param  {Function}  next [Function next in the middleware]
+	 */
+	LoggerObject.startRequest = function (req, res, next) {
+		// Only import config on the first request, means system logger
+		// is always available even without config
+		const config = require("./config.js");
+
+		req[C.REQ_REPO] = {};
+		req[C.REQ_REPO].logger = new RepoLogger(req, config.logfile.console_level, config.logfile.file_level, config.logfile.filename); // Create logger for this request
+		req[C.REQ_REPO].logger.logInfo("BEGIN " + req.method + " " + req.url);
+
+		next();
+	};
+
+	/**
+	 * [endRequest Called at the end of a request to logger time taken]
+	 * @param  {Request} req [Express request object]
+	 */
+	LoggerObject.endRequest = function (req) {
+		req[C.REQ_REPO].logger.logInfo("END " + req.method + " " + req.url);
+	};
+
+	/**
+	 * [systemLogger System logger to use when not in a request]
+	 * @type {RepoLogger}
+	 */
+	LoggerObject.systemLogger = new RepoLogger(null, C.LOG_TRACE, null, null, C.LOG_SYSTEM);
+
+	return LoggerObject;
+
+}());

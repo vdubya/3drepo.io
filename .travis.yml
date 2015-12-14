@@ -1,4 +1,6 @@
 language: node_js
+services: 
+    - mongodb
 node_js:
     - "0.10"
 
@@ -6,3 +8,6 @@ notifications:
     email: 
         recipients:
             - team@3drepo.org
+
+before_script:
+    - mongo 
