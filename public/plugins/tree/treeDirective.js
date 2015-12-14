@@ -42,7 +42,10 @@
 			promise = null,
 			item = {},
 			i = 0,
-			length = 0;
+			length = 0,
+			levels = 4,
+			levelCount = 0;
+
 		vm.nodes = [];
 		vm.showTree = false;
 		vm.showFilterList = true;
@@ -50,7 +53,7 @@
 		vm.viewerSelectedObject = null;
 
 		promise = TreeService.init();
-		promise.then(function(data) {
+		promise.then(function (data) {
 			vm.showChildren = true;
 			vm.allNodes = [];
 			vm.allNodes.push(data.nodes);
@@ -58,7 +61,243 @@
 			vm.showTree = true;
 			vm.idToName = data.idToName;
 			vm.idToPath = data.idToPath;
+
+			initNodesToShow();
+			setupInfiniteScroll();
 		});
+
+		var initNodesToShow = function () {
+			vm.nodesToShow = [vm.allNodes[0]];
+			vm.nodesToShow[0].level = 0;
+			vm.nodesToShow[0].expanded = false;
+			vm.nodesToShow[0].hasChildren = true;
+			vm.nodesToShow[0].selected = false;
+			vm.nodesToShow[0].toggleState = "visible";
+		};
+
+		vm.expand = function (_id) {
+			var i,
+				j,
+				numChildren,
+				index = -1,
+				length,
+				endOfSplice = false;
+
+			for (i = 0, length = vm.nodesToShow.length; i < length; i += 1) {
+				if (vm.nodesToShow[i]._id === _id) {
+					index = i;
+					break;
+				}
+			}
+			if (index !== -1) {
+				if (vm.nodesToShow[index].hasChildren) {
+					if (vm.nodesToShow[index].expanded) {
+						while (!endOfSplice) {
+							if (angular.isDefined(vm.nodesToShow[index + 1]) && vm.nodesToShow[index + 1].path.indexOf(_id) !== -1) {
+								vm.nodesToShow.splice(index + 1, 1);
+							} else {
+								endOfSplice = true;
+							}
+						}
+					} else {
+						numChildren = vm.nodesToShow[index].children.length;
+						for (i = 0; i < numChildren; i += 1) {
+							vm.nodesToShow[index].children[i].expanded = false;
+							if (!vm.nodesToShow[index].children[i].hasOwnProperty("toggleState")) {
+								vm.nodesToShow[index].children[i].toggleState = vm.nodesToShow[index].toggleState;
+							}
+							vm.nodesToShow[index].children[i].level = vm.nodesToShow[index].level + 1;
+							vm.nodesToShow[index].children[i].hasChildren = vm.nodesToShow[index].children[i].children.length > 0;
+							vm.nodesToShow.splice(index + i + 1, 0, vm.nodesToShow[index].children[i]);
+						}
+					}
+					vm.nodesToShow[index].expanded = !vm.nodesToShow[index].expanded;
+				}
+			}
+		};
+
+		function expandToSelection(path, level) {
+			var i,
+				j,
+				length = 0,
+				pathLength,
+				childrenLength,
+				selectedId = path[path.length - 1],
+				selectedIndex = 0,
+				selectionFound = false;
+
+			for (i = 0, length = vm.nodesToShow.length; i < length; i += 1) {
+				if (vm.nodesToShow[i]._id === path[level]) {
+					vm.nodesToShow[i].expanded = true;
+					vm.nodesToShow[i].selected = false;
+					childrenLength = vm.nodesToShow[i].children.length;
+
+					if (level === (path.length - 2)) {
+						selectedIndex = i;
+					}
+
+					for (j = 0; j < childrenLength; j += 1) {
+						vm.nodesToShow[i].children[j].selected = (vm.nodesToShow[i].children[j]._id === selectedId);
+						vm.nodesToShow[i].children[j].toggleState = "visible";
+						vm.nodesToShow[i].children[j].hasChildren = vm.nodesToShow[i].children[j].children.length > 0;
+						if (vm.nodesToShow[i].children[j].selected) {
+							console.log(vm.nodesToShow[i].children[j]);
+							selectionFound = true;
+						}
+						if ((level === (path.length - 2)) && !selectionFound) {
+							selectedIndex += 1;
+						}
+						vm.nodesToShow[i].children[j].level = level + 1;
+						vm.nodesToShow.splice(i + j + 1, 0, vm.nodesToShow[i].children[j]);
+					}
+				}
+			}
+			if (level < (path.length - 2)) {
+				expandToSelection(path, (level + 1));
+			} else if (level === (path.length - 2)) {
+				vm.topIndex = selectedIndex - 2;
+			}
+		}
+
+		$(document).on("objectSelected", function (event, object, zoom) {
+			$timeout(function () {
+				if (angular.isUndefined(object)) {
+					vm.viewerSelectedObject = null;
+					vm.filterText = "";
+				} else {
+					var objectID = null;
+					var idParts = null;
+					var path = null;
+
+					if (object["multipart"]) {
+						idParts = object.id.split("__");
+					} else {
+						idParts = object.getAttribute("id").split("__");
+					}
+					path = vm.idToPath[idParts[idParts.length - 1]].split("__");
+
+					initNodesToShow();
+					expandToSelection(path, 0);
+				}
+			});
+		});
+
+		vm.toggleTreeNode = function (node) {
+			var i = 0,
+				j = 0,
+				k = 0,
+				nodesLength,
+				path,
+				parent = null,
+				nodeToggleState = "visible",
+				numInvisible = 0;
+
+			vm.toggledNode = node;
+
+			path = node.path.split("__");
+			path.splice(path.length - 1, 1);
+
+			for (i = 0, nodesLength = vm.nodesToShow.length; i < nodesLength; i += 1) {
+				// Set node toggle state
+				if (vm.nodesToShow[i]._id === node._id) {
+					vm.nodesToShow[i].toggleState = (vm.nodesToShow[i].toggleState === "visible") ? "invisible" : "visible";
+					nodeToggleState = vm.nodesToShow[i].toggleState;
+				}
+				// Set children to node toggle state
+				else if (vm.nodesToShow[i].path.indexOf(node._id) !== -1) {
+					vm.nodesToShow[i].toggleState = nodeToggleState;
+				}
+				// Get node parent
+				if (vm.nodesToShow[i]._id === path[path.length - 1]) {
+					parent = vm.nodesToShow[i];
+				}
+			}
+
+			// Set the toggle state of the nodes above
+			if (parent !== null) {
+				for (i = (path.length - 1); i >= 0; i -= 1) {
+					for (j = 0, nodesLength = vm.nodesToShow.length; j < nodesLength; j += 1) {
+						if (vm.nodesToShow[j]._id === path[i]) {
+							vm.nodesToShow[j].toggleState = "visible";
+							numInvisible = 0;
+							for (k = 0; k < vm.nodesToShow[j].children.length; k += 1) {
+								if (vm.nodesToShow[j].children[k].toggleState === "invisible") {
+									numInvisible += 1;
+									vm.nodesToShow[j].toggleState = "parentOfInvisible";
+								} else if (vm.nodesToShow[j].children[k].toggleState === "parentOfInvisible") {
+									vm.nodesToShow[j].toggleState = "parentOfInvisible";
+								}
+							}
+							if (numInvisible === vm.nodesToShow[j].children.length) {
+								vm.nodesToShow[j].toggleState = "invisible";
+							}
+						}
+					}
+				}
+			}
+			toggleNode(node);
+		};
+
+		var toggleNode = function (node) {
+			var map = [];
+			var pathArr = [];
+			for (var obj in vm.idToPath) {
+				if (vm.idToPath.hasOwnProperty(obj) && (vm.idToPath[obj].indexOf(node.path) !== -1)) {
+					pathArr = vm.idToPath[obj].split("__");
+					map.push(pathArr[pathArr.length - 1]);
+				}
+			}
+
+			ViewerService.defaultViewer.setVisibilityByID(map, (node.toggleState === "visible"));
+		};
+
+		vm.nodeSelected = function (nodeId) {
+			var map = [];
+			var pathArr = [];
+			for (var obj in vm.idToPath) {
+				if (vm.idToPath.hasOwnProperty(obj) && (vm.idToPath[obj].indexOf(nodeId) !== -1)) {
+					pathArr = vm.idToPath[obj].split("__");
+					map.push(pathArr[pathArr.length - 1]);
+				}
+			}
+
+			ViewerService.defaultViewer.selectPartsByID(map, false);
+		};
+
+
+		function setupInfiniteScroll() {
+			// Infinite items
+			vm.infiniteItemsTree = {
+				numLoaded_: 0,
+				toLoad_: 0,
+
+				getItemAtIndex: function (index) {
+					if (index > this.numLoaded_) {
+						this.fetchMoreItems_(index);
+						return null;
+					}
+
+					if (index < vm.nodesToShow.length) {
+						return vm.nodesToShow[index];
+					} else {
+						return null;
+					}
+				},
+
+				getLength: function () {
+					return this.numLoaded_ + 5;
+				},
+
+				fetchMoreItems_: function (index) {
+					if (this.toLoad_ < index) {
+						this.toLoad_ += 500;
+						$timeout(angular.noop, 300).then(angular.bind(this, function () {
+							this.numLoaded_ = this.toLoad_;
+						}));
+					}
+				}
+			};
+		}
 
 		$scope.$watch("vm.filterText", function (newValue) {
 			if (angular.isDefined(newValue)) {
@@ -91,7 +330,7 @@
 							vm.nodes[i].toggleState = true;
 							vm.nodes[i].class = "unselectedFilterItem";
 						}
-						setupInfiniteItems();
+						setupInfiniteItemsFilter();
 					});
 				}
 			}
@@ -111,12 +350,10 @@
 			if (vm.currentFilterItemSelected === null) {
 				vm.nodes[item.index].class = "selectedFilterItem";
 				vm.currentFilterItemSelected = item;
-			}
-			else if (item.index === vm.currentFilterItemSelected.index) {
+			} else if (item.index === vm.currentFilterItemSelected.index) {
 				vm.nodes[item.index].class = "unselectedFilterItem";
 				vm.currentFilterItemSelected = null;
-			}
-			else {
+			} else {
 				vm.nodes[vm.currentFilterItemSelected.index].class = "unselectedFilterItem";
 				vm.nodes[item.index].class = "selectedFilterItem";
 				vm.currentFilterItemSelected = item;
@@ -128,11 +365,11 @@
 			TreeService.toggleNode(item._id);
 		};
 
-		function setupInfiniteItems () {
-			vm.infiniteItems = {
+		function setupInfiniteItemsFilter() {
+			vm.infiniteItemsFilter = {
 				numLoaded_: 0,
 				toLoad_: 0,
-				getItemAtIndex: function(index) {
+				getItemAtIndex: function (index) {
 					if (index > this.numLoaded_) {
 						this.fetchMoreItems_(index);
 						return null;
@@ -152,34 +389,11 @@
 					if (this.toLoad_ < index) {
 						this.toLoad_ += 20;
 						$timeout(angular.noop, 300).then(angular.bind(this, function() {
-							this.numLoaded_ = this.toLoad_;
+						this.numLoaded_ = this.toLoad_;
 						}));
 					}
 				}
 			};
 		}
-
-		$(document).on("objectSelected", function(event, object, zoom) {
-			$timeout(function () {
-				if (angular.isUndefined(object)) {
-					vm.viewerSelectedObject = null;
-					vm.filterText = "";
-				}
-				else {
-				#### Holder - will cause merge conflict
-				}
-
-				$rootScope.$apply();
-			});
-		});
-
-		/*
-		$(document).on("partSelected", function(event, part, zoom) {
-			$scope.IssuesService.mapPromise.then(function () {
-				vm.viewerSelectedObject = $filter('filter')(vm.idToName, {_id: $scope.IssuesService.IDMap[part.partID]})[0];
-				vm.filterText = vm.viewSelectedObject;
-			});
-		});
-		*/
 	}
 }());

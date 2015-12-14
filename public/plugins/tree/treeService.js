@@ -52,26 +52,22 @@
 		};
 
 		var selectNode = function (nodeId) {
+			console.log(nodeId);
 			if (nodeId === currentSelectedNodeId) {
 				currentSelectedNodeId = null;
 				$(document).trigger("objectSelected", [undefined, true]);
-			}
-			else {
+			} else {
 				var rootObj = document.getElementById("model__" + nodeId);
 				currentSelectedNodeId = nodeId;
 				$(document).trigger("objectSelected", [rootObj, true]);
 			}
 		};
 
-		var toggleNode = function (nodeId) {
-			### Replace this
-		};
-
 		return {
 			init: init,
 			search: search,
-			selectNode: selectNode,
-			toggleNode: toggleNode
+			selectNode: selectNode
 		};
 	}
 }());
+
