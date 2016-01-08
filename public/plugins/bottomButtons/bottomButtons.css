@@ -33,3 +33,9 @@ bottom-buttons .actionButton {
 bottom-buttons .actionButton md-icon {
   color: rgba(0, 0, 0, 0.6) !important;
 }
+
+bottom-buttons .viewingOptionButtons {
+  position: absolute;
+  right: 0;
+  top: -102px;
+}

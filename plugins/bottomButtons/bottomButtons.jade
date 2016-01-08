@@ -1,17 +1,28 @@
-#leftButtons(ng-if="bb.showButtons")
+#leftButtons(ng-if="vm.showButtons")
 	md-button.md-fab.md-mini.actionButton(
-		ng-repeat="button in bb.leftButtons track by $index"
+		ng-repeat="button in vm.leftButtons track by $index"
 		ng-click="button.click()"
 		aria-label="{{button.label}}"
 	)
 		md-tooltip(md-direction="top") {{button.label}}
 		md-icon(md-font-icon="{{button.icon}}", class="fa")
+
+	.viewingOptionButtons(layout="column", ng-if="vm.showViewingOptionButtons")
+		md-button.md-fab.md-mini.actionButton(
+			ng-repeat="button in vm.viewingOptionButtons"
+			ng-click="button.click()"
+			aria-label="{{button.label}}"
+		)
+			md-tooltip(md-direction="top") {{button.label}}
+			md-icon(md-font-icon="{{button.icon}}", class="fa")
+
 div
-	md-button.md-fab.md-primary(ng-click="bb.toggleElements()", aria-label="Show buttons")
+	md-button.md-fab.md-primary(ng-click="vm.toggleElements()", aria-label="Show buttons")
 		md-icon#showButtonIcon(md-font-icon="fa-navicon", class="fa")
-#rightButtons(ng-if="bb.showButtons")
+
+#rightButtons(ng-if="vm.showButtons")
 	md-button.md-fab.md-mini.actionButton(
-		ng-repeat="button in bb.rightButtons track by $index"
+		ng-repeat="button in vm.rightButtons track by $index"
 		ng-click="button.click()"
 		aria-label="{{button.label}}"
 	)

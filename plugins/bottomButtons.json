@@ -5,8 +5,7 @@
             "bottomButtons/bottomButtonsDirective.js"
         ],
         "jade": [
-            {"template" : "bottomButtons/bottomButtons.jade", "id" : "bottomButtons.html"},
-            {"template" : "bottomButtons/help.jade", "id" : "help.html"}
+            {"template" : "bottomButtons/bottomButtons.jade", "id" : "bottomButtons.html"}
         ],
         "css" : [
             "bottomButtons/bottomButtons.css"
