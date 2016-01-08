@@ -220,66 +220,74 @@ var repoGetHandler = function(router, checkAccess){
 };
 
 
-repoGetHandler.prototype.getInternal = function(regex, queryDefaults, customCallback) {
+repoGetHandler.prototype.getInternal = function(regex, queryDefaults, customHeaders, customCallback) {
 	"use strict";
 
-	if (queryDefaults === undefined)
-	{
+	if (arguments.length === 3){
+		customHeaders = {};
+		customCallback = arguments[2];
+	}
+
+	if (queryDefaults === undefined){
 		queryDefaults = {};
 	}
 
 	var self = this;
 
-	if (customCallback === undefined)
-	{
-		self.router.get(regex, this.checkAccess, function(req, res, next) {
-			// Have we already processed this request
-			if (req[C.REQ_REPO].processed) {
-				return next();
+	self.router.get(regex, this.checkAccess, function(req, res, next) {
+
+		if (customHeaders){
+			Object.keys(customHeaders).forEach(key => {
+				res.header(key, customHeaders[key]);
+			});
+		}
+
+		if (req[C.REQ_REPO].processed) {
+			next();
+		} else {
+			
+			req[C.REQ_REPO].processed = true;
+
+			if(customCallback) {
+
+				customCallback(req, res, next);
+
 			} else {
-				req[C.REQ_REPO].processed = true;
-			}
 
-			req[C.REQ_REPO].logger.logInfo("Matched REGEX " + regex);
+				req[C.REQ_REPO].logger.logInfo("Matched REGEX " + regex);
 
-			var current_user = (req.session.hasOwnProperty(C.REPO_SESSION_USER)) ? req.session.user.username : "";
-			var format = req.params[C.REPO_REST_API_FORMAT];
+				var current_user = (req.session.hasOwnProperty(C.REPO_SESSION_USER)) ? req.session.user.username : "";
+				var format = req.params[C.REPO_REST_API_FORMAT];
 
-			var params = _.clone(req.params);
-			params.user  = current_user;
+				var params = _.clone(req.params);
+				params.user  = current_user;
 
-			if (req.query) {
-				params.query = _.clone(req.query);
-			} else {
-				params.query = {};
-			}
+				if (req.query) {
+					params.query = _.clone(req.query);
+				} else {
+					params.query = {};
+				}
 
-			for(var defValue in queryDefaults)
-			{
-				if(queryDefaults.hasOwnProperty(defValue))
+				for(var defValue in queryDefaults)
 				{
-					if (!params.query.hasOwnProperty(defValue))
+					if(queryDefaults.hasOwnProperty(defValue))
 					{
-						params.query[defValue] = queryDefaults[defValue];
+						if (!params.query.hasOwnProperty(defValue))
+						{
+							params.query[defValue] = queryDefaults[defValue];
+						}
 					}
 				}
-			}
 
-			regex = regex.replace(".:format", "");
-			regex = regex.replace(".:subformat?", "");
+				regex = regex.replace(".:format", "");
+				regex = regex.replace(".:subformat?", "");
 
-			self.transRouter(format, regex, req, res, next, params);
-		});
-	} else {
-		self.router.get(regex, this.checkAccess, function(req, res, next) {
-			if (req[C.REQ_REPO].processed) {
-				next();
-			} else {
-				req[C.REQ_REPO].processed = true;
-				customCallback(req, res, next);
+				self.transRouter(format, regex, req, res, next, params);
 			}
-		});
-	}
+			
+		}
+	});
+
 };
 
 repoGetHandler.prototype.transRouter = function(format, regex, req, res, next, params)
