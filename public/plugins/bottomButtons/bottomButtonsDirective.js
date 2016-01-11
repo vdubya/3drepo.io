@@ -32,9 +32,9 @@
         };
     }
 
-    BottomButtonsCtrl.$inject = ["$scope", "EventService", "ViewerService"];
+    BottomButtonsCtrl.$inject = ["EventService", "ViewerService"];
 
-    function BottomButtonsCtrl ($scope, EventService, ViewerService) {
+    function BottomButtonsCtrl (EventService, ViewerService) {
         var vm = this,
             defaultViewer = ViewerService.defaultViewer;
         vm.showButtons = true;
@@ -46,20 +46,23 @@
             vm.showButtons = !vm.showButtons;
         };
 
-        var turntable = function () {
-            defaultViewer.setNavMode("TURNTABLE");
-        };
+		var setViewingOption = function (index) {
+			if (angular.isDefined(index)) {
+				// Set the viewing mode
+				defaultViewer.setNavMode(vm.viewingOptions[index].mode);
 
-        var helicopter = function () {
-            defaultViewer.setNavMode("HELICOPTER");
-        };
+				// Replace this option with the current selected option
+				vm.otherViewingOptionsIndices[vm.otherViewingOptionsIndices.indexOf(index)] = vm.selectedViewingOptionIndex;
 
-        var walk = function () {
-            defaultViewer.setNavMode("WALK");
-        };
+				// Set up the new current selected option button
+				vm.selectedViewingOptionIndex = index;
+				vm.leftButtons[2] = vm.viewingOptions[index];
 
-		var toggleViewingOptionButtons = function () {
-			vm.showViewingOptionButtons = !vm.showViewingOptionButtons;
+				vm.showViewingOptionButtons = false;
+			}
+			else {
+				vm.showViewingOptionButtons = !vm.showViewingOptionButtons;
+			}
 		};
 
         var home = function () {
@@ -94,21 +97,22 @@
 			ViewerService.switchVR();
 		};
 
+		vm.viewingOptions = [
+			{mode: "TURNTABLE", label: "Turntable", icon: "fa-mouse-pointer", click: setViewingOption, index: 0},
+			{mode: "HELICOPTER", label: "Helicopter", icon: "fa-arrows", click: setViewingOption, index: 1},
+			{mode: "WALK", label: "Walk", icon: "fa-child", click: setViewingOption, index: 2}
+		];
+		vm.selectedViewingOptionIndex = 0;
+		vm.otherViewingOptionsIndices = [2, 1];
+
         vm.leftButtons = [];
+		vm.leftButtons.push({label: "Help", icon: "fa-question", click: toggleHelp});
 		vm.leftButtons.push({label: "Home", icon: "fa-home", click: home});
-        vm.leftButtons.push({label: "Turntable", icon: "fa-mouse-pointer", click: turntable});
-        vm.leftButtons.push({label: "Helicopter", icon: "fa-arrows", click: helicopter});
-        vm.leftButtons.push({label: "Walk", icon: "fa-child", click: toggleViewingOptionButtons});
+		vm.leftButtons.push(vm.viewingOptions[vm.selectedViewingOptionIndex]);
 
         vm.rightButtons = [];
-        vm.rightButtons.push({label: "Help", icon: "fa-question", click: toggleHelp});
         vm.rightButtons.push({label: "Full screen", icon: "fa-arrows-alt", click: enterFullScreen});
 		vm.rightButtons.push({label: "QR code", icon: "fa-qrcode", click: showQRCodeReader});
 		vm.rightButtons.push({label: "Oculus", icon: "fa-simplybuilt", click: enterOculusDisplay});
-
-		vm.viewingOptionButtons = [
-			{label: "Helicopter", icon: "fa-arrows", click: helicopter},
-			{label: "Turntable", icon: "fa-mouse-pointer", click: turntable}
-		];
     }
 }());
