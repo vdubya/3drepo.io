@@ -552,8 +552,12 @@ DBInterface.prototype.getIssueStatsForProjectList = function(projectList, callba
 	});
 };
 
-DBInterface.prototype.getUserInfo = function(username, callback) {
+DBInterface.prototype.getUserInfo = function(username, includeTimestamp, callback) {
 	var self = this;
+
+	if(arguments.length === 2) {
+		callback = includeTimestamp;
+	}
 
 	if(!username) {
 		return callback(responseCodes.USERNAME_NOT_SPECIFIED);
@@ -573,6 +577,8 @@ DBInterface.prototype.getUserInfo = function(username, callback) {
 	};
 
 	dbConn(self.logger).filterColl("admin", "system.users", filter, projection, function(err, coll) {
+		'use strict';
+
 		if(err.value) {
 			return callback(err);
 		}
@@ -623,7 +629,41 @@ DBInterface.prototype.getUserInfo = function(username, callback) {
 				});
 				*/
 
-				callback(responseCodes.OK, user);
+				// get project timestamp (if any)
+				if(includeTimestamp){
+					
+					let promises = [];
+					
+					user.projects.forEach(project => {
+						promises.push(new Promise((resolve, reject) => {
+							self.getHeadRevision(project.account, project.project, 'master', {timestamp : 1}, (res, doc) => {
+
+								project.timestamp = doc ? doc[0].timestamp : null
+								console.log(typeof project.timestamp)
+								resolve();
+							});
+						}));
+					});
+
+					//sort project by timestamp
+
+					user.projects.sort(function(a, b){
+						if(a.timestamp == null) {
+							return 1;
+						} else if(b.timestamp == null) {
+							return 0;
+						} else {
+							return b.timestamp - a.timestamp
+						}
+					});
+
+					Promise.all(promises).then(() => {
+						callback(responseCodes.OK, user);
+					});
+
+				} else { 
+					callback(responseCodes.OK, user);
+				}
 			});
 
 		} else {
@@ -1316,8 +1356,13 @@ DBInterface.prototype.getSIDMap = function(dbName, project, branch, revision, ca
 	});
 };
 
-DBInterface.prototype.getHeadRevision = function(dbName, project, branch, callback) {
+DBInterface.prototype.getHeadRevision = function(dbName, project, branch, projection, callback) {
 	'use strict';
+
+	if(arguments.length === 4){
+		callback = projection;
+		projection = null
+	}
 
 	let branch_id;
 
@@ -1333,7 +1378,7 @@ DBInterface.prototype.getHeadRevision = function(dbName, project, branch, callba
 
 	var self = this;
 
-	dbConn(self.logger).getLatest(dbName, project + ".history", historyQuery, null, function(err, doc) {
+	dbConn(self.logger).getLatest(dbName, project + ".history", historyQuery, projection, function(err, doc) {
 		if (err.value) { return callback(err); }
 
 		callback(responseCodes.OK, doc);

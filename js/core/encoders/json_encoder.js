@@ -379,7 +379,9 @@ exports.route = function(router)
 	});
 
 	router.get("json", "/:account", function(req, res, params, err_callback) {
-		dbInterface(req[C.REQ_REPO].logger).getUserInfo(params.account, function(err, user)
+		
+		var  getTimestamp = true;
+		dbInterface(req[C.REQ_REPO].logger).getUserInfo(params.account, getTimestamp, function(err, user)
 		{
 			if(err.value) {
 				err_callback(err);
