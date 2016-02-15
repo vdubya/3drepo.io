@@ -635,11 +635,9 @@ DBInterface.prototype.getUserInfo = function(username, includeTimestamp, callbac
 					let promises = [];
 					
 					user.projects.forEach(project => {
-						promises.push(new Promise((resolve, reject) => {
+						promises.push(new Promise((resolve) => {
 							self.getHeadRevision(project.account, project.project, 'master', {timestamp : 1}, (res, doc) => {
-
-								project.timestamp = doc ? doc[0].timestamp : null
-								console.log(typeof project.timestamp)
+								project.timestamp = doc ? doc[0].timestamp : null;
 								resolve();
 							});
 						}));
@@ -648,12 +646,12 @@ DBInterface.prototype.getUserInfo = function(username, includeTimestamp, callbac
 					//sort project by timestamp
 
 					user.projects.sort(function(a, b){
-						if(a.timestamp == null) {
+						if(a.timestamp === null) {
 							return 1;
-						} else if(b.timestamp == null) {
+						} else if(b.timestamp === null) {
 							return 0;
 						} else {
-							return b.timestamp - a.timestamp
+							return b.timestamp - a.timestamp;
 						}
 					});
 
@@ -727,11 +725,12 @@ DBInterface.prototype.getProjectBranchHeadRid = function(account, project, branc
     };
 
     dbConn(this.logger).getLatest(account, project + ".history", historyQuery, historyProjection, function (err, docs) {
-        if (err.value) return err_callback(err);
+        if (err.value) { return err_callback(err); }
         if (!docs.length) { return err_callback(responseCodes.PROJECT_HISTORY_NOT_FOUND); }
         callback(uuidToString(docs[0]._id));
     });
-}
+};
+
 DBInterface.prototype.getProjectInfo = function(account, project, callback) {
 	if(!project){
 		return callback(responseCodes.PROJECT_NOT_SPECIFIED);
@@ -1361,7 +1360,7 @@ DBInterface.prototype.getHeadRevision = function(dbName, project, branch, projec
 
 	if(arguments.length === 4){
 		callback = projection;
-		projection = null
+		projection = null;
 	}
 
 	let branch_id;
