@@ -557,6 +557,7 @@ DBInterface.prototype.getUserInfo = function(username, includeTimestamp, callbac
 
 	if(arguments.length === 2) {
 		callback = includeTimestamp;
+		includeTimestamp =  false;
 	}
 
 	if(!username) {
@@ -646,9 +647,9 @@ DBInterface.prototype.getUserInfo = function(username, includeTimestamp, callbac
 					//sort project by timestamp
 
 					user.projects.sort(function(a, b){
-						if(a.timestamp === null) {
+						if(!a.timestamp) {
 							return 1;
-						} else if(b.timestamp === null) {
+						} else if(!b.timestamp) {
 							return 0;
 						} else {
 							return b.timestamp - a.timestamp;
