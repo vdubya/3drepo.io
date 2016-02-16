@@ -62,7 +62,10 @@ angular.module('3drepo')
 						if (!(project['account'] in self.projectsGrouped)) {
 							self.projectsGrouped[project['account']] = [];
 						}
-						self.projectsGrouped[project['account']].push(project['project']);
+						self.projectsGrouped[project['account']].push({
+							project: project['project'],
+							timestamp: project['timestamp']
+						});
 					}
 				}
 

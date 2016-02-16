@@ -49,9 +49,14 @@
 							.account-projects
 								div(ng-repeat="project in projects")
 									.project-line
-										i.fa.fa-cube.menu-icon
-										span.commit-number
-											a(ng-href="{{'/' + account + '/' + project}}") {{project}}
+										.row
+											.col-md-4
+												i.fa.fa-cube.menu-icon
+												span.commit-number
+													a(ng-href="{{'/' + account + '/' + project}}") {{project.project}}
+											.col-md-5
+												span.project-owner
+													p {{project.timestamp}}
 				// project thumbnails
 				#projects-thumbnails.row(ng-show="view=='projects' && !projectsShowList")
 					.col-xs-12.unpadded.js-masonry(data-masonry-options='{ "itemSelector": ".item-masonry", "columnWidth": ".grid-sizer", "gutter": 0, "percentPosition": true}')
