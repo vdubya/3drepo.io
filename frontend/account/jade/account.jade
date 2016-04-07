@@ -1,6 +1,6 @@
 logout
 div(ng-if="!vm.state.project")
-	#account(layout="row")
+	//#account(layout="row")
 		div(layout="column", layout-fill, flex="20")
 			#logo(flex="15", layout="row", layout-align="center center")
 				img(src="/public/images/3drepo-logo-white.png", flex="70")
@@ -18,5 +18,26 @@ div(ng-if="!vm.state.project")
 				account-projects(flex account="vm.account" projects-grouped='vm.projectsGrouped')
 			md-tab(label="Profile")
 				account-profile(username="vm.username" first-name="vm.firstName" last-name="vm.lastName" email="vm.email")
+
+	//div(layout="row")
+		span(flex="20")
+		md-toolbar(class="md-primary" flex)
+			md-toolbar-tools(flex)
+				label.md-flex Projects
+		span(flex="20")
+
+	#account(layout="row")
+		span(flex="20")
+		span(flex="5")
+		div(layout="column", flex layout-align="start", layout-fill)
+			span(flex="10")
+			//.md-whiteframe-1dp
+				md-toolbar.md-primary
+					.md-toolbar-tools
+						label.md-flex Projects
+			account-projects(flex, account="vm.account", projects-grouped='vm.projectsGrouped')
+		span(flex="5")
+		span(flex="20")
+
 div(ng-if="vm.state.project")
-	project(account="vm.state.account" project="vm.state.project" branch="vm.state.branch" revision="vm.state.revision" state="vm.state")
+	project(account="vm.state.account", project="vm.state.project", branch="vm.state.branch", revision="vm.state.revision", state="vm.state")

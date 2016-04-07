@@ -6,19 +6,17 @@ login #login {
   background-size: contain;
 }
 
-login #loginContent {
-  padding-top: 50px;
-  background: rgba(63,81,181,0.7);
+login #loginContainer {
+  padding: 10px;
+}
+login #loginContainer .md-button {
+  margin-left: 2px;
 }
 
-login #loginTitle {
-  color: #ffffff;
-  margin: 50px 0 -10px 0;
-}
-
-login #loginSubTitle,
-login #loginVersion{
-  color: rgba(255,255,255,0.6);
+login #loginVersion {
+  color: rgba(0,0,0,.3);
+  font-size: 14px;
+  margin-right: 4px;
 }
 
 login md-input-container {
@@ -34,4 +32,10 @@ login md-input-container input {
 
 login #loginError {
   color: #F44336;
+  margin: 5px 0 0 2px;
+}
+
+/* Taken from Fareed's answer http://stackoverflow.com/a/14205976/782358 */
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px white inset;
 }

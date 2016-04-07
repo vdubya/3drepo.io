@@ -81,6 +81,18 @@
 				});
 				vm.accounts.push(account);
 			});
+
+			vm.projects = [];
+			angular.forEach(vm.projectsGrouped, function(value, key) {
+				angular.forEach(value, function(name) {
+					vm.projects.push({
+						account: key,
+						name: name
+					});
+				});
+			});
+
+
 			setupBid4FreeAccess();
 		});
 

@@ -46,6 +46,10 @@ account-dir #account md-tab-content div:first-child {
 }
 
 /** Account Projects **************************************************************************************************/
+account-projects {
+  display: block;
+}
+
 account-projects .dataContainer {
   height: calc(100% - 20px);
   overflow: auto;
