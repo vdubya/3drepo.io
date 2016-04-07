@@ -27,6 +27,7 @@
 		var obj = {},
 			deferred,
 			bid4free,
+			bid4free,
 			currentLanguage;
 
 		/**
