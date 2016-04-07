@@ -43,9 +43,9 @@
 		};
 	}
 
-	GroupsCtrl.$inject = ["$scope", "$timeout", "EventService", "GroupsService"];
+	GroupsCtrl.$inject = ["$scope", "$timeout", "$translate", "EventService", "GroupsService"];
 
-	function GroupsCtrl ($scope, $timeout, EventService, GroupsService) {
+	function GroupsCtrl ($scope, $timeout, $translate, EventService, GroupsService) {
 		var vm = this,
 			eventWatch,
 			promise,
@@ -62,9 +62,15 @@
 		vm.editingText = "Start";
 		vm.colourPickerColour = [255, 255, 255];
 		vm.toShow = "showLoading";
-		vm.loadingInfo = "Loading groups";
 		setContentHeight();
 		GroupsService.init(vm.account, vm.project);
+
+		/*
+		 * Translate
+		 */
+		$translate("Loading groups").then(function (value) {
+			vm.loadingInfo = value;
+		});
 
 		promise = GroupsService.getGroups();
 		promise.then(function (data) {

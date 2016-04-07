@@ -2,17 +2,17 @@ div(layout="column" layout-align="start")
 	.accountProfileUserInfo(layout="row" flex="50")
 		div(flex="45" layout-align="start")
 			md-input-container.md-block
-				label Username
+				label {{"Username" | translate}}
 				input(ng-model="vm.username" ng-disabled="true")
 			div(layout="row" layout-align="space-between")
 				md-input-container.md-block(flex="45")
-					label First name
+					label {"First name" | translate}}
 					input(ng-model="vm.firstName")
 				md-input-container.md-block(flex="45")
-					label Last name
+					label {"Last name" | translate}}
 					input(ng-model="vm.lastName")
 			md-input-container.md-block
-				label Email
+				label {{"Email" | translate}}
 				input(ng-model="vm.email", type="email")
 			div(layout="row", layout-align="start center")
 				md-button.md-accent(ng-click="vm.updateInfo()") Update

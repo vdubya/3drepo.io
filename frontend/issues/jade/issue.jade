@@ -39,7 +39,7 @@
 
 					// Assign role
 					md-menu(md-position-mode="target-right target", ng-if="vm.canModifyIssue")
-						md-button.md-primary(ng-click="vm.openAssignedRolesMenu($mdOpenMenu, $event)") Assign
+						md-button.md-primary(ng-click="vm.openAssignedRolesMenu($mdOpenMenu, $event)") {{"Assign" | translate}}
 						md-menu-content(width="4")
 							md-menu-item(ng-repeat="role in vm.roles")
 								md-list-item.issueRole
@@ -49,6 +49,6 @@
 									md-checkbox.md-secondary(ng-model="role.assigned", aria-label="Issue Assign")
 
 					// Close/Open issue
-					md-button.md-primary.md-accent(ng-click="vm.toggleCloseIssue()", ng-if="vm.canModifyIssue") Close
+					md-button.md-primary.md-accent(ng-click="vm.toggleCloseIssue()", ng-if="vm.canModifyIssue") {{"Close" | translate}}
 				.issueOpenContainer(ng-if="!vm.issueIsOpen")
 					md-button.md-primary.md-accent(ng-click="vm.toggleCloseIssue()", ng-if="vm.canModifyIssue") Open

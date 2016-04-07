@@ -3,7 +3,7 @@ div(ng-switch="vm.toShow")
 	// Add group
 	#groupsAdd(ng-switch-when="showAdd" layout-margin)
 		div(layout="column")
-			h4#addGroupTitle Add a new group
+			h4#addGroupTitle {{"Add a new group" | translate}}
 			md-input-container.md-block(md-no-float="")
 				input(placeholder="Name", ng-model="vm.name")
 			div(layout="row")
@@ -31,7 +31,7 @@ div(ng-switch="vm.toShow")
 		div(layout="row" layout-align="start center" flex)
 			md-switch(ng-model="vm.editingGroup" aria-label="Edit group" flex="30") {{vm.editingText}}
 			tdr-colour-picker(
-				title="Change Colour"
+				title="{{'Change Colour' | translate}}"
 				on-colour-change="vm.colourPickerChange(colour)"
 				offset="20 0" colour="vm.selectedGroup.color"
 				flex="60")
@@ -43,7 +43,7 @@ div(ng-switch="vm.toShow")
 	// Info
 	#groupsInfo(ng-switch-when="showInfo" layout="column")
 		.cardInfo
-			p There are currently no groups
+			p {{"There are currently no groups" | translate}}
 
 	// Loading
 	div(ng-switch-when="showLoading")
