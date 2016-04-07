@@ -5,7 +5,7 @@ div(layout="column", class="md-whiteframe-1dp")
 		div(class="md-toolbar-tools" flex)
 			span.statusIcon(class="fa", ng-class="vm.statusIcon", ng-click="vm.hideItem()" flex="none")
 			span(ng-if="!vm.showFilter" flex="50")
-				label(class="md-flex") {{vm.contentData.title}}
+				label(class="md-flex") {{vm.contentData.title | translate}}
 			#filterContainer
 			span(flex)
 

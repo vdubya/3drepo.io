@@ -37,11 +37,29 @@
 		};
 	}
 
-	AccountProfileCtrl.$inject = ["AccountService"];
+	AccountProfileCtrl.$inject = ["$scope", "AccountService", "$translate"];
 
-	function AccountProfileCtrl(AccountService) {
+	function AccountProfileCtrl($scope, AccountService, $translate) {
 		var vm = this,
 			promise;
+
+		/*
+		 * Init
+		 */
+		if (angular.isUndefined(AccountService.currentLanguage)) {
+			vm.language = "en";
+		}
+		else {
+			vm.language = AccountService.currentLanguage;
+		}
+
+		/*
+		 * Watch for language change
+		 */
+		$scope.$watch("vm.language", function (newValue) {
+			AccountService.currentLanguage = newValue;
+			$translate.use(newValue);
+		});
 
 		/**
 		 * Update the user info

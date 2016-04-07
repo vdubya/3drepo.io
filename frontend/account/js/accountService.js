@@ -25,7 +25,8 @@
 
 	function AccountService($http, $q, serverConfig) {
 		var obj = {},
-			deferred;
+			deferred,
+			currentLanguage;
 
 		/**
 		 * Get account data
@@ -39,7 +40,6 @@
 				.then(function (response) {
 					var i, length,
 						project, projectsGrouped;
-					console.log(response);
 
 					// Groups projects under accounts
 					projectsGrouped = {};
@@ -96,6 +96,18 @@
 
 			return deferred.promise;
 		};
+
+		/*
+		 * Get/set current language
+		 */
+		Object.defineProperty(
+			obj,
+			"currentLanguage",
+			{
+				get: function () {return currentLanguage;},
+				set: function (language) {currentLanguage = language;}
+			}
+		);
 
 		return obj;
 	}

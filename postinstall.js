@@ -40,6 +40,8 @@ var public_files = {
         angularanimatejs: '/public/js/external/angular-animate.min.js',
         angularariajs: '/public/js/external/angular-aria.min.js',
 		angularsanitizejs: '/public/js/external/angular-sanitize.min.js',
+		angulartranslate: '/public/js/external/angular-translate.min.js',
+		angulartranslateloaderstaticfiles: '/public/js/external/angular-translate-loader-static-files.min.js',
 
 		// QR Code stuff
 		qrgrid: '/public/js/external/qrcode/grid.js',
@@ -106,7 +108,9 @@ var internal_files = {
     'bower_components/angular-material/angular-material.min.css',
     'bower_components/angular-animate/angular-animate.min.js',
     'bower_components/angular-aria/angular-aria.min.js',
-	'bower_components/angular-sanitize/angular-sanitize.min.js'
+	'bower_components/angular-sanitize/angular-sanitize.min.js',
+	'bower_components/angular-translate/angular-translate.min.js',
+	'bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files.min.js'
 	],
 
 	x3dom_files: [
