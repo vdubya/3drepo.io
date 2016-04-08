@@ -15,10 +15,29 @@
 			md-divider
 
 md-grid-list(
-	md-cols="10"
-	md-row-height="80px"
-	md-gutter="200px")
-	md-grid-tile(ng-repeat="project in vm.projects" flex)
-		.md-whiteframe-1dp(flex)
-			p {{project.account}}
-			p {{project.name}}
+	md-cols-gt-md="4"
+	md-cols-md="3"
+	md-cols="2"
+	md-row-height="210px"
+	md-gutter="10px")
+	md-grid-tile(ng-repeat="project in vm.projects")
+		.md-whiteframe-1dp.accountProjectContainer(
+			flex
+			layout-fill
+			layout="column"
+			layout-align="start"
+			ng-click="vm.goToProject(project.account, project.name)")
+			md-toolbar.md-primary
+			.accountProjectInfo(flex)
+				.accountProjectThumbnail(flex)
+					img(ng-src="{{project.thumbnail}}" flex)
+				.accountProjectText
+					div
+						p.accountProjectSubtitle {{project.name}}
+					div(layout="row", layout-align="space-between")
+						p.accountProjectTitle {{project.account}}
+						div(layout="row", layout-align="center center")
+							p 7
+							md-icon(class="fa fa-circle-o", style="color:green")
+							p 2
+							md-icon(class="fa fa-circle-o", style="color:grey")

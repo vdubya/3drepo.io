@@ -6,6 +6,11 @@ login #login {
   background-size: contain;
 }
 
+login md-toolbar {
+  min-height: 20px;
+  height: 20px;
+}
+
 login #loginContainer {
   padding: 10px;
 }

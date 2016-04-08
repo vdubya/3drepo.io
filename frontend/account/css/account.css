@@ -85,6 +85,48 @@ account-projects .projects .md-button {
   margin-right: 20px !important;
 }
 
+account-projects .accountProjectContainer {
+  outline: none;
+}
+account-projects .accountProjectContainer md-toolbar {
+  min-height: 20px;
+  height: 20px;
+}
+account-projects .accountProjectContainer:hover {
+  cursor: pointer;
+}
+
+account-projects .accountProjectThumbnail {
+  padding: 5px;
+}
+account-projects .accountProjectThumbnail img {
+  width: 100%;
+  height:120px;
+}
+
+account-projects .accountProjectInfo:hover {
+  background: #E8EAF6;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+account-projects .accountProjectText {
+  outline: none;
+  padding-left: 10px;
+}
+account-projects .accountProjectText p {
+  margin: 0 0 10px;
+}
+account-projects .accountProjectText .accountProjectTitle {
+  color: #888888;
+}
+account-projects .accountProjectText .accountProjectSubtitle {
+  color: #555555;
+}
+account-projects .accountProjectText md-icon {
+  margin: -1px 4px 0;
+}
+
 /** Account Profile ***************************************************************************************************/
 account-profile .dataContainer {
   padding: 10px;
