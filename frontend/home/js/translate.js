@@ -25,6 +25,6 @@
 				suffix: '.json'
 			});
 			$translateProvider.preferredLanguage("en");
-			$translateProvider.useSanitizeValueStrategy("sanitize");
+			$translateProvider.useSanitizeValueStrategy("escape");
 		}]);
 })();

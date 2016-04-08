@@ -32,14 +32,13 @@
 		};
 	}
 
-	BottomButtonsCtrl.$inject = ["EventService"];
+	BottomButtonsCtrl.$inject = ["$translate", "EventService"];
 
-	function BottomButtonsCtrl (EventService) {
+	function BottomButtonsCtrl ($translate, EventService) {
 		var vm = this;
 		vm.showButtons = true;
 		vm.fullScreen = false;
 		vm.showViewingOptionButtons = false;
-		console.log(EventService);
 
 		vm.toggleElements = function () {
 			EventService.send(EventService.EVENT.TOGGLE_ELEMENTS);
@@ -95,57 +94,63 @@
 			EventService.send(EventService.EVENT.VIEWER.ENTER_VR);
 		};
 
-		vm.viewingOptions = [
-			{
+		vm.viewingOptions = [];
+		$translate("Walk").then(function (value) {
+			vm.viewingOptions.push({
 				mode: VIEWER_NAV_MODES.WALK,
-				label: "Walk",
+				label: value,
 				icon: "fa fa-child",
 				click: setViewingOption,
 				iconClass: "bottomButtomIconWalk"
-			},
-			{
+			});
+		});
+		$translate("Helicopter").then(function (value) {
+			vm.viewingOptions.push({
 				mode: VIEWER_NAV_MODES.HELICOPTER,
-				label: "Helicopter",
+				label: value,
 				icon: "icon icon_helicopter",
 				click: setViewingOption,
 				iconClass: "bottomButtomIconHelicopter"
-			},
-			{
+			});
+		});
+		$translate("Turntable").then(function (value) {
+			vm.viewingOptions.push({
 				mode: VIEWER_NAV_MODES.TURNTABLE,
-				label: "Turntable",
+				label: value,
 				icon: "icon icon_turntable",
 				click: setViewingOption
-			}
-		];
+			});
+		});
 		vm.selectedViewingOptionIndex = 2;
 
-		vm.leftButtons = [];
-		vm.leftButtons.push({
-			label: "Home",
-			icon: "fa fa-home",
-			click: home
+		$translate("Home").then(function (value) {
+			vm.leftButtons = [];
+			vm.leftButtons.push({
+				label: value,
+				icon: "fa fa-home",
+				click: home
+			});
+			vm.leftButtons.push(vm.viewingOptions[vm.selectedViewingOptionIndex]);
 		});
-		vm.leftButtons.push(vm.viewingOptions[vm.selectedViewingOptionIndex]);
+
 
 		vm.rightButtons = [];
-		//vm.rightButtons.push({label: "Full screen", icon: "fa fa-arrows-alt", click: enterFullScreen});
-		vm.rightButtons.push({
-			label: "QR code",
-			icon: "fa fa-qrcode",
-			click: showQRCodeReader
+
+		$translate("QR code").then(function (value) {
+			vm.rightButtons.push({
+				label: value,
+				icon: "fa fa-qrcode",
+				click: showQRCodeReader
+			});
 		});
-		/*
-		vm.rightButtons.push({
-			label: "Help",
-			icon: "fa fa-question",
-			click: toggleHelp
-		});
-		*/
-		vm.rightButtons.push({
-			label: "VR",
-			icon: "icon icon_cardboard",
-			click: enterOculusDisplay,
-			iconClass: "bottomButtomIconCardboard"
+
+		$translate("VR").then(function (value) {
+			vm.rightButtons.push({
+				label: value,
+				icon: "icon icon_cardboard",
+				click: enterOculusDisplay,
+				iconClass: "bottomButtomIconCardboard"
+			});
 		});
 	}
 }());

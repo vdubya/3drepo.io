@@ -38,9 +38,9 @@
         };
     }
 
-    PanelCtrl.$inject = ["$scope", "$window", "$timeout", "EventService"];
+    PanelCtrl.$inject = ["$scope", "$window", "$timeout", "$translate", "EventService"];
 
-    function PanelCtrl ($scope, $window, $timeout, EventService) {
+    function PanelCtrl ($scope, $window, $timeout, $translate, EventService) {
         var vm = this,
 			panelTopBottomGap = 40,
 			maxHeightAvailable = $window.innerHeight - panelTopBottomGap,
@@ -56,7 +56,8 @@
 		vm.activate = true;
 
         $scope.$watch(EventService.currentEvent, function (event) {
-			var i;
+			var i,
+				titles = [];
             if (event.type === EventService.EVENT.PANEL_CONTENT_SETUP) {
 				vm.contentItems = (event.value[vm.position]);
 				hideLastItemGap();
@@ -69,8 +70,17 @@
 							numNonFixedHeightPanelsShowing += 1;
 						}
 					}
+
+					titles.push(vm.contentItems[i].title);
 				}
-            }
+
+				// Translate the button labels
+				$translate(titles).then(function (values) {
+					for (i = 0; i < vm.contentItems.length; i += 1) {
+						vm.contentItems[i].titleTranslate = values[vm.contentItems[i].title];
+					}
+				});
+			}
             else if (event.type === EventService.EVENT.TOGGLE_ELEMENTS) {
                 vm.showPanel = !vm.showPanel;
             }

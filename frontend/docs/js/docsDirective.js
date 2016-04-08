@@ -35,23 +35,31 @@
 		};
 	}
 
-	DocsCtrl.$inject = ["$scope", "$mdDialog", "EventService", "DocsService"];
+	DocsCtrl.$inject = ["$scope", "$mdDialog", "$translate", "EventService", "DocsService"];
 
-	function DocsCtrl($scope, $mdDialog, EventService, DocsService) {
+	function DocsCtrl($scope, $mdDialog, $translate, EventService, DocsService) {
 		var vm = this,
 			promise,
 			docTypeHeight = 50,
 			allDocTypesHeight,
 			currentOpenDocTypes = [],
-			eventWatch;
+			eventWatch,
+			infoText = "";
 
 		/*
 		 * Init
 		 */
 		vm.showDocsGetProgress = false;
 		vm.showInfo = true;
-		vm.info = "No object currently selected";
 		vm.onContentHeightRequest({height: 80});
+
+		/*
+		 * Translate
+		 */
+		$translate("No object currently selected").then(function (value) {
+			infoText = value;
+			vm.info = infoText;
+		});
 
 		/**
 		 * Get any documents associated with an object
@@ -104,7 +112,7 @@
 				else if (event.type === EventService.EVENT.VIEWER.BACKGROUND_SELECTED) {
 					vm.docs = [];
 					vm.showInfo = true;
-					vm.info = "No object currently selected";
+					vm.info = infoText;
 					vm.onContentHeightRequest({height: noObjectSelectedHeight});
 					currentOpenDocTypes = [];
 				}
