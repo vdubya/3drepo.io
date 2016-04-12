@@ -29,7 +29,7 @@
 // Set up REST routing calls
 exports.route = function(router)
 {
-	router.get("gltf", "/:account/:project/:uid", function(req, res, params, err_callback) {
+	router.get("gltf", "/:account/:project/revision/:rid", function(req, res, params, err_callback) {
         //The Repo IO server has no capability of generating gltfs on the fly.
         //So this is going to call the stash and see if we have a stashed gltf in the database
         //if not, just return a NOT_FOUND

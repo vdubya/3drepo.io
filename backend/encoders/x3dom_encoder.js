@@ -529,11 +529,11 @@ function X3D_AddChildren(xmlDoc, xmlNode, node, matrix, globalCoordOffset, globa
 
 			if ((mode == "mp") && (subMeshKeys.length > 1))
 			{
-				var mp = xmlDoc.createElement('MultiPart');
+				//var mp = xmlDoc.createElement('MultiPart');
+				var mp = xmlDoc.createElement("glTF");
 				mp.setAttribute('onload', 'onLoaded(event);');
 				mp.setAttribute('id', child['id']);
-				mp.setAttribute('url', config.api_server.url + '/' + account + '/' + project + '/' + child['id'] + '.x3d.mpc');
-				mp.setAttribute('urlIDMap', config.api_server.url + '/' + account + '/' + project + '/' + child['id'] + '.json.mpc');
+				mp.setAttribute('url', config.api_server.url + '/' + account + '/' + project + '/' + child['id'] + '.gltf');
 				mp.setAttribute('onclick', 'clickObject(event);');
 				mp.setAttribute('solid', 'true');
 				mp.setAttribute('onmouseover', 'onMouseOver(event);');
@@ -903,67 +903,103 @@ function X3D_AddGroundPlane(xmlDoc, bbox)
 function render(dbInterface, account, project, subFormat, branch, revision, callback) {
 	var full = (subFormat == "x3d");
 
-	dbInterface.getScene(account, project, branch, revision, full, function(err, doc) {
-		if(err.value) return callback(err);
-
+	if (subFormat === "gltf")
+	{
 		var xmlDoc = X3D_Header();
 
-		if (!doc.mRootNode)
+		var scene = xmlDoc.createElement('Scene');
+		scene.setAttribute('id', 'scene');
+		scene.setAttribute('dopickpass', 'false');
+
+		xmlDoc.firstChild.appendChild(scene);
+
+		if (revision)
 		{
-			return callback(responseCodes.ROOT_NODE_NOT_FOUND);
+			var gltf = xmlDoc.createElement("gltf");
+			var gltfURL = config.api_server.url + "/" + account + "/" + project + "/revision/"  + revision + ".gltf";
+
+			gltf.setAttribute("url", gltfURL);
+
+			scene.appendChild(gltf);
+
+			return callback(responseCodes.OK, new xmlSerial().serializeToString(xmlDoc));
+		} else {
+			dbInterface.getProjectBranchHeadRid(account, project, branch, function(err, revision) {
+				var gltf = xmlDoc.createElement("gltf");
+				var gltfURL = config.api_server.url + "/" + account + "/" + project + "/revision/"  + revision + ".gltf";
+
+				gltf.setAttribute("url", gltfURL);
+
+				scene.appendChild(gltf);
+
+				return callback(responseCodes.OK, new xmlSerial().serializeToString(xmlDoc));
+			});
 		}
 
-		var sceneRoot	= X3D_CreateScene(xmlDoc, doc.mRootNode);
 
-		// Hack for the demo, generate objects server side
-		json_objs = [];
+	} else {
+		dbInterface.getScene(account, project, branch, revision, full, function(err, doc) {
+			if(err.value) return callback(err);
 
-		var sceneBBoxMin = [];
-		var sceneBBoxMax = [];
+			var xmlDoc = X3D_Header();
 
-		var dummyRoot = { children: [doc.mRootNode] };
-
-		var mat = mathjs.eye(4);
-		var globalCoordOffset = null;
-		var globalCoordPromise = deferred();
-
-		X3D_AddChildren(xmlDoc, sceneRoot.root, dummyRoot, mat, globalCoordOffset, globalCoordPromise, dbInterface, account, project, subFormat, dbInterface.logger);
-
-		/*
-		// Compute the scene bounding box.
-		// Should be a better way of doing this.
-		for (var meshId in doc['meshes']) {
-			var mesh = doc['meshes'][meshId];
-			var bbox = repoNodeMesh.extractBoundingBox(mesh);
-
-			if (sceneBBoxMin.length)
+			if (!doc.mRootNode)
 			{
-				for(var idx = 0; idx < 3; idx++)
-				{
-					sceneBBoxMin[idx] = Math.min(sceneBBoxMin[idx], bbox.min[idx]);
-					sceneBBoxMax[idx] = Math.max(sceneBBoxMax[idx], bbox.max[idx]);
-				}
-			} else {
-				sceneBBoxMin = bbox.min.slice(0);
-				sceneBBoxMax = bbox.max.slice(0);
+				return callback(responseCodes.ROOT_NODE_NOT_FOUND);
 			}
-		}
 
-		var bbox	= {};
-		bbox.min	= sceneBBoxMin;
-		bbox.max	= sceneBBoxMax;
-		bbox.center = [0.5 * (bbox.min[0] + bbox.max[0]), 0.5 * (bbox.min[1] + bbox.max[1]), 0.5 * (bbox.min[2] + bbox.max[2])];
-		bbox.size	= [(bbox.max[0] - bbox.min[0]), (bbox.max[1] - bbox.min[1]), (bbox.max[2] - bbox.min[2])];
-		*/
+			var sceneRoot	= X3D_CreateScene(xmlDoc, doc.mRootNode);
 
-		var bbox = repoNodeMesh.extractBoundingBox(doc.mRootNode);
+			// Hack for the demo, generate objects server side
+			json_objs = [];
 
-		//X3D_AddGroundPlane(xmlDoc, bbox);
-		X3D_AddViewpoint(xmlDoc, sceneRoot.scene, account, project, bbox);
-		//X3D_AddLights(xmlDoc, bbox);
+			var sceneBBoxMin = [];
+			var sceneBBoxMax = [];
 
-		return callback(responseCodes.OK, new xmlSerial().serializeToString(xmlDoc));
-	});
+			var dummyRoot = { children: [doc.mRootNode] };
+
+			var mat = mathjs.eye(4);
+			var globalCoordOffset = null;
+			var globalCoordPromise = deferred();
+
+			X3D_AddChildren(xmlDoc, sceneRoot.root, dummyRoot, mat, globalCoordOffset, globalCoordPromise, dbInterface, account, project, subFormat, dbInterface.logger);
+
+			/*
+			// Compute the scene bounding box.
+			// Should be a better way of doing this.
+			for (var meshId in doc['meshes']) {
+				var mesh = doc['meshes'][meshId];
+				var bbox = repoNodeMesh.extractBoundingBox(mesh);
+
+				if (sceneBBoxMin.length)
+				{
+					for(var idx = 0; idx < 3; idx++)
+					{
+						sceneBBoxMin[idx] = Math.min(sceneBBoxMin[idx], bbox.min[idx]);
+						sceneBBoxMax[idx] = Math.max(sceneBBoxMax[idx], bbox.max[idx]);
+					}
+				} else {
+					sceneBBoxMin = bbox.min.slice(0);
+					sceneBBoxMax = bbox.max.slice(0);
+				}
+			}
+
+			var bbox	= {};
+			bbox.min	= sceneBBoxMin;
+			bbox.max	= sceneBBoxMax;
+			bbox.center = [0.5 * (bbox.min[0] + bbox.max[0]), 0.5 * (bbox.min[1] + bbox.max[1]), 0.5 * (bbox.min[2] + bbox.max[2])];
+			bbox.size	= [(bbox.max[0] - bbox.min[0]), (bbox.max[1] - bbox.min[1]), (bbox.max[2] - bbox.min[2])];
+			*/
+
+			var bbox = repoNodeMesh.extractBoundingBox(doc.mRootNode);
+
+			//X3D_AddGroundPlane(xmlDoc, bbox);
+			X3D_AddViewpoint(xmlDoc, sceneRoot.scene, account, project, bbox);
+			//X3D_AddLights(xmlDoc, bbox);
+
+			return callback(responseCodes.OK, new xmlSerial().serializeToString(xmlDoc));
+		});
+	}
 };
 
 exports.route = function(router)

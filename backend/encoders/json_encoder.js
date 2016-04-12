@@ -445,6 +445,15 @@ exports.route = function(router)
 		});
 	});
 
+	router.get("json", "/:account/:project/revision/:rid/partitioning", function(req, res, params, err_callback) {
+
+		console.log(req.url);
+
+		dbInterface(req[C.REQ_REPO].logger).cacheFunction(params.account, params.project, req.url, "json_mpc", function(callback) {
+            err_callback(responseCodes.FILE_DOESNT_EXIST);
+		}, err_callback);
+	});
+
 	router.get("json", "/:account/:project/revision/:rid/readme", function(req, res, params, err_callback) {
 		dbInterface(req[C.REQ_REPO].logger).getReadme(params.account, params.project, params.rid, function(err, readme) {
 			if(err.value)

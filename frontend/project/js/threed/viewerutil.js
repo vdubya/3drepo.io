@@ -16,6 +16,8 @@
  **/
 
 var ViewerUtil;
+var ViewerUtilListeners = [];
+var ViewerUtilMyListeners = [];
 
 (function() {
 	"use strict";

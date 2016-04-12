@@ -132,11 +132,14 @@ var repoGetHandler = function(router, checkAccess){
 	// Get subtree for head revision for a branch, with (optional) depth query string parameter
 	self.getInternal("/:account/:project/revision/:branch/head/tree/:sid.:format.:subformat?");
 
-	// Get README for branch"s head revision
+	// Get README for branch's head revision
 	self.getInternal("/:account/:project/revision/:branch/head/readme.:format.:subformat?");
 
-	// Get README for branch"s head revision
+	// Get README for branch's head revision
 	self.getInternal("/:account/:project/revision/:branch/head/readme.:format.:subformat?");
+
+	// Get spatial partitioning for specific revision
+	self.getInternal("/:account/:project/revision/:rid/partitioning.:format.:subformat?");
 
 	// Get README for specific project revision
 	self.getInternal("/:account/:project/revision/:rid/readme.:format.:subformat?");
