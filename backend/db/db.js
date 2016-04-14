@@ -23,6 +23,8 @@
 
 	var config	  = require("../config.js");
 
+	var async = require("async");
+
 	var responseCodes = require("../response_codes.js");
 
 	var MongoClient = require("mongodb").MongoClient,
@@ -254,6 +256,84 @@
 			});
 		});
 	};
+
+	/*******************************************************************************
+	 * Constitute a file from a list of bytes from a GridFS file
+	 *
+	 * @param {string} dbName     - Database name to get the file from
+	 * @param {string} collName   - Collection to get the file from
+	 * @param {string} fileName   - File name to retrieve
+	 * @param {Array}  bytes      - An array of arrays of start and end byte positions
+	 * @param {function} callback - Callback function to return the file data
+	 *
+	 ******************************************************************************/
+	MongoWrapper.prototype.getGridFSBytes = function(dbName, collName, fileName, bytes, callback)
+	{
+		var self = this;
+
+		self.dbCallback(dbName, function (err, dbConn) {
+			if (err.value) {
+				return callback(err);
+			}
+
+			// Verify that the file exists
+			self.existsGridFSFile(dbName, collName, fileName, function(err, result) {
+				if (!result) {
+					return callback(responseCodes.FILE_DOESNT_EXIST);
+				}
+
+				if (err.value) {
+					return callback(err);
+				}
+
+				var options = {
+					root : collName
+				};
+
+				var grid = new GridStore(dbConn, fileName, "r", options);
+
+				grid.open(function (err, gs) {
+					if (err) {
+						return callback(responseCodes.DB_ERROR(err));
+					}
+
+					for (var i = 0; i < bytes.length; i++)
+					{
+						bytes[i] = [i].concat(bytes[i]);
+					}
+
+					async.concat(bytes, function(item, iter_callback) {
+						var index      = item[0];
+						var byteStart  = item[1];
+						var byteEnd    = item[2];
+						var byteLength = byteEnd - byteStart;
+
+						gs.seek(byteStart, function() {
+							gs.read(byteLength, function(err, data) {
+								if (err) {
+									console.log(err);
+									return iter_callback(responseCodes.DB_ERROR(err));
+								}
+
+								iter_callback(null, {index: index, data: data });
+							});
+						});
+					}, function(err, data) {
+						if (err)
+						{
+							return callback(err);
+						}
+
+						data.sort(function(a,b) { return a.index - b.index; });
+						data = data.map(function(item) { return item.data; });
+
+						callback(responseCodes.OK, Buffer.concat(data));
+					});
+				});
+			});
+		});
+	};
+
 
 	/*******************************************************************************
 	 * Store a file in the Grid FS store

@@ -2330,6 +2330,21 @@ DBInterface.prototype.appendMeshFiles = function(dbName, project, fromStash, uid
 	}
 };
 
+DBInterface.prototype.getGridFSBytes = function(dbName, collection, url, bytes, callback)
+{
+	"use strict";
+	var self = this;
+
+	dbConn(self.logger).getGridFSBytes(dbName, collection, url, bytes, function(err, data) {
+		if (err.value)
+		{
+			return callback(err);
+		}
+		
+		callback(responseCodes.OK, data);
+	});
+};
+
 DBInterface.prototype.cacheFunction = function(dbName, collection, url, format, generate, callback)
 {
 	"use strict";
