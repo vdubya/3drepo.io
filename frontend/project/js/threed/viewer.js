@@ -1660,7 +1660,8 @@ var VIEWER_NAV_MODES = Viewer.prototype.NAV_MODES = {
 	WALK: "WALK",
 	TURNTABLE: "TURNTABLE",
 	WAYFINDER: "WAYFINDER",
-	FLY: "FLY"
+	FLY: "FLY",
+	CAR: "CAR"
 };
 
 var VIEWER_EVENTS = Viewer.prototype.EVENT = {

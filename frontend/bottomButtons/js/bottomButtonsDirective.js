@@ -104,6 +104,12 @@
 				iconClass: "bottomButtomIconWalk"
 			},
 			{
+				mode: VIEWER_NAV_MODES.CAR,
+				label: "Car",
+				icon: "fa fa-car",
+				click: setViewingOption
+			},
+			{
 				mode: VIEWER_NAV_MODES.HELICOPTER,
 				label: "Helicopter",
 				icon: "icon icon_helicopter",
@@ -117,7 +123,7 @@
 				click: setViewingOption
 			}
 		];
-		vm.selectedViewingOptionIndex = 2;
+		vm.selectedViewingOptionIndex = 3;
 
 		vm.leftButtons = [];
 		vm.leftButtons.push({
