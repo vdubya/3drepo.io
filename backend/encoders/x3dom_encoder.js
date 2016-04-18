@@ -263,7 +263,7 @@ function det(mat) {
  * @param {string} project - Name of the project
  * @param {string} mode - Type of X3D being rendered
  *******************************************************************************/
-function X3D_AddChildren(xmlDoc, xmlNode, node, matrix, globalCoordOffset, globalCoordPromise, dbInterface, account, project, mode, logger)
+function X3D_AddChildren(xmlDoc, xmlNode, node, matrix, globalCoordOffset, globalCoordPromise, dbInterface, account, project, revision, mode, logger)
 {
 	if (!node.hasOwnProperty("children")) {
 		return globalCoordOffset;
@@ -321,7 +321,7 @@ function X3D_AddChildren(xmlDoc, xmlNode, node, matrix, globalCoordOffset, globa
 
 				var childGlobalCoordPromise = deferred();
 
-				X3D_AddChildren(xmlDoc, inlineNode, child, matrix, null, childGlobalCoordPromise, dbInterface, account, project, mode, logger);
+				X3D_AddChildren(xmlDoc, inlineNode, child, matrix, null, childGlobalCoordPromise, dbInterface, account, project, revision, mode, logger);
 			});
 		}
 		else if (child.type == "camera")
@@ -388,7 +388,7 @@ function X3D_AddChildren(xmlDoc, xmlNode, node, matrix, globalCoordOffset, globa
 			newNode.setAttribute("orientation", orientation.join(' '));
 
 			xmlNode.appendChild(newNode);
-			globalCoordOffset = X3D_AddChildren(xmlDoc, newNode, child, matrix, globalCoordOffset, globalCoordPromise, dbInterface, account, project, mode, logger);
+			globalCoordOffset = X3D_AddChildren(xmlDoc, newNode, child, matrix, globalCoordOffset, globalCoordPromise, dbInterface, account, project, revision, mode, logger);
 		}
 		else if (child.type == "transformation")
 		{
@@ -420,7 +420,7 @@ function X3D_AddChildren(xmlDoc, xmlNode, node, matrix, globalCoordOffset, globa
 			var transMatrix  = mathjs.matrix(child['matrix']);
 			newMatrix = mathjs.multiply(transMatrix, newMatrix);
 
-			globalCoordOffset = X3D_AddChildren(xmlDoc, newNode, child, newMatrix, globalCoordOffset, globalCoordPromise, dbInterface, account, project, mode, logger);
+			globalCoordOffset = X3D_AddChildren(xmlDoc, newNode, child, newMatrix, globalCoordOffset, globalCoordPromise, dbInterface, account, project, revision, mode, logger);
 		} else if(child.type === "material") {
 			 var appearance = xmlDoc.createElement("Appearance");
 
@@ -483,7 +483,7 @@ function X3D_AddChildren(xmlDoc, xmlNode, node, matrix, globalCoordOffset, globa
 				newNode.setAttribute('DEF', utils.uuidToString(child["shared_id"]));
 				appearance.appendChild(newNode);
 				xmlNode.appendChild(appearance);
-				globalCoordOffset = X3D_AddChildren(xmlDoc, appearance, child, matrix, globalCoordOffset, globalCoordPromise, dbInterface, account, project, mode, logger);
+				globalCoordOffset = X3D_AddChildren(xmlDoc, appearance, child, matrix, globalCoordOffset, globalCoordPromise, dbInterface, account, project, revision, mode, logger);
 		} else if (child['type'] == 'texture') {
 			newNode = xmlDoc.createElement('ImageTexture');
 			newNode.setAttribute('url', config.api_server.url + '/' + account + '/' + project + '/' + child['id'] + '.' + child['extension']);
@@ -497,7 +497,7 @@ function X3D_AddChildren(xmlDoc, xmlNode, node, matrix, globalCoordOffset, globa
 			texProperties.setAttribute('generateMipMaps', 'true');
 			newNode.appendChild(texProperties);
 
-			globalCoordOffset = X3D_AddChildren(xmlDoc, newNode, child, matrix, globalCoordOffset, globalCoordPromise, dbInterface, account, project, mode, logger);
+			globalCoordOffset = X3D_AddChildren(xmlDoc, newNode, child, matrix, globalCoordOffset, globalCoordPromise, dbInterface, account, project, revision, mode, logger);
 		} else if (child['type'] == 'map') {
 			if(!child['maptype'])
 				child['maptype'] = 'satellite';
@@ -547,6 +547,12 @@ function X3D_AddChildren(xmlDoc, xmlNode, node, matrix, globalCoordOffset, globa
 				}
 
 				xmlNode.appendChild(mp);
+			} else if ((mode == "gltf")) {
+				var gltf = xmlDoc.createElement("gltf");
+				var gltfURL = config.api_server.url + "/" + account + "/" + project + "/revision/"  + revision + ".gltf";
+
+				gltf.setAttribute("url", gltfURL);
+				xmlNode.appendChild(gltf);
 			} else {
 				for(var i = 0; i < subMeshKeys.length; i++)
 				{
@@ -566,7 +572,7 @@ function X3D_AddChildren(xmlDoc, xmlNode, node, matrix, globalCoordOffset, globa
 						shape.setAttribute('bboxSize', bbox.size);
 					}
 
-					globalCoordOffset = X3D_AddChildren(xmlDoc, shape, child, matrix, globalCoordOffset, globalCoordPromise, dbInterface, account, project, mode, logger);
+					globalCoordOffset = X3D_AddChildren(xmlDoc, shape, child, matrix, globalCoordOffset, globalCoordPromise, dbInterface, account, project, revision, mode, logger);
 
 					X3D_AddToShape(xmlDoc, shape, dbInterface, account, project, child, subMeshKeys[i],mode, logger);
 
@@ -903,103 +909,40 @@ function X3D_AddGroundPlane(xmlDoc, bbox)
 function render(dbInterface, account, project, subFormat, branch, revision, callback) {
 	var full = (subFormat == "x3d");
 
-	if (subFormat === "gltf")
-	{
+	dbInterface.getScene(account, project, branch, revision, full, function(err, doc) {
+		if(err.value) return callback(err);
+
 		var xmlDoc = X3D_Header();
 
-		var scene = xmlDoc.createElement('Scene');
-		scene.setAttribute('id', 'scene');
-		scene.setAttribute('dopickpass', 'false');
-
-		xmlDoc.firstChild.appendChild(scene);
-
-		if (revision)
+		if (!doc.mRootNode)
 		{
-			var gltf = xmlDoc.createElement("gltf");
-			var gltfURL = config.api_server.url + "/" + account + "/" + project + "/revision/"  + revision + ".gltf";
-
-			gltf.setAttribute("url", gltfURL);
-
-			scene.appendChild(gltf);
-
-			return callback(responseCodes.OK, new xmlSerial().serializeToString(xmlDoc));
-		} else {
-			dbInterface.getProjectBranchHeadRid(account, project, branch, function(err, revision) {
-				var gltf = xmlDoc.createElement("gltf");
-				var gltfURL = config.api_server.url + "/" + account + "/" + project + "/revision/"  + revision + ".gltf";
-
-				gltf.setAttribute("url", gltfURL);
-
-				scene.appendChild(gltf);
-
-				return callback(responseCodes.OK, new xmlSerial().serializeToString(xmlDoc));
-			});
+			return callback(responseCodes.ROOT_NODE_NOT_FOUND);
 		}
 
+		var sceneRoot	= X3D_CreateScene(xmlDoc, doc.mRootNode);
 
-	} else {
-		dbInterface.getScene(account, project, branch, revision, full, function(err, doc) {
-			if(err.value) return callback(err);
+		// Hack for the demo, generate objects server side
+		json_objs = [];
 
-			var xmlDoc = X3D_Header();
+		var sceneBBoxMin = [];
+		var sceneBBoxMax = [];
 
-			if (!doc.mRootNode)
-			{
-				return callback(responseCodes.ROOT_NODE_NOT_FOUND);
-			}
+		var dummyRoot = { children: [doc.mRootNode] };
 
-			var sceneRoot	= X3D_CreateScene(xmlDoc, doc.mRootNode);
+		var mat = mathjs.eye(4);
+		var globalCoordOffset = null;
+		var globalCoordPromise = deferred();
 
-			// Hack for the demo, generate objects server side
-			json_objs = [];
-
-			var sceneBBoxMin = [];
-			var sceneBBoxMax = [];
-
-			var dummyRoot = { children: [doc.mRootNode] };
-
-			var mat = mathjs.eye(4);
-			var globalCoordOffset = null;
-			var globalCoordPromise = deferred();
-
-			X3D_AddChildren(xmlDoc, sceneRoot.root, dummyRoot, mat, globalCoordOffset, globalCoordPromise, dbInterface, account, project, subFormat, dbInterface.logger);
-
-			/*
-			// Compute the scene bounding box.
-			// Should be a better way of doing this.
-			for (var meshId in doc['meshes']) {
-				var mesh = doc['meshes'][meshId];
-				var bbox = repoNodeMesh.extractBoundingBox(mesh);
-
-				if (sceneBBoxMin.length)
-				{
-					for(var idx = 0; idx < 3; idx++)
-					{
-						sceneBBoxMin[idx] = Math.min(sceneBBoxMin[idx], bbox.min[idx]);
-						sceneBBoxMax[idx] = Math.max(sceneBBoxMax[idx], bbox.max[idx]);
-					}
-				} else {
-					sceneBBoxMin = bbox.min.slice(0);
-					sceneBBoxMax = bbox.max.slice(0);
-				}
-			}
-
-			var bbox	= {};
-			bbox.min	= sceneBBoxMin;
-			bbox.max	= sceneBBoxMax;
-			bbox.center = [0.5 * (bbox.min[0] + bbox.max[0]), 0.5 * (bbox.min[1] + bbox.max[1]), 0.5 * (bbox.min[2] + bbox.max[2])];
-			bbox.size	= [(bbox.max[0] - bbox.min[0]), (bbox.max[1] - bbox.min[1]), (bbox.max[2] - bbox.min[2])];
-			*/
-
+		dbInterface.getProjectBranchHeadRid(account, project, branch, function(err, revision) {
+			X3D_AddChildren(xmlDoc, sceneRoot.root, dummyRoot, mat, globalCoordOffset, globalCoordPromise, dbInterface, account, project, revision, subFormat, dbInterface.logger);
 			var bbox = repoNodeMesh.extractBoundingBox(doc.mRootNode);
 
-			//X3D_AddGroundPlane(xmlDoc, bbox);
 			X3D_AddViewpoint(xmlDoc, sceneRoot.scene, account, project, bbox);
-			//X3D_AddLights(xmlDoc, bbox);
 
 			return callback(responseCodes.OK, new xmlSerial().serializeToString(xmlDoc));
 		});
-	}
+
+	});
 };
 
 exports.route = function(router)
