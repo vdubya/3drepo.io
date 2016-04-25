@@ -17,38 +17,51 @@
 
 (function() {
 	"use strict";
-	
+
 	angular.module("3drepo")
 	.controller("VRDemoCtrl", ["$scope", function($scope)
 	{
-		$scope.showMenu = true;
-		$scope.demoOne  = false;
-		$scope.demoTwo  = false;
-		
+		$scope.showMenu  = true;
+		$scope.demoOne   = false;
+		$scope.demoTwo   = false;
+		$scope.demoThree = false;
+
 		$scope.goDemoOne = function($event) {
 			$scope.showMenu = false;
 			$scope.demoOne = true;
 			$scope.demoTwo = false;
-			
+			$scope.demoThree = false;
+
 			$event.preventDefault();
 		};
-		
+
 		$scope.goDemoTwo = function($event) {
 			$scope.showMenu = false;
 			$scope.demoOne = false;
 			$scope.demoTwo = true;
-			
-			$event.preventDefault();			
+			$scope.demoThree = false;
+
+			$event.preventDefault();
 		};
-		
+
+		$scope.goDemoThree = function($event) {
+			$scope.showMenu = false;
+			$scope.demoOne = false;
+			$scope.demoTwo = false;
+			$scope.demoThree = true;
+
+			$event.preventDefault();
+		};
+
 		$scope.backToMenu = function() {
 			if (!document.webkitIsFullScreen && !document.msFullscreenElement && !document.mozFullScreen) {
 				$scope.showMenu = true;
 				$scope.demoOne = false;
 				$scope.demoTwo = false;
-			}			
+				$scope.demoThree = false;
+			}
 		};
-		
+
 		document.addEventListener("webkitfullscreenchange", $scope.backToMenu, false);
 		document.addEventListener("mozfullscreenchange", $scope.backToMenu, false);
 		document.addEventListener("fullscreenchange", $scope.backToMenu, false);

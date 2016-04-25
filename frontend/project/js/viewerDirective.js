@@ -55,19 +55,19 @@
 		v.branch   = v.branch ? v.branch : "master";
 		v.revision = v.revision ? v.revision : "head";
 
-		if (!angular.isDefined(v.eventService))
+		if (!angular.isDefined(v.myEventService))
 		{
-			v.EventService = EventService;
+			v.myEventService = EventService;
 		}
 
 		function errCallback(errorType, errorValue)
 		{
-			v.eventService.sendError(errorType, errorValue);
+			v.myEventService.sendError(errorType, errorValue);
 		}
 
 		function eventCallback(type, value)
 		{
-			v.eventService.send(type, value);
+			v.myEventService.send(type, value);
 		}
 
 		$scope.reload = function() {
@@ -129,7 +129,7 @@
 			});
 		};
 
-		$scope.$watch(v.eventService.currentEvent, function(event) {
+		$scope.$watch(v.myEventService.currentEvent, function(event) {
 			if (angular.isDefined(event) && angular.isDefined(event.type)) {
 				if (event.type === EventService.EVENT.VIEWER.START_LOADING) {
 					v.initialised.resolve();
@@ -217,9 +217,13 @@
 								event.value.promise.resolve(v.viewer.getCurrentViewpointInfo());
 							}
 						} else if (event.type === EventService.EVENT.VIEWER.SET_NAV_MODE) {
-							v.manager.getCurrentViewer().setNavMode(event.value.mode);
+							if (angular.isDefined(event.value.disableInteraction))
+							{
+								v.viewer.getScene()._x3domNode._nameSpace.doc.canvas.isMulti = event.value.disableInteraction;
+							} else {
+								v.viewer.setNavMode(event.value.mode);
+							}
 						} else if (event.type === EventService.EVENT.VIEWER.UPDATE_URL){
-							//console.log('update url!!');
 							$location.path("/" + v.account + '/' + v.project).search({at: event.value.at});
 						}
 					});
@@ -231,7 +235,9 @@
 
 		if (angular.isDefined(v.vrMode))
 		{
-				$scope.enterVR();
+			v.loaded.promise.then(function() {
+				v.oculus.switchVR(true);
+			});
 		}
 	}
 }());

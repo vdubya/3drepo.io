@@ -39,37 +39,40 @@ var Oculus = {};
 		this.oculus		= null;
 
 		this.viewer		= viewer;
-		
+
 		this.addInstructions = function() {
-			
+
 			var instruction = document.createElement("div");
 			instruction.setAttribute("id", "instructionCircle");
 			self.viewer.element.appendChild(instruction);
-	
+
 			instruction.addEventListener("click", function() {
 				self.viewer.switchFullScreen(self.vrHMD);
 				instruction.style.display = "none";
 			});
-			
+
 			var instructionImage = document.createElement("img");
 			instructionImage.setAttribute("id", "instructionImage");
 			instructionImage.setAttribute("src", "public/plugins/walkthroughVr/instruction_trans.gif");
 			instruction.appendChild(instructionImage);
-			
+
 			var instructionOK = document.createElement("div");
 			instructionOK.setAttribute("id", "instructionOK");
-			instructionOK.textContent = "OK";		
+			instructionOK.textContent = "OK";
 			instruction.appendChild(instructionOK);
 		};
 
-		this.switchVR = function()
+		this.switchVR = function(withInstructions)
 		{
 			var scene = self.viewer.scene;
 
 			if (!this.enabled)
 			{
-				self.addInstructions();
-				
+				if (withInstructions)
+				{
+					self.addInstructions();
+				}
+
 				// Add oculus eyes
 				var eyeGroup = document.createElement("group");
 				eyeGroup.setAttribute("def", "oculus");
@@ -185,14 +188,12 @@ var Oculus = {};
 				// Enable EXAMINE mode for compatibility with gyro
 				self.oldNavMode = self.viewer.nav.getAttribute("type");
 				self.viewer.nav.setAttribute("type", "EXAMINE");
-				
-				self.viewer.getScene()._x3domNode._nameSpace.doc.canvas.isMulti = true;
 
 				this.oldNavMode = self.viewer.currentNavMode;
 				self.viewer.setNavMode(self.viewer.NAV_MODES.FLY);
-				
+
 				this.enabled = true;
-				
+
 				self.viewer.removeLogo();
 			} else {
 				this.oculus.parentNode.removeChild(this.oculus);
@@ -221,11 +222,10 @@ var Oculus = {};
 
 				self.viewer.nav.setAttribute("type", self.oldNavMode);
 				self.oldNavMode = null;
-				
-				self.viewer.getScene()._x3domNode._nameSpace.doc.canvas.isMulti = false;
+
 				self.viewer.createBackground();
 				self.viewer.setNavMode(this.oldNavMode);
-				
+
 				self.viewer.addLogo();
 			}
 		};
@@ -279,7 +279,7 @@ var Oculus = {};
 				var w = self.viewer.runtime.getWidth() * (window.devicePixelRatio ? window.devicePixelRatio : 1);
 				var h = self.viewer.runtime.getHeight() * (window.devicePixelRatio ? window.devicePixelRatio : 1);
 
-				
+
 				// The image should be split across the longest dimension of the screen
 				var rotate = (h > w);
 
@@ -297,7 +297,7 @@ var Oculus = {};
 					self.viewer.runtime.canvas.doc.ctx.stateManager.viewport(w / 2,0,w / 2,h);
 					self.viewer.viewer.runtime.canvas.doc._scene._fgnd._webgl.render(self.viewer.viewer.runtime.canvas.doc.ctx.ctx3d, self.rightTex._x3domNode._webgl.fbo.tex);
 				}
-				
+
 				if (w !== self.lastW || h !== self.lastH)
 				{
 					var half = 0;
@@ -328,7 +328,7 @@ var Oculus = {};
 		};
 
 		this.exitFullscreen = function() {
-			//self.instruction.style.display = "none";			
+			//self.instruction.style.display = "none";
 			/*
 			if (!document.webkitIsFullScreen && !document.msFullscreenElement && !document.mozFullScreen && self.enabled) {
 				self.switchVR();

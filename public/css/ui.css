@@ -1732,10 +1732,10 @@ ul.fancytree-container li {
 }
 
 .VRDemoMenuItem {
-	height: 50%;
+	height: 33%;
 	text-align: center;
 	vertical-align: middle;
-	transform: translateY(50%);
+	transform: translateY(33%);
 	font-size: 400%;
 	cursor: pointer;
 	font-variant: small-caps;

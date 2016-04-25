@@ -59,7 +59,7 @@
 				$http.get(serverConfig.apiUrl(url))
 					.then(function(data) {
 						for (i = 0, length = data.data.length; i < length; i++) {
-							walkthroughs[projectKey][data.data[i].index] = data.data[i].cameraData;
+							walkthroughs[projectKey][data.data[i].index] = data.data[i].frames;
 						}
 
 						loading.resolve(walkthroughs[projectKey][index]);
@@ -85,7 +85,8 @@
 
         return {
             saveRecording: saveRecording,
-            getWalkthroughs: getWalkthroughs
+            getWalkthroughs: getWalkthroughs,
+            walkthroughs: walkthroughs
         };
     }
 }());
