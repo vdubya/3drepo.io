@@ -67,10 +67,10 @@
 		}
 		wt.disableInteraction = angular.isDefined(wt.disableInteraction);
 
-		wt.fps			 = angular.isDefined(wt.fps) ? wt.fps : DEFAULT_FRAMES_PER_SECOND;
+		wt.fps           = angular.isDefined(wt.fps) ? wt.fps : DEFAULT_FRAMES_PER_SECOND;
 
-		wt.rollerCoaster = angular.isDefined(wt.rollerCoaster);
-		wt.animate		 = angular.isDefined(wt.animate);
+		wt.enableRollerCoaster = angular.isDefined(wt.rollerCoaster);
+		wt.animate       = angular.isDefined(wt.animate);
 
 		wt.currentWalkthrough = wt.autoPlay ? parseInt(wt.autoPlay) : -1;
 
@@ -79,9 +79,9 @@
 		wt.isPlaying   = false;
 		wt.isRecording = false;
 
-		wt.playInterval		 = null;
+		wt.playInterval      = null;
 		wt.recordingInterval = null;
-		wt.userWatchDog		 = null;
+		wt.userWatchDog      = null;
 
 		wt.stop = function () {
 			if (wt.isPlaying)
@@ -140,11 +140,11 @@
 				wt.loading.then(function() {
 					EventService.send(EventService.EVENT.VIEWER.SET_CAMERA,
 					{
-						position:		   wt.frames[wt.frame].position,
-						up:				   wt.frames[wt.frame].up,
-						view_dir:		   wt.frames[wt.frame].view_dir,
-						rollerCoasterMode: wt.rollerCoaster,
-						animate:		   wt.animate
+						position:          wt.frames[wt.frame].position,
+						up:                wt.frames[wt.frame].up,
+						view_dir:          wt.frames[wt.frame].view_dir,
+						rollerCoasterMode: wt.enableRollerCoaster,
+						animate:           wt.animate
 					});
 
 					if (wt.frame === (wt.frames.length - 1)) {

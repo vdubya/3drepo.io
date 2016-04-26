@@ -35,6 +35,7 @@
 				name: "@",
 				autoInit: "@",
 				vrMode: "@",
+				gyroOn: "@",
 				eventService: "="
 			},
 			controller: ViewerCtrl,
@@ -87,6 +88,7 @@
 			}
 
 			v.viewer.init(options);
+
 			// TODO: Move this so that the attachment is contained
 			// within the plugins themselves.
 			// Comes free with oculus support and gamepad support
@@ -237,6 +239,13 @@
 		{
 			v.loaded.promise.then(function() {
 				v.oculus.switchVR(true);
+			});
+		}
+
+		if (angular.isDefined(v.gyroOn) && !angular.isDefined(v.vrMode))
+		{
+			v.loaded.promise.then(function() {
+				v.viewer.startGyro();
 			});
 		}
 	}

@@ -195,6 +195,7 @@ var Oculus = {};
 				this.enabled = true;
 
 				self.viewer.removeLogo();
+				self.viewer.startGyro();
 			} else {
 				this.oculus.parentNode.removeChild(this.oculus);
 
@@ -227,6 +228,8 @@ var Oculus = {};
 				self.viewer.setNavMode(this.oldNavMode);
 
 				self.viewer.addLogo();
+				self.viewer.endGyro();
+
 			}
 		};
 
@@ -238,40 +241,6 @@ var Oculus = {};
 
 			self.viewer.getViewArea().skipSceneRender = true;
 
-			self.gyroOrientation = null;
-
-			// This code handles gyroscopic sensors on a phone
-			if(window.DeviceOrientationEvent){
-				window.addEventListener("deviceorientation", function (event) {
-					self.gyroOrientation = event;
-				}, false);
-			}
-
-			self.viewer.runtime.enterFrame = function () {
-				if (self.gyroOrientation)
-				{
-					self.viewer.gyroscope(
-						self.gyroOrientation.alpha,
-						self.gyroOrientation.beta,
-						self.gyroOrientation.gamma
-					);
-
-					self.gyroOrientation = null;
-				} else if (self.vrSensor) {
-					var state = self.vrSensor.getState();
-					var h     = state.orientation;
-
-					if (h)
-					{
-						var vp     = self.viewer.getCurrentViewpoint()._x3domNode;
-						var flyMat = vp.getViewMatrix().inverse();
-						var q      = new x3dom.fields.Quaternion(h.x, h.y, h.z, h.w);
-
-						flyMat.setRotate(q);
-						vp.setView(flyMat.inverse());
-					}
-				}
-			};
 
 			self.viewer.runtime.exitFrame = function ()
 			{
