@@ -239,6 +239,15 @@
 								angular.isDefined(event.value.animate) ? event.value.animate : true,
 								event.value.rollerCoasterMode
 							);
+
+							if(v.viewer.plugins && v.viewer.plugins.mapTile){
+
+								setTimeout(function(){
+									v.mapTile.appendMapTileByViewPoint();
+								}, 1000);
+								
+							}
+
 						} else if (event.type === EventService.EVENT.VIEWER.GET_CURRENT_VIEWPOINT) {
 							if (angular.isDefined(event.value.promise)) {
 								event.value.promise.resolve(v.viewer.getCurrentViewpointInfo());

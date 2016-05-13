@@ -800,6 +800,7 @@ var os_clickBuildingObject  = ViewerUtil.eventFactory("os_clickBuildingObject");
 			b = rotatedViewAreaCoors[2];
 			c = rotatedViewAreaCoors[0];
 			d = rotatedViewAreaCoors[1];
+			
 		}
 
 
@@ -847,11 +848,16 @@ var os_clickBuildingObject  = ViewerUtil.eventFactory("os_clickBuildingObject");
 			var yCond = options.yCond;
 			var xCond = options.xCond;
 			var callback = options.callback;
+			var enlarge = 0;
+
+			if(lookingToInf){
+				enlarge = 0.4;
+			}
 
 			var horVecLen = LenVec2D([a[0], a[2]], [c[0], c[2]]);
 			var stepY = genStepY(a, horVecLen);
 
-			for(var ky = -stepY; ky <= 1 + stepY && yCond(); ky += stepY){
+			for(var ky = -stepY -enlarge; ky <= 1 + stepY + enlarge && yCond(); ky += stepY){
 
 				var startCoor = getCoorVertical(0, ky);
 				var endCoor = getCoorVertical(1, ky);
@@ -859,7 +865,7 @@ var os_clickBuildingObject  = ViewerUtil.eventFactory("os_clickBuildingObject");
 
 				var stepX = genStepX(startCoor, vertVecLen);
 
-				for(var kx = -stepX; kx <= 1 + stepX && xCond(); kx += stepX){
+				for(var kx = -stepX -enlarge; kx <= 1 + stepX + enlarge && xCond(); kx += stepX){
 
 					var coor = getCoorVertical(kx, ky);
 					callback(coor);
