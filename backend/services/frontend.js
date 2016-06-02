@@ -26,6 +26,9 @@ module.exports.createApp = function(serverConfig)
 	let fs = require("fs");
 	let jade = require("jade");
 
+	//let systemLogger = require("../logger.js").systemLogger;
+
+
 	let app = express();
 
 	app.use(compress({level:9}));
@@ -42,11 +45,42 @@ module.exports.createApp = function(serverConfig)
 	app.get("/public/plugins/base/config.js", function(req, res) {
 		let params = {};
 
-		if (config.api_server.use_location) {
-			params.config_js = "var server_config = {}; server_config.apiUrl = " + config.api_server.location_url;
-		} else {
-			params.config_js = "var server_config = {}; server_config.apiUrl = function(path) { return '" + config.api_server.url + "/' + path; };";
+		params.config_js = "var server_config = {};";
+
+		params.config_js += "server_config.apiUrls = {";
+
+		for (var k in config.apiUrls)
+		{
+			params.config_js += "\"" + k + "\" : [";
+			params.config_js += config.apiUrls[k].join(",");
+			params.config_js += "],";
 		}
+
+		params.config_js += "};\n";
+
+		var numApiUrlTypes = Object.keys(config.apiUrls).length;
+
+		params.config_js += "server_config.apiUrlCounter = {";
+
+		for (var k in config.apiUrls)
+		{
+			params.config_js += "\"" + k + "\" : 0,";
+		}
+
+		params.config_js += "};\n";
+
+		params.config_js += `server_config.apiUrl = function(type, path) {
+			var typeFunctions = server_config.apiUrls[type];
+			var functionIndex = this.apiUrlCounter[type] % typeFunctions.length;
+
+			this.apiUrlCounter[type] += 1;
+
+			return this.apiUrls[type][functionIndex](path);
+		};\n`;
+
+		params.config_js += "server_config.GET_API =  \"all\"\n";
+		params.config_js += "server_config.POST_API = (\"post\" in server_config.apiUrls) ? \"post\" : server_config.GET_API;\n";
+		params.config_js += "server_config.MAP_API = (\"map\" in server_config.apiUrls) ? \"map\" : server_config.GET_API;\n";
 
 		if("wayfinder" in config)
 		{
@@ -63,6 +97,9 @@ module.exports.createApp = function(serverConfig)
 		{
 			params.config_js += "\nserver_config.backgroundImage = '" + serverConfig.backgroundImage + "'";
 		}
+
+		params.config_js += "\nwindow.hostAlias = {};\n";
+		params.config_js += "\nwindow.hostAlias[\"3drepo_api\"] = function(path) { return server_config.apiUrl(server_config.GET_API, path); }\n";
 
 		params.config_js += "\nserver_config.return_path = '/';";
 
@@ -91,20 +128,23 @@ module.exports.createApp = function(serverConfig)
 							"viewpoints",
 							"issues",
 							"clip",
+							"building",
 							"bottomButtons",
-							"qrCodeReader",
 							"docs",
 							"utils",
 							"walkthroughVr",
 							"oculus",
 							"groups"
 						],
+						'url': '/:project?at&up&view',
 						"children" : [
 							{
 								"plugin": "bid4free",
+								'url': '/bid4free',
 								children: [
 									{
-										plugin: "bid4freeWorkspace"
+										plugin: "bid4freeWorkspace",
+										url: '/bid4freeWorkspace'
 									}
 								]
 							}

@@ -147,14 +147,17 @@ var Viewer = {};
 		};
 
 		this.removeLogo = function () {
-			var numLogos = this.logos.length - 1;
-			var widthPercentage = Math.floor(100 / numLogos) + "%";
+			if (self.logos.length)
+			{
+				var numLogos = this.logos.length - 1;
+				var widthPercentage = Math.floor(100 / numLogos) + "%";
 
-			self.logos[numLogos].parentNode.removeChild(self.logos[numLogos]);
+				self.logos[numLogos].parentNode.removeChild(self.logos[numLogos]);
 
-			self.logos.splice(numLogos,1);
+				self.logos.splice(numLogos,1);
 
-			self.updateLogoWidth(widthPercentage);
+				self.updateLogoWidth(widthPercentage);
+			}
 		};
 
 		this.updateLogoWidth = function(widthPercentage) {
@@ -165,8 +168,26 @@ var Viewer = {};
 			}
 		};
 
-		this.init = function() {
+		this.handleKeyPresses = function(e) {
+			if (e.charCode === "r".charCodeAt(0)) {
+				self.reset();
+				self.setApp(null);
+				self.setNavMode(self.NAV_MODES.WALK);
+				self.disableClicking();
+			} else if (e.charCode === "a".charCodeAt(0)) {
+				self.showAll();
+				self.enableClicking();
+			} else if (e.charCode === "u".charCodeAt(0)) {
+				self.revealAll();
+			}
+		};
+
+		this.init = function(options) {
 			if (!self.initialized) {
+
+				// Set option param from viewerDirective
+				self.options = options;
+
 				// If we have a viewer manager then it
 				// will take care of initializing the runtime
 				// else we'll do it ourselves
@@ -219,19 +240,7 @@ var Viewer = {};
 
 				self.loadViewpoint = self.name + "_default"; // Must be called after creating nav
 
-				self.viewer.addEventListener("keypress", function(e) {
-					if (e.charCode === "r".charCodeAt(0)) {
-						self.reset();
-						self.setApp(null);
-						self.setNavMode(self.NAV_MODES.WALK);
-						self.disableClicking();
-					} else if (e.charCode === "a".charCodeAt(0)) {
-						self.showAll();
-						self.enableClicking();
-					} else if (e.charCode === "u".charCodeAt(0)) {
-						self.revealAll();
-					}
-				});
+				self.viewer.addEventListener("keypress", self.handleKeyPresses);
 
 				self.initialized = true;
 
@@ -241,6 +250,12 @@ var Viewer = {};
 
 				self.enableClicking();
 
+
+				self.plugins = self.options.plugins;
+				Object.keys(self.plugins).forEach(function(key){
+					self.plugins[key].initCallback && self.plugins[key].initCallback(self);
+				});
+
 				callback(self.EVENT.READY, {
 					name: self.name,
 					model: self.modelString
@@ -248,13 +263,27 @@ var Viewer = {};
 			}
 		};
 
-		this.close = function() {
+		this.destroy = function() {
+			self.currentViewpoint._xmlNode.removeEventListener("viewpointChanged", self.viewPointChanged);
+			self.viewer.removeEventListener("mousedown", self.managerSwitchMaster);
+
+			self.removeLogo();
+
+			self.viewer.removeEventListener("mousedown", onMouseDown);
+			self.viewer.removeEventListener("mouseup", onMouseUp);
+			self.viewer.removeEventListener("keypress", self.handleKeyPresses);
+
 			self.viewer.parentNode.removeChild(self.viewer);
-			self.viewer = null;
+
+			ViewerUtil.offEventAll();
+
+			self.viewer = undefined;
 		};
 
 		// This is called when the X3DOM runtime is initialized
+		// member of x3dom.runtime instance
 		this.initRuntime = function() {
+
 			if (this.doc.id === self.name) {
 				self.runtime = this;
 
@@ -282,8 +311,6 @@ var Viewer = {};
 
 				self.setNavMode(self.defaultNavMode);
 			};
-
-			self.getCurrentViewpoint().addEventListener("viewpointChanged", self.viewPointChanged);
 
 			ViewerUtil.onEvent("onLoaded", function(objEvent) {
 				if (self.loadViewpoint) {
@@ -326,11 +353,18 @@ var Viewer = {};
 					self.pinSize = sceneSize / 20;
 				}
 
-				self.showAll();
+				//console.log('my op', options);
+
+				var options = self.options;
+				// don't show all if lat,lon,height is set in URL
+				if(options.showAll){
+					self.showAll();
+				}
 
 				if (!self.downloadsLeft) {
 					callback(self.EVENT.LOADED);
 				}
+
 			});
 		};
 
@@ -493,6 +527,10 @@ var Viewer = {};
 			ViewerUtil.onEvent("onMouseUp", functionToBind);
 		};
 
+		this.offMouseUp = function(functionToBind) {
+			ViewerUtil.offEvent("onMouseUp", functionToBind);
+		};
+
 		this.onMouseDown = function(functionToBind) {
 			ViewerUtil.onEvent("onMouseDown", functionToBind);
 		};
@@ -503,34 +541,45 @@ var Viewer = {};
 
 			if (pickingInfo.pickObj)
 			{
-				var account, project;
 
-				var projectParts = pickingInfo.pickObj._xmlNode ?
-					pickingInfo.pickObj._xmlNode.getAttribute("id").split("__") :
-					pickingInfo.pickObj.pickObj._xmlNode.getAttribute("id").split("__");
+					var account, project;
+					var projectParts = null;
 
-				var objectID = pickingInfo.pickObj.partID ?
-					pickingInfo.pickObj.partID :
-					projectParts[2];
+					if (pickingInfo.pickObj._xmlNode)
+					{
+						if (pickingInfo.pickObj._xmlNode.hasAttribute("id"))
+						{
+							projectParts = pickingInfo.pickObj._xmlNode.getAttribute("id").split("__");
+						}
+					} else {
+						projectParts = pickingInfo.pickObj.pickObj._xmlNode.getAttribute("id").split("__");
+					}
 
-				account = projectParts[0];
-				project = projectParts[1];
+					if (projectParts)
+					{
+						var objectID = pickingInfo.pickObj.partID ?
+							pickingInfo.pickObj.partID :
+							projectParts[2];
 
-				var inlineTransName = ViewerUtil.escapeCSSCharacters(account + "__" + project);
-				var projectInline = self.inlineRoots[inlineTransName];
-				var trans = projectInline._x3domNode.getCurrentTransform();
+						account = projectParts[0];
+						project = projectParts[1];
 
-				callback(self.EVENT.PICK_POINT, {
-					id: objectID,
-					position: pickingInfo.pickPos,
-					normal: pickingInfo.pickNorm,
-					trans: trans
-				});
-			} else {
-				callback(self.EVENT.PICK_POINT, {
-					position: pickingInfo.pickPos,
-					normal: pickingInfo.pickNorm
-				});
+						var inlineTransName = ViewerUtil.escapeCSSCharacters(account + "__" + project);
+						var projectInline = self.inlineRoots[inlineTransName];
+						var trans = projectInline._x3domNode.getCurrentTransform();
+
+						callback(self.EVENT.PICK_POINT, {
+							id: objectID,
+							position: pickingInfo.pickPos,
+							normal: pickingInfo.pickNorm,
+							trans: trans
+						});
+					} else {
+						callback(self.EVENT.PICK_POINT, {
+							position: pickingInfo.pickPos,
+							normal: pickingInfo.pickNorm
+						});
+					}
 			}
 		};
 
@@ -545,9 +594,12 @@ var Viewer = {};
 		};
 
 		this.viewPointChanged = function(event) {
+			//console.log('vp changed');
 			var vpInfo = self.getCurrentViewpointInfo();
 			var eye = vpInfo.position;
 			var viewDir = vpInfo.view_dir;
+
+			console.log(event.orientation);
 
 			if (self.currentNavMode === self.NAV_MODES.HELICOPTER) {
 				self.nav._x3domNode._vf.typeParams[0] = Math.asin(viewDir[1]);
@@ -990,15 +1042,23 @@ var Viewer = {};
 
 		this.pickObject = {};
 
-		this.pickPoint = function() {
+		this.pickPoint = function(x,y) {
 			var viewArea = self.getViewArea();
 			var scene = viewArea._scene;
+
+			if ((typeof x !== "undefined") && (typeof y !== "undefined"))
+			{
+				var viewMatrix = self.getViewArea().getViewMatrix();
+				var projMatrix = self.getViewArea().getProjectionMatrix();
+
+				viewArea._doc.ctx.pickValue(viewArea, x, y, 0, viewMatrix, projMatrix.mult(viewMatrix));
+			}
 
 			var oldPickMode = scene._vf.pickMode.toLowerCase();
 			scene._vf.pickMode = "idbuf";
 			scene._vf.pickMode = oldPickMode;
 
-			self.pickObject = ViewerUtil.cloneObject(viewArea._pickingInfo);
+			self.pickObject = viewArea._pickingInfo;
 			self.pickObject.part = null;
 			self.pickObject.partID = null;
 
@@ -1136,16 +1196,16 @@ var Viewer = {};
 			self.setCameraPosition(currentPos);
 		};
 
-		this.setCameraViewDir = function(viewDir, upDir) {
+		this.setCameraViewDir = function(viewDir, upDir, centerOfRotation) {
 			var currentPos = self.getCurrentViewpointInfo().position;
-			self.updateCamera(currentPos, upDir, viewDir);
+			self.updateCamera(currentPos, upDir, viewDir, centerOfRotation);
 		};
 
-		this.setCamera = function(pos, viewDir, upDir, animate, rollerCoasterMode) {
-			self.updateCamera(pos, upDir, viewDir, animate, rollerCoasterMode);
+		this.setCamera = function(pos, viewDir, upDir, centerOfRotation, animate, rollerCoasterMode) {
+			self.updateCamera(pos, upDir, viewDir, centerOfRotation, animate, rollerCoasterMode);
 		};
 
-		this.updateCamera = function(pos, up, viewDir, animate, rollerCoasterMode) {
+		this.updateCamera = function(pos, up, viewDir, centerOfRotation, animate, rollerCoasterMode) {
 			if (!viewDir)
 			{
 				viewDir = self.getCurrentViewpointInfo().view_dir;
@@ -1184,12 +1244,32 @@ var Viewer = {};
 				}
 			}
 
+			var x3domCenter = null;
+
+			if (!centerOfRotation)
+			{
+				var canvasWidth  = self.getViewArea()._doc.canvas.width;
+				var canvasHeight = self.getViewArea()._doc.canvas.height;
+
+				self.pickPoint(canvasWidth / 2, canvasHeight / 2);
+				x3domCenter = self.pickObject.pickPos;
+			} else {
+				x3domCenter = new x3dom.fields.SFVec3f(centerOfRotation[0], centerOfRotation[1], centerOfRotation[2]);
+			}
+
+			currViewpoint.setCenterOfRotation(x3domCenter);
+
 			if (self.linked) {
 				self.manager.switchMaster(self.handle);
 			}
 		};
 
 		this.linked = false;
+
+		this.managerSwitchMaster = function() {
+			self.manager.switchMaster(self.handle);
+		};
+
 		this.linkMe = function() {
 			// Need to be attached to the viewer master
 			if (!self.manager) {
@@ -1199,9 +1279,7 @@ var Viewer = {};
 			self.manager.linkMe(self.handle);
 			self.onViewpointChanged(self.manager.viewpointLinkFunction);
 
-			self.viewer.addEventListener("mousedown", function() {
-				self.manager.switchMaster(self.handle);
-			});
+			self.viewer.addEventListener("mousedown", self.managerSwitchMaster);
 
 			self.linked = true;
 		};
@@ -1237,9 +1315,9 @@ var Viewer = {};
 			var url = "";
 
 			if (revision === "head") {
-				url = server_config.apiUrl(account + "/" + project + "/revision/" + branch + "/head.x3d.gltf");
+				url = server_config.apiUrl(server_config.GET_API, account + "/" + project + "/revision/" + branch + "/head.x3d.gltf");
 			} else {
-				url = server_config.apiUrl(account + "/" + project + "/revision/" + revision + ".x3d.gltf");
+				url = server_config.apiUrl(server_config.GET_API, account + "/" + project + "/revision/" + revision + ".x3d.gltf");
 			}
 
 			self.account = account;
@@ -1701,5 +1779,6 @@ var VIEWER_EVENTS = Viewer.prototype.EVENT = {
 	CHANGE_PIN_COLOUR: "VIEWER_CHANGE_PIN_COLOUR",
 	REMOVE_PIN: "VIEWER_REMOVE_PIN",
 	ADD_PIN: "VIEWER_ADD_PIN",
-	MOVE_PIN: "VIEWER_MOVE_PIN"
+	MOVE_PIN: "VIEWER_MOVE_PIN",
+
 };
