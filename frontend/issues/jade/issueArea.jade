@@ -8,3 +8,14 @@ div(ng-if="!vm.data")
 
 #scribbleDisplay(ng-if="vm.data")
     img(ng-src="{{vm.scribble}}")
+
+#issueAreaTools(style="pointer-events:{{vm.pointerEvents}}", layout="row", ng-show="vm.showAreaTools")
+    md-button.md-accent.md-fab.md-mini(ng-click="vm.setPenSize('small')")
+        md-icon.angular-material-icons#issueAreaSmallPen mode_edit
+    md-button.md-accent.md-fab.md-mini(ng-click="vm.setPenSize('medium')")
+        md-icon.angular-material-icons#issueAreaMediumPen mode_edit
+    md-button.md-accent.md-fab.md-mini(ng-click="vm.setPenSize('large')")
+        md-icon.angular-material-icons mode_edit
+    span#issueAreaToolsDivider(flex)
+    md-button.md-accent.md-fab.md-mini(ng-click="vm.reset()")
+        md-icon.angular-material-icons clear

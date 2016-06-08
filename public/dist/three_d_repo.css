@@ -1194,6 +1194,31 @@ issue-area #scribbleDisplay img {
   left: -200%;
   right: -200%;
 }
+
+issue-area #issueAreaTools {
+  position: absolute;
+  top: 20px;
+  right: 100px;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.1);
+  height: 54px;
+}
+
+issue-area #issueAreaTools #issueAreaSmallPen {
+  font-size: 15px;
+  margin-top: 8px;
+}
+issue-area #issueAreaTools #issueAreaMediumPen {
+  font-size: 20px;
+  margin-top: 3px;
+}
+
+issue-area #issueAreaTools #issueAreaToolsDivider {
+  width: 1px;
+  height: 100%;
+  background: rgba(255,255,255,0.3);
+  margin: 0 5px;
+}
 login {
   position: absolute;
   top: 0;

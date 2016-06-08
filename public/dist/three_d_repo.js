@@ -9274,6 +9274,7 @@ var ViewerManager = {};
 					for (state in vm.state) {
 						if (vm.state.hasOwnProperty(state)) {
 							if ((state !== "loggedIn") && (typeof vm.state[state] === "string")) {
+								console.log(vm.state[state]);
 								goToUserPage = false;
 								break;
 							}
@@ -9507,8 +9508,10 @@ angular.module('3drepo')
             mouse_dragging = false,
             pen_col = "#FF0000",
             initialPenIndicatorSize = 10,
-            penIndicatorSize = initialPenIndicatorSize,
-            pen_size = penIndicatorSize,
+            //penIndicatorSize = initialPenIndicatorSize,
+            penIndicatorSize = 10,
+            penToIndicatorRatio = 0.8,
+            pen_size = penIndicatorSize * penToIndicatorRatio,
             mouseWheelDirectionUp = null,
             hasDrawnOnCanvas = false;
 
@@ -9530,9 +9533,7 @@ angular.module('3drepo')
                 vm.showPenIndicator = false;
                 resizeCanvas();
                 initCanvas(myCanvas);
-                if (angular.isDefined(vm.type)) {
-                    vm.canvasPointerEvents = (vm.type === "pin") ? "none" : "auto";
-                }
+                setup(vm.type);
             }
         });
 
@@ -9541,15 +9542,7 @@ angular.module('3drepo')
          */
         vm.eventsWatch = $scope.$watch(EventService.currentEvent, function(event) {
             if (event.type === EventService.EVENT.SET_ISSUE_AREA_MODE) {
-                if (event.value === "scribble") {
-                    setupScribble();
-                }
-                else if (event.value === "erase") {
-                    setupErase();
-                }
-                else if (event.value === "pin") {
-                    setupPin();
-                }
+                setup(event.value);
             }
             else if (event.type === EventService.EVENT.GET_ISSUE_AREA_PNG) {
                 var png = null;
@@ -9561,6 +9554,36 @@ angular.module('3drepo')
                 event.value.promise.resolve(png);
             }
         });
+
+		/**
+         * Reset
+         */
+        vm.reset = function () {
+            hasDrawnOnCanvas = false;
+            clearCanvas();
+        };
+
+		/**
+         * Set the pen size
+         * @param size
+         */
+        vm.setPenSize = function (size) {
+            switch (size) {
+                case "small":
+                    penIndicatorSize = 10;
+                    break;
+                case "medium":
+                    penIndicatorSize = 20;
+                    break;
+                case "large":
+                    penIndicatorSize = 30;
+                    break;
+                default:
+                    break;
+            }
+            penIndicator.css("font-size", penIndicatorSize + "px");
+            pen_size = penIndicatorSize * penToIndicatorRatio;
+        };
 
         /**
          * Make the canvas the same size as the area
@@ -9650,6 +9673,7 @@ angular.module('3drepo')
                 setPenIndicatorPosition(evt.layerX, evt.layerY);
             }, false);
 
+            /*
             canvas.addEventListener('wheel', function (evt) {
                 var penToIndicatorRation = 0.8;
 
@@ -9675,6 +9699,7 @@ angular.module('3drepo')
                     pen_size = (pen_size < 0) ? 0 : pen_size;
                 }
             }, false);
+            */
         }
 
         /**
@@ -9722,12 +9747,29 @@ angular.module('3drepo')
             context.lineCap = "round";
         }
 
+		/**
+         * Set up the area according to its type
+		 *
+         * @param type
+         */
+        function setup (type) {
+            if (type === "scribble") {
+                setupScribble();
+            }
+            else if (type === "erase") {
+                setupErase();
+            }
+            else if (type === "pin") {
+                setupPin();
+            }
+        }
+
         /**
          * Set up placing of the pin
          */
         function setupPin () {
-            console.log(1);
             vm.canvasPointerEvents = "none";
+            vm.showAreaTools = false;
         }
 
         /**
@@ -9738,6 +9780,8 @@ angular.module('3drepo')
             context.globalCompositeOperation = "destination-out";
             pen_col = "rgba(0, 0, 0, 1)";
             vm.canvasPointerEvents = "auto";
+            vm.showAreaTools = true;
+            vm.canvasPointerEvents = (vm.type === "pin") ? "none" : "auto";
         }
 
         /**
@@ -9749,6 +9793,7 @@ angular.module('3drepo')
             pen_col = "#FF0000";
             pen_size = penIndicatorSize;
             vm.canvasPointerEvents = "auto";
+            vm.showAreaTools = true;
         }
 
         /*
