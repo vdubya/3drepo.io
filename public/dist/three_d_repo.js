@@ -983,10 +983,12 @@ var os_clickBuildingObject  = ViewerUtil.eventFactory("os_clickBuildingObject");
 		this.viewer = viewer;
 		this.options = options;
 		this.eventCallback = eventCallback;
-
+		//default map tile source
+		this.source = 'os';
 		// add new event name to viewer
 		this.viewer.EVENT.OS_BUILDING_CLICK = 'VIEWER_OS_BUILDING_CLICK';
 		this.viewer.EVENT.UPDATE_URL = 'VIEWER_UPDATE_URL';
+		this.viewer.EVENT.CHANGE_MAP_TILE_SOURCE = 'VIEWER_CHANGE_MAP_TILE_SOURCE';
 
 		ViewerUtil.onEvent("os_clickBuildingObject", this.os_clickBuildingObject.bind(this));
 	}
@@ -1316,7 +1318,7 @@ var os_clickBuildingObject  = ViewerUtil.eventFactory("os_clickBuildingObject");
 
 	MapTile.prototype._moveMapImagesY = function (y){
 
-		this.viewer.imagesDoms.forEach(function(dom){
+		this.imagesDoms.forEach(function(dom){
 
 			var t = dom.getAttribute('translation').split(' ');
 
@@ -1430,6 +1432,10 @@ var os_clickBuildingObject  = ViewerUtil.eventFactory("os_clickBuildingObject");
 			this.imagesDoms = [];
 		}
 
+		if(!this.imageElementDoms){
+			this.imageElementDoms = [];
+		}
+
 		if(!this.addedMapImages[ox + ',' + oy]){
 
 			// console.log('ox, oy', ox, oy);
@@ -1437,14 +1443,15 @@ var os_clickBuildingObject  = ViewerUtil.eventFactory("os_clickBuildingObject");
 			// console.log('getSumSizeForXRow', self.getSumSizeForXRow(ox, oy))
 			// console.log('size form sum size', self.getSumSizeForXRow(ox, oy) / ox);
 
-			var dom = this.createMapImageTile(size, x + ox, y + oy, [
+			var tile = this.createMapImageTile(size, x + ox, y + oy, [
 				offsetX + this.getSumSizeForXRow(ox, oy),
 				mapHeight,
 				offsetY + this.getSumSize(oy)
 			]);
 
-			this.imagesDoms.push(dom);
-			this.viewer.getScene().appendChild(dom);
+			this.imagesDoms.push(tile.dom);
+			this.imageElementDoms.push(tile.imageElement);
+			this.viewer.getScene().appendChild(tile.dom);
 			this.addedMapImages[ox + ',' + oy] = 1;
 
 			return true;
@@ -1464,6 +1471,7 @@ var os_clickBuildingObject  = ViewerUtil.eventFactory("os_clickBuildingObject");
 			});
 		}
 		this.imagesDoms = [];
+		this.imageElementDoms = [];
 		this.addedMapImages = {};
 		this.mapSizes = [];
 	}
@@ -2051,6 +2059,36 @@ var os_clickBuildingObject  = ViewerUtil.eventFactory("os_clickBuildingObject");
 	};
 
 
+	MapTile.prototype.imageUrl = function(source, z, x, y){
+		if(source === 'os') {
+			return server_config.apiUrl(server_config.MAP_API, 'os/map-images/Outdoor/' + z + '/' + x + '/' + y + '.png')
+		} else if(source === 'google-satellite') {
+			return 'http://mt1.google.com/vt/lyrs=y&x='+x+'&y='+y+'&z='+z;
+		} else if(source === 'google-standard') {
+			return 'http://mt1.google.com/vt/lyrs=m&x='+x+'&y='+y+'&z='+z;
+		} else if(source === 'google-terrain') {
+			return 'http://mt1.google.com/vt/lyrs=p&x='+x+'&y='+y+'&z='+z;
+		} else if (source === 'openstreetmap') {
+			return 'http://a.tile.openstreetmap.org/'+z+'/'+x+'/'+y+'.png';
+		}
+	}
+
+	MapTile.prototype.changeTileImageSource = function(source){
+
+		var self = this;
+		this.source = source;
+		this.imageElementDoms.forEach(function(imageElement){
+			if(source === 'os'){
+				imageElement.dom.setAttribute("crossOrigin", "use-credentials");
+			} else {
+				imageElement.dom.setAttribute("crossOrigin", "");
+				imageElement.dom.removeAttribute("crossOrigin");
+			}
+
+			imageElement.dom.setAttribute('url', self.imageUrl(self.source, imageElement.z, imageElement.x, imageElement.y));
+		});
+	}
+
 	MapTile.prototype.createMapImageTile = function(size, x, y, t){
 
 		var shape = document.createElement("Shape");
@@ -2069,9 +2107,10 @@ var os_clickBuildingObject  = ViewerUtil.eventFactory("os_clickBuildingObject");
 		// material.setAttribute('transparency', 0.7)
 		// app.appendChild(material);
 
-
-		it.setAttribute("url", server_config.apiUrl(server_config.MAP_API, 'os/map-images/Outdoor/' + mapImagePosInfo.zoomLevel + '/' + x + '/' + y + '.png'));
-		it.setAttribute("crossOrigin", "use-credentials");
+		it.setAttribute("url", this.imageUrl(this.source, mapImagePosInfo.zoomLevel, x, y));
+		if(this.source === 'os'){
+			it.setAttribute("crossOrigin", "use-credentials");
+		}
 
 		app.appendChild(it);
 
@@ -2094,7 +2133,7 @@ var os_clickBuildingObject  = ViewerUtil.eventFactory("os_clickBuildingObject");
 		translate.setAttribute('translation', t.join(' '));
 		translate.appendChild(rotate);
 
-		return translate;
+		return {dom: translate, imageElement: {dom: it, z:mapImagePosInfo.zoomLevel, x:x, y:y}};
 	};
 
 	MapTile.prototype._vec3Len = function(vec){
@@ -11632,6 +11671,76 @@ angular.module('3drepo')
 }());
 
 /**
+ *	Copyright (C) 2014 3D Repo Ltd
+ *
+ *	This program is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU Affero General Public License as
+ *	published by the Free Software Foundation, either version 3 of the
+ *	License, or (at your option) any later version.
+ *
+ *	This program is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	GNU Affero General Public License for more details.
+ *
+ *	You should have received a copy of the GNU Affero General Public License
+ *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+(function () {
+	"use strict";
+
+	angular.module("3drepo")
+		.directive("maptile", maptile);
+
+	function maptile() {
+		return {
+			restrict: "EA",
+			templateUrl: "maptile.html",
+			scope: {
+				show: "=",
+				visible: "=",
+				onContentHeightRequest: "&"
+			},
+			controller: MaptileCtrl,
+			controllerAs: 'vm',
+			bindToController: true
+		};
+	}
+
+	MaptileCtrl.$inject = ["$scope", "$timeout", "EventService", "$http"];
+
+	function MaptileCtrl($scope, $timeout, EventService, $http) {
+		var vm = this;
+		vm.meta = {};
+		/*
+		 * Init
+		 */
+		 vm.maptilesource = 'os';
+		/*
+		 * Watch for show/hide of card
+		 */
+		$scope.$watch("vm.show", function (newValue) {
+
+		});
+
+		/*
+		 * Toggle the clipping plane
+		 */
+		$scope.$watch("vm.visible", function (newValue) {
+
+		});
+
+		/**
+		 * Toggle the closed status of an issue
+		 */
+		vm.changeMapTile = function() {
+			EventService.send(EventService.EVENT.VIEWER.CHANGE_MAP_TILE_SOURCE, vm.maptilesource);
+		};
+	}
+}());
+
+/**
  **  Copyright (C) 2014 3D Repo Ltd
  **
  **  This program is free software: you can redistribute it and/or modify
@@ -13862,6 +13971,17 @@ var Oculus = {};
 			]
 		});
 
+		panelCard.right.push({
+			type: "maptile",
+			title: "Map Tile",
+			show: true,
+			icon: "fa-cubes",
+			fixedHeight: true,
+			options: [
+			]
+		});
+
+
 		$scope.$watchGroup(["vm.account","vm.project"], function()
 		{
 			if (angular.isDefined(vm.account) && angular.isDefined(vm.project)) {
@@ -14344,6 +14464,8 @@ var Oculus = {};
 								view: event.value.view,
 								up: event.value.up
 							});
+						} else if (event.type === EventService.EVENT.VIEWER.CHANGE_MAP_TILE_SOURCE) {
+							v.mapTile.changeTileImageSource(event.value);
 						}
 					});
 				}

@@ -178,6 +178,17 @@
 			]
 		});
 
+		panelCard.right.push({
+			type: "maptile",
+			title: "Map Tile",
+			show: true,
+			icon: "fa-cubes",
+			fixedHeight: true,
+			options: [
+			]
+		});
+
+
 		$scope.$watchGroup(["vm.account","vm.project"], function()
 		{
 			if (angular.isDefined(vm.account) && angular.isDefined(vm.project)) {

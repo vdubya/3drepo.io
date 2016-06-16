@@ -26,10 +26,12 @@ var os_clickBuildingObject  = ViewerUtil.eventFactory("os_clickBuildingObject");
 		this.viewer = viewer;
 		this.options = options;
 		this.eventCallback = eventCallback;
-
+		//default map tile source
+		this.source = 'os';
 		// add new event name to viewer
 		this.viewer.EVENT.OS_BUILDING_CLICK = 'VIEWER_OS_BUILDING_CLICK';
 		this.viewer.EVENT.UPDATE_URL = 'VIEWER_UPDATE_URL';
+		this.viewer.EVENT.CHANGE_MAP_TILE_SOURCE = 'VIEWER_CHANGE_MAP_TILE_SOURCE';
 
 		ViewerUtil.onEvent("os_clickBuildingObject", this.os_clickBuildingObject.bind(this));
 	}
@@ -359,7 +361,7 @@ var os_clickBuildingObject  = ViewerUtil.eventFactory("os_clickBuildingObject");
 
 	MapTile.prototype._moveMapImagesY = function (y){
 
-		this.viewer.imagesDoms.forEach(function(dom){
+		this.imagesDoms.forEach(function(dom){
 
 			var t = dom.getAttribute('translation').split(' ');
 
@@ -473,6 +475,10 @@ var os_clickBuildingObject  = ViewerUtil.eventFactory("os_clickBuildingObject");
 			this.imagesDoms = [];
 		}
 
+		if(!this.imageElementDoms){
+			this.imageElementDoms = [];
+		}
+
 		if(!this.addedMapImages[ox + ',' + oy]){
 
 			// console.log('ox, oy', ox, oy);
@@ -480,14 +486,15 @@ var os_clickBuildingObject  = ViewerUtil.eventFactory("os_clickBuildingObject");
 			// console.log('getSumSizeForXRow', self.getSumSizeForXRow(ox, oy))
 			// console.log('size form sum size', self.getSumSizeForXRow(ox, oy) / ox);
 
-			var dom = this.createMapImageTile(size, x + ox, y + oy, [
+			var tile = this.createMapImageTile(size, x + ox, y + oy, [
 				offsetX + this.getSumSizeForXRow(ox, oy),
 				mapHeight,
 				offsetY + this.getSumSize(oy)
 			]);
 
-			this.imagesDoms.push(dom);
-			this.viewer.getScene().appendChild(dom);
+			this.imagesDoms.push(tile.dom);
+			this.imageElementDoms.push(tile.imageElement);
+			this.viewer.getScene().appendChild(tile.dom);
 			this.addedMapImages[ox + ',' + oy] = 1;
 
 			return true;
@@ -507,6 +514,7 @@ var os_clickBuildingObject  = ViewerUtil.eventFactory("os_clickBuildingObject");
 			});
 		}
 		this.imagesDoms = [];
+		this.imageElementDoms = [];
 		this.addedMapImages = {};
 		this.mapSizes = [];
 	}
@@ -1094,6 +1102,36 @@ var os_clickBuildingObject  = ViewerUtil.eventFactory("os_clickBuildingObject");
 	};
 
 
+	MapTile.prototype.imageUrl = function(source, z, x, y){
+		if(source === 'os') {
+			return server_config.apiUrl(server_config.MAP_API, 'os/map-images/Outdoor/' + z + '/' + x + '/' + y + '.png')
+		} else if(source === 'google-satellite') {
+			return 'http://mt1.google.com/vt/lyrs=y&x='+x+'&y='+y+'&z='+z;
+		} else if(source === 'google-standard') {
+			return 'http://mt1.google.com/vt/lyrs=m&x='+x+'&y='+y+'&z='+z;
+		} else if(source === 'google-terrain') {
+			return 'http://mt1.google.com/vt/lyrs=p&x='+x+'&y='+y+'&z='+z;
+		} else if (source === 'openstreetmap') {
+			return 'http://a.tile.openstreetmap.org/'+z+'/'+x+'/'+y+'.png';
+		}
+	}
+
+	MapTile.prototype.changeTileImageSource = function(source){
+
+		var self = this;
+		this.source = source;
+		this.imageElementDoms.forEach(function(imageElement){
+			if(source === 'os'){
+				imageElement.dom.setAttribute("crossOrigin", "use-credentials");
+			} else {
+				imageElement.dom.setAttribute("crossOrigin", "");
+				imageElement.dom.removeAttribute("crossOrigin");
+			}
+
+			imageElement.dom.setAttribute('url', self.imageUrl(self.source, imageElement.z, imageElement.x, imageElement.y));
+		});
+	}
+
 	MapTile.prototype.createMapImageTile = function(size, x, y, t){
 
 		var shape = document.createElement("Shape");
@@ -1112,9 +1150,10 @@ var os_clickBuildingObject  = ViewerUtil.eventFactory("os_clickBuildingObject");
 		// material.setAttribute('transparency', 0.7)
 		// app.appendChild(material);
 
-
-		it.setAttribute("url", server_config.apiUrl(server_config.MAP_API, 'os/map-images/Outdoor/' + mapImagePosInfo.zoomLevel + '/' + x + '/' + y + '.png'));
-		it.setAttribute("crossOrigin", "use-credentials");
+		it.setAttribute("url", this.imageUrl(this.source, mapImagePosInfo.zoomLevel, x, y));
+		if(this.source === 'os'){
+			it.setAttribute("crossOrigin", "use-credentials");
+		}
 
 		app.appendChild(it);
 
@@ -1137,7 +1176,7 @@ var os_clickBuildingObject  = ViewerUtil.eventFactory("os_clickBuildingObject");
 		translate.setAttribute('translation', t.join(' '));
 		translate.appendChild(rotate);
 
-		return translate;
+		return {dom: translate, imageElement: {dom: it, z:mapImagePosInfo.zoomLevel, x:x, y:y}};
 	};
 
 	MapTile.prototype._vec3Len = function(vec){

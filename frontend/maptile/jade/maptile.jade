@@ -1,0 +1,9 @@
+div(layout="column" layout-align="start center" flex)
+	div
+		div(style='margin-left:10px;margin-bottom:10px')
+			select(ng-model="vm.maptilesource" ng-click="vm.changeMapTile()")
+				option(value='os') OS
+				option(value='google-satellite') Google - satellite
+				option(value='google-standard') Google - standard
+				option(value='google-terrain') Google - terrain
+				option(value='openstreetmap') OpenStreet

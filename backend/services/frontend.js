@@ -190,7 +190,8 @@ module.exports.createApp = function(serverConfig)
 							"groups",
 							"measure",
 							"rightPanel",
-							"building"
+							"building",
+							"maptile"
 						],
 						'url': '/:project?at&up&view',
 						"children" : [

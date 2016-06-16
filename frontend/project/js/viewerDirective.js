@@ -260,6 +260,8 @@
 								view: event.value.view,
 								up: event.value.up
 							});
+						} else if (event.type === EventService.EVENT.VIEWER.CHANGE_MAP_TILE_SOURCE) {
+							v.mapTile.changeTileImageSource(event.value);
 						}
 					});
 				}
