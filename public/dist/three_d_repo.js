@@ -5741,6 +5741,7 @@ var ViewerManager = {};
 			restrict: 'E',
 			templateUrl: 'accountProject.html',
 			scope: {
+				userAccount: "=",
 				account: "=",
 				project: "=",
 				onUploadFile: "&",
@@ -5773,11 +5774,19 @@ var ViewerManager = {};
 			vm.project.timestampPretty = $filter("prettyDate")(vm.project.timestamp, {showSeconds: true});
 		}
 		vm.project.canUpload = true;
-		vm.projectOptions = {
-			upload: {label: "Upload file", icon: "cloud_upload"},
-			team: {label: "Team", icon: "group"},
-			delete: {label: "Delete", icon: "delete"}
-		};
+		// Only allow user to add teams to or delete projects in their own account
+		if (vm.account.account === vm.userAccount) {
+			vm.projectOptions = {
+				upload: {label: "Upload file", icon: "cloud_upload"},
+				team: {label: "Team", icon: "group"},
+				delete: {label: "Delete", icon: "delete"}
+			};
+		}
+		else {
+			vm.projectOptions = {
+				upload: {label: "Upload file", icon: "cloud_upload"},
+			};
+		}
 		checkFileUploading();
 
 		/*

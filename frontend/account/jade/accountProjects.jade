@@ -33,6 +33,7 @@ input#newProjectFileUploader(type="file")
 				md-list.projects(ng-if="account.showProjects")
 					account-project(
 					ng-repeat="project in account.projects"
+					user-account="vm.account"
 					account="account"
 					project="project"
 					on-upload-file="vm.uploadFile(project)"
