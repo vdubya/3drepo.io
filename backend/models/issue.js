@@ -55,6 +55,10 @@ var schema = Schema({
 	norm: [Number],
 	created: Number,
 	parent: Object,
+
+	object_ids: [],
+	parents: [],
+
 	number: Number,
 	owner: String,
 	closed: Boolean,
@@ -327,7 +331,7 @@ schema.statics.findByUID = function(dbColOptions, uid, onlyStubs, noClean){
 schema.statics.createIssue = function(dbColOptions, data){
 	'use strict';
 
-	let objectId = data.object_id;
+	let objectIds = data.object_ids;
 
 	let promises = [];
 
@@ -338,12 +342,16 @@ schema.statics.createIssue = function(dbColOptions, data){
  		return Promise.reject({ resCode: responseCodes.ISSUE_NO_NAME });
  	}
 
-	if(objectId){
-		promises.push(
-			GenericObject.getSharedId(dbColOptions, objectId).then(sid => {
-				issue.parent = stringToUUID(sid);
-			})
-		);
+	if(objectIds){
+		objectIds.forEach((objectId, i) => {
+			promises.push(
+				GenericObject.getSharedId(dbColOptions, objectId).then(sid => {
+					issue.parents[i] = stringToUUID(sid);
+				})
+			);
+
+			objectIds[i] = stringToUUID(objectId);
+		});
 	}
 
 	let getHistory;
@@ -370,7 +378,7 @@ schema.statics.createIssue = function(dbColOptions, data){
 	}).then(count => {
 
 		issue.number  = count + 1;
-		issue.object_id = objectId && stringToUUID(objectId);
+		issue.object_ids = objectIds;
 		issue.name = data.name;
 		issue.created = (new Date()).getTime();
 		issue.owner = data.owner;
@@ -514,6 +522,14 @@ schema.methods.clean = function(typePrefix){
 	if(cleaned.scribble){
 		cleaned.scribble = cleaned.scribble.toString('base64');
 	}
+
+	cleaned.parents && cleaned.parents.forEach((id, i) => {
+		cleaned.parents[i] = uuidToString(id);
+	});
+
+	cleaned.object_ids && cleaned.object_ids.forEach((id, i) => {
+		cleaned.object_ids[i] = uuidToString(id);
+	});
 
 	return cleaned;
 };
