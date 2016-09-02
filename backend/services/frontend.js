@@ -179,7 +179,8 @@ module.exports.createApp = function(serverConfig)
 							"measure",
 							"rightPanel",
 							"building",
-							"revisions"
+							"revisions",
+							"zoom"
 						]
 					}
 				]
