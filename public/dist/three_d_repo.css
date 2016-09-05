@@ -1754,12 +1754,6 @@ panel #buttons .panelButtonGroup {
 panel #buttons .panelButtonGroup button {
   margin-bottom: 2px;
 }
-panel #buttons .panelButtonGroup label {
-  color: #FFFFFF;
-  text-shadow: 0 0 2px rgba(0,0,0,0.5);
-  font-weight: bold;
-  font-size: 14px;
-}
 
 /** Panels ************************************************************************************************************/
 
@@ -2004,6 +1998,12 @@ privacy-text {
 
 }
 
+project .projectElementLabel {
+    color: #FFF;
+    text-shadow: 0 0 2px rgba(0,0,0,.5);
+    font-weight: 700;
+    font-size: 14px;
+}
 register-verify .databaseError {
     color: #F44336;
     margin: 5px 0 5px;
@@ -2111,12 +2111,6 @@ right-panel #rightPanelButtons .fa {
     font-size: 24px;
 }
 
-right-panel #rightPanelButtons label {
-    color: #FFFFFF;
-    text-shadow: 0 0 2px rgba(0,0,0,0.5);
-    font-weight: bold;
-    font-size: 14px;
-}
 sign-up .registerLinks {
     font-size: 14px;
     margin: 5px 0;
@@ -2315,6 +2309,6 @@ tdr-progress p {
 zoom {
     position: absolute;
     z-index: 2;
-    bottom: 20px;
-    right: 10px;
+    bottom: 30px;
+    right: 0;
 }

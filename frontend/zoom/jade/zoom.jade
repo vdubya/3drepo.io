@@ -1,1 +1,13 @@
-| {{$ctrl.text}}
+//| {{$ctrl.text}}
+md-slider-container
+	md-slider(
+	ng-model="$ctrl.zoom"
+	ng-change="$ctrl.zoomChange()"
+	min="{{$ctrl.minZoom}}"
+	max="{{$ctrl.maxZoom}}"
+	aria-label="volume"
+	id="volume-slider"
+	class="md-accent"
+	md-vertical
+	md-range)
+	label.projectElementLabel Zoom

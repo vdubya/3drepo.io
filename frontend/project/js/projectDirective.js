@@ -50,7 +50,10 @@
 			issueArea,
 			issuesCardIndex = 0;
 
+		// Init
 		vm.pointerEvents = "auto";
+		// Below inspired by blmstr's answer - http://stackoverflow.com/a/4819886/782358
+		vm.isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints;
 
 		/*
 		 * Get the project element

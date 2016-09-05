@@ -15696,7 +15696,10 @@ var Oculus = {};
 			issueArea,
 			issuesCardIndex = 0;
 
+		// Init
 		vm.pointerEvents = "auto";
+		// Below inspired by blmstr's answer - http://stackoverflow.com/a/4819886/782358
+		vm.isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints;
 
 		/*
 		 * Get the project element
@@ -18849,9 +18852,37 @@ var Oculus = {};
 		);
 
 
-	ZoomCtrl.$inject = [];
+	ZoomCtrl.$inject = ["$q", "EventService"];
 
-	function ZoomCtrl () {
+	function ZoomCtrl ($q, EventService) {
+		var viewpointPromise = $q.defer(),
+			initViewpoint;
+
+		/*
+		 * Init
+		 */
+		this.zoom = 0;
+		this.minZoom = -50;
+		this.maxZoom = 50;
+
+		EventService.send(EventService.EVENT.VIEWER.GET_CURRENT_VIEWPOINT, {promise: viewpointPromise});
+		viewpointPromise.promise.then(function (viewpoint) {
+			console.log("viewpointPromise", viewpoint);
+			initViewpoint = viewpoint;
+		});
+
+		this.zoomChange = function () {
+			console.log(this.zoom);
+			EventService.send(EventService.EVENT.VIEWER.SET_CAMERA, {
+				position : [
+					initViewpoint.position[0],
+					initViewpoint.position[1],
+					initViewpoint.position[2] + this.zoom
+				],
+				view_dir : initViewpoint.view_dir,
+				up: initViewpoint.up
+			});
+		};
 	}
 }());
 

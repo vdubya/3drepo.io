@@ -25,12 +25,6 @@ panel #buttons .panelButtonGroup {
 panel #buttons .panelButtonGroup button {
   margin-bottom: 2px;
 }
-panel #buttons .panelButtonGroup label {
-  color: #FFFFFF;
-  text-shadow: 0 0 2px rgba(0,0,0,0.5);
-  font-weight: bold;
-  font-size: 14px;
-}
 
 /** Panels ************************************************************************************************************/
 

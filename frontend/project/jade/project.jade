@@ -25,5 +25,5 @@
 		right-panel(style="pointer-events:{{vm.pointerEvents}}")
 		bottom-buttons(style="pointer-events:{{vm.pointerEvents}}")
 		qr-code-reader
-		zoom(text="blah")
+		zoom(ng-if="vm.isTouchDevice")
 
