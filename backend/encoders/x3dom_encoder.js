@@ -249,6 +249,7 @@ function det(mat) {
 		- mat[0,2] * (mat[1,0] * mat[2,1] - mat[1,1] * mat[2,0]);
 }*/
 
+var onceAlready = false;
 
 /*******************************************************************************
  * Add children of node to xmlNode in X3D document
@@ -548,11 +549,15 @@ function X3D_AddChildren(xmlDoc, xmlNode, node, matrix, globalCoordOffset, globa
 
 				xmlNode.appendChild(mp);
 			} else if ((mode == "gltf")) {
-				var gltf = xmlDoc.createElement("gltf");
-				var gltfURL = config.api_server.url + "/" + account + "/" + project + "/revision/"  + revision + ".gltf";
+				if (!onceAlready) {
+					var gltf = xmlDoc.createElement("gltf");
+					var gltfURL = config.api_server.url + "/" + account + "/" + project + "/revision/"  + revision + ".gltf";
 
-				gltf.setAttribute("url", gltfURL);
-				xmlNode.appendChild(gltf);
+					gltf.setAttribute("url", gltfURL);
+					xmlNode.appendChild(gltf);
+
+					onceAlready = true;
+				}
 			} else {
 				for(var i = 0; i < subMeshKeys.length; i++)
 				{
@@ -932,6 +937,8 @@ function render(dbInterface, account, project, subFormat, branch, revision, call
 		var mat = mathjs.eye(4);
 		var globalCoordOffset = null;
 		var globalCoordPromise = deferred();
+
+		onceAlready = false;
 
 		dbInterface.getProjectBranchHeadRid(account, project, branch, function(err, revision) {
 			X3D_AddChildren(xmlDoc, sceneRoot.root, dummyRoot, mat, globalCoordOffset, globalCoordPromise, dbInterface, account, project, revision, subFormat, dbInterface.logger);
