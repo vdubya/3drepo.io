@@ -3476,11 +3476,13 @@ var GOLDEN_RATIO = (1.0 + Math.sqrt(5)) / 2.0;
 			ViewerUtil.offEvent("bgroundClicked", functionToBind);
 		};
 
-		this.selectParts = function(part, zoom, colour) {
+		this.selectParts = function(part, zoom, colour, otherPart) {
+
 			var i;
 
 			colour = colour ? colour : self.SELECT_COLOUR.EMISSIVE;
 
+			otherPart = otherPart || [];
 			if (!Array.isArray(part)) {
 				part = [part];
 			}
@@ -3488,6 +3490,10 @@ var GOLDEN_RATIO = (1.0 + Math.sqrt(5)) / 2.0;
 			if (zoom) {
 				for (i = 0; i < part.length; i++) {
 					part[i].fit();
+				}
+
+				for (i = 0; i < otherPart.length; i++) {
+					otherPart[i].fit();
 				}
 			}
 
@@ -3497,10 +3503,21 @@ var GOLDEN_RATIO = (1.0 + Math.sqrt(5)) / 2.0;
 				}
 			}
 
+			if (self.oldOtherPart) {
+				for (i = 0; i < self.oldOtherPart.length; i++) {
+					self.oldOtherPart[i].resetColor();
+				}
+			}
+
 			self.oldPart = part;
+			self.oldOtherPart = otherPart;
 
 			for (i = 0; i < part.length; i++) {
 				part[i].setEmissiveColor(colour, "both");
+			}
+
+			for (i = 0; i < otherPart.length; i++) {
+				otherPart[i].setTransparency(0.5, "both");
 			}
 		};
 
@@ -3547,6 +3564,7 @@ var GOLDEN_RATIO = (1.0 + Math.sqrt(5)) / 2.0;
 			// Is this a multipart project
 			if (!nameSpaceName || self.multipartNodesByProject.hasOwnProperty(nameSpaceName)) {
 				var fullPartsList = [];
+				var allOtherPartsList = [];
 				var nsMultipartNodes;
 
 				// If account and project have been specified
@@ -3558,17 +3576,34 @@ var GOLDEN_RATIO = (1.0 + Math.sqrt(5)) / 2.0;
 					nsMultipartNodes = self.multipartNodes;
 				}
 
+
+
 				for (var multipartNodeName in nsMultipartNodes) {
 					if (nsMultipartNodes.hasOwnProperty(multipartNodeName)) {
 						var parts = nsMultipartNodes[multipartNodeName].getParts(ids);
-
 						if (parts && parts.ids.length > 0) {
 							fullPartsList.push(parts);
 						}
 					}
+
+					if(ids.length){
+						var allIds = nsMultipartNodes[multipartNodeName].getIdList();
+						
+						for(var i=allIds.length - 1 ; i >= 0 ; i--){
+							if(ids.indexOf(allIds[i]) !== -1){
+								allIds.splice(i, 1);
+							}
+						}
+
+						var parts = nsMultipartNodes[multipartNodeName].getParts(allIds);
+						if (parts && parts.ids.length > 0) {
+							allOtherPartsList.push(parts);
+						}
+					}
+
 				}
 
-				self.selectParts(fullPartsList, zoom, colour);
+				self.selectParts(fullPartsList, zoom, colour, allOtherPartsList);
 			}
 
 			for(var i = 0; i < ids.length; i++)
