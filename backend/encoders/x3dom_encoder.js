@@ -751,18 +751,44 @@ function X3D_AddToShape(xmlDoc, shape, dbInterface, account, project, mesh, subM
  * @param {xmlDom} xmlDoc - The XML document to add the scene to
  * @param {JSON} bbox - Bounding used to compute the position of the light
  *******************************************************************************/
-function X3D_AddLights(xmlDoc, bbox)
+function X3D_AddLights(xmlDoc, lights)
 {
+	'use strict';
+
 	var scene = xmlDoc.getElementsByTagName('Scene')[0];
 
-	var pLight = xmlDoc.createElement('PointLight');
-	pLight.setAttribute('ambientIntensity', '1.0');
-	pLight.setAttribute('intensity', '0.5');
-	//pLight.setAttribute('location', bbox.max.join(' '));
-	//pLight.setAttribute('shadowIntensity', 0.7);
-	pLight.textContent = ' ';
+	Object.keys(lights).forEach(id => {
 
-	//scene.appendChild(pLight);
+		let light = lights[id];
+
+		let pLight;
+		let lightType = light['light type'];
+
+
+		if(lightType === 'spot'){
+			pLight = xmlDoc.createElement('SpotLight');
+		} else if (lightType === 'point'){
+			pLight = xmlDoc.createElement('PointLight');
+		} else if (lightType === 'directional'){
+			pLight = xmlDoc.createElement('DirectionalLight');
+		}
+		
+		if(pLight && light.position && light.direction && light['diffuse color']){
+			pLight.setAttribute('ambientIntensity', '1.0');
+			pLight.setAttribute('intensity', '0.5');
+			pLight.setAttribute('location', light.position.join(' '));
+			pLight.setAttribute('direction', light.direction.join(' '));
+			pLight.setAttribute('shadowIntensity', 0.7);
+			pLight.setAttribute('color', light['diffuse color'].join(' '));
+			pLight.textContent = ' ';
+
+			scene.appendChild(pLight);
+		}
+
+
+	});
+
+
 };
 
 /*******************************************************************************
@@ -917,7 +943,8 @@ exports.render = function (account, project, doc, logger){
 	var bbox = repoNodeMesh.extractBoundingBox(doc.mRootNode);
 
 	X3D_AddViewpoint(xmlDoc, sceneRoot.scene, account, project, bbox);
-
+	X3D_AddLights(xmlDoc, doc.lights);
+	
 	return new xmlSerial().serializeToString(xmlDoc);
 
 }

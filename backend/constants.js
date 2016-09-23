@@ -55,6 +55,7 @@ define("REPO_NODE_TYPE_REVISION", "revision");
 define("REPO_NODE_TYPE_REF", "ref");
 define("REPO_NODE_TYPE_META", "meta");
 define("REPO_NODE_TYPE_MAP", "map");
+define("REPO_NODE_TYPE_LIGHT", "light");
 
 //-----------------------------------------------------------------------------
 // Shared fields
@@ -154,6 +155,7 @@ define("REPO_HISTORY_LABEL_REVISIONS_COUNT", "revisions_count");
 define("REPO_SCENE_LABEL_REF_COUNT", "ref_count");
 define("REPO_SCENE_LABEL_METAS_COUNT", "meta_count");
 define("REPO_SCENE_LABEL_MAPS_COUNT", "map_count");
+define("REPO_SCENE_LABEL_LIGHTS_COUNT", "light_count");
 
 //-----------------------------------------------------------------------------
 //

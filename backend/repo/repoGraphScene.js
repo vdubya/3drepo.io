@@ -63,6 +63,7 @@ repoGraphScene.prototype.decode = function(bsonArray, gridfsfiles) {
 	scene[C.REPO_SCENE_LABEL_REF_COUNT] = 0;
 	scene[C.REPO_SCENE_LABEL_META_COUNT] = 0;
 	scene[C.REPO_SCENE_LABEL_MAPS_COUNT] = 0;
+	scene[C.REPO_SCENE_LABEL_LIGHTS_COUNT] = 0;
 
 	// Sort documents into categories (dictionaries of {id : bson} pairs)
 	// UUID is a binary object of subtype 3 (old) or 4 (new)
@@ -75,6 +76,7 @@ repoGraphScene.prototype.decode = function(bsonArray, gridfsfiles) {
 	var refs = {};
 	var metas = {};
 	var maps = {};
+	var lights = {};
 
 	// dictionary of {shared_id : bson}
 	var all = {};
@@ -126,6 +128,10 @@ repoGraphScene.prototype.decode = function(bsonArray, gridfsfiles) {
 					case C.REPO_NODE_TYPE_MAP:
 						maps[bson.id] = bson;
 						scene[C.REPO_SCENE_LABEL_MAPS_COUNT]++;
+						break;
+					case C.REPO_NODE_TYPE_LIGHT:
+						lights[bson.id] = bson;
+						scene[C.REPO_SCENE_LABEL_LIGHTS_COUNT]++;
 						break;
 					default :
 						console.log('Unsupported node type found: ' + bson[C.REPO_NODE_LABEL_TYPE]);
@@ -210,6 +216,11 @@ repoGraphScene.prototype.decode = function(bsonArray, gridfsfiles) {
 
 	scene.metas = metas;
 
+	//---------------------------------------------------------------------
+
+	// Lights
+	scene.lights = lights;
+	
 	//---------------------------------------------------------------------
 	// Register root node
 	if (rootNode){
