@@ -761,7 +761,6 @@ exports.route = function(router)
 												specColour[1] = specColour[1] * strength;
 												specColour[2] = specColour[2] * strength;
 
-												console.log(specColour);
 												material["specularColor"] = specColour.join(" ");
 											}
 

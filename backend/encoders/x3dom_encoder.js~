@@ -668,7 +668,7 @@ function X3D_AddToShape(xmlDoc, shape, dbInterface, account, project, mesh, subM
 				if(tex_id)
 				{
 					suffix = "#" + meshId + "_0";
-					suffix += "?tex_uuid=" + tex_id;
+					//suffix += "?tex_uuid=" + tex_id;
 				}
 			}
 
