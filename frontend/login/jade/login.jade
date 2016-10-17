@@ -1,5 +1,6 @@
 .homeUserContent(layout="row", layout-align="center", flex)
-	md-content.md-whiteframe-1dp(aria-label="Registered", flex-lg="25", flex-gt-lg="15")
+	span(flex-lg="35", flex-gt-lg="40")
+	md-content.md-whiteframe-1dp(aria-label="Registered", flex-lg="30", flex-gt-lg="20")
 		md-toolbar
 			.md-toolbar-tools
 				h2 Log in
@@ -30,3 +31,6 @@
 					div(layout="row", layout-align="start center", flex="none")
 						a.loginLinks(href="pricing") Sign up
 					h2.md-subhead#loginVersion Version: {{vm.version}}
+
+	div(flex-lg="35", flex-gt-lg="40")
+		#loginLogo(ng-include="'fis.html'")

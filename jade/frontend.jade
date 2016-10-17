@@ -80,4 +80,9 @@ html(lang="en" ng-app="3drepo")
 			script(type="text/ng-template", id=j.page+".html")
 				!= renderMe(j.path, locals)
 
+		// Logos
+		each j in logoTemplates
+			script(type="text/ng-template", id=j.type + ".html")
+				!= renderMe(j.path, locals)
+
 		home

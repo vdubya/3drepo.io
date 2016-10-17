@@ -143,6 +143,8 @@ module.exports.createApp = function(serverConfig)
 
 		params.config_js += "\n\nserver_config.acceptedFormat = " + JSON.stringify(ProjectHelper.acceptedFormat) + ";";
 
+		params.config_js += "\n\nserver_config.logo = " + JSON.stringify(config.logo) + ";";
+
 		res.header("Content-Type", "text/javascript");
 		res.render("config.jade", params);
 	});
@@ -328,6 +330,12 @@ module.exports.createApp = function(serverConfig)
 		params.legalTemplates = [];
 		if (config.hasOwnProperty("legal")) {
 			params.legalTemplates = config.legal;
+		}
+
+		// Set up the logo templates
+		params.logoTemplates = [];
+		if (config.hasOwnProperty("logo")) {
+			params.logoTemplates = config.logo;
 		}
 
 		setupJade(params);
