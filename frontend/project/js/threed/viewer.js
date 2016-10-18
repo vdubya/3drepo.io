@@ -1017,7 +1017,7 @@ var GOLDEN_RATIO = (1.0 + Math.sqrt(5)) / 2.0;
 			var viewpointList = document.getElementsByTagName("Viewpoint");
 
 			for (var v = 0; v < viewpointList.length; v++) {
-				if (viewpointList[v].hasAttribute("id")) {
+				if (viewpointList[v].hasAttribute("id") && viewpointList[v].id) {
 					var id = viewpointList[v].id.trim();
 					viewpointList[v].DEF = id;
 

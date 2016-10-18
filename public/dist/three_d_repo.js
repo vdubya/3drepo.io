@@ -1,3 +1,22 @@
+(function () {
+	"use strict";
+
+	if ( typeof window.CustomEvent === "function" ) {
+		return false;
+	}
+
+	function CustomEvent ( event, params ) {
+		params = params || { bubbles: false, cancelable: false, detail: undefined };
+		var evt = document.createEvent( 'CustomEvent' );
+		evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
+		return evt;
+	}
+
+	CustomEvent.prototype = window.Event.prototype;
+
+	window.CustomEvent = CustomEvent;
+})();
+
 /**
  **  Copyright (C) 2014 3D Repo Ltd
  **
@@ -4021,7 +4040,7 @@ var GOLDEN_RATIO = (1.0 + Math.sqrt(5)) / 2.0;
 			var viewpointList = document.getElementsByTagName("Viewpoint");
 
 			for (var v = 0; v < viewpointList.length; v++) {
-				if (viewpointList[v].hasAttribute("id")) {
+				if (viewpointList[v].hasAttribute("id") && viewpointList[v].id) {
 					var id = viewpointList[v].id.trim();
 					viewpointList[v].DEF = id;
 
