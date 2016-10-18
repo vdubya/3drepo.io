@@ -37,31 +37,30 @@
 							label VAT number
 							input(type="text", ng-model="vm.newBillingAddress.vat")
 
-					div(layout="column", flex)
-						div(layout="row", flex, layout-align="start start")
-							div(layout="column", flex)
-								md-input-container(flex)
-									label Address
-									input(type="text", ng-model="vm.newBillingAddress.line1", required)
-								md-input-container(flex)
-									label Address 2
-									input(type="text", ng-model="vm.newBillingAddress.line2")
+					div(layout="row", layout-align="start start")
+						div(layout="column", flex)
+							md-input-container
+								label Address
+								input(type="text", ng-model="vm.newBillingAddress.line1", required)
+							md-input-container
+								label Address 2
+								input(type="text", ng-model="vm.newBillingAddress.line2")
 
-							div(layout="column", flex)
-								md-input-container(flex)
-									label City
-									input(type="text", ng-model="vm.newBillingAddress.city", required)
-								md-input-container(flex, ng-if="vm.showStates")
-									label State
-									md-select(ng-model="vm.newBillingAddress.state", ng-required="true")
-										md-option(ng-repeat="state in vm.usStates", value="{{state.code}}") {{state.name}}
-								md-input-container(flex)
-									label Postal code
-									input(type="text", ng-model="vm.newBillingAddress.postalCode", required)
-								md-input-container(flex)
-									label Country
-									md-select(ng-model="vm.newBillingAddress.countryCode", required, ng-disabled="vm.countrySelectDisabled")
-										md-option(ng-repeat="country in vm.countries", value="{{country.code}}") {{country.name}}
+						div(layout="column", flex)
+							md-input-container
+								label City
+								input(type="text", ng-model="vm.newBillingAddress.city", required)
+							md-input-container(ng-if="vm.showStates")
+								label State
+								md-select(ng-model="vm.newBillingAddress.state", ng-required="true")
+									md-option(ng-repeat="state in vm.usStates", value="{{state.code}}") {{state.name}}
+							md-input-container
+								label Postal code
+								input(type="text", ng-model="vm.newBillingAddress.postalCode", required)
+							md-input-container
+								label Country
+								md-select(ng-model="vm.newBillingAddress.countryCode", required, ng-disabled="vm.countrySelectDisabled")
+									md-option(ng-repeat="country in vm.countries", value="{{country.code}}") {{country.name}}
 
 
 					.accountBillingSave

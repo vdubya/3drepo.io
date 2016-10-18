@@ -24,8 +24,8 @@
 	function revisionsCtrl ($location, $scope, RevisionsService, UtilsService, $filter) {
 		var vm = this;
 
-		RevisionsService.listAll(vm.account, vm.project).then(function(revisions){
-			vm.revisions = revisions;
+		UtilsService.doGet(vm.account + "/" + vm.project + "/revisions.json").then(function(response){
+			vm.revisions = response.data;
 		});
 
 		$scope.$watch("vm.revisions", function () {
@@ -62,7 +62,7 @@
 			}
 
 			UtilsService.showDialog("revisionsDialog.html", $scope, event, true);
-		}
+		};
 
 		/**
 		* Go to the specified revision
@@ -72,7 +72,7 @@
 			UtilsService.closeDialog();
 			$location.path("/" + vm.account + "/" + vm.project + "/" + revId , "_self");
 
-		}
+		};
 
 		vm.closeDialog = function() {
 			UtilsService.closeDialog();

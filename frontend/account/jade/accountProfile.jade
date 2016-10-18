@@ -8,18 +8,18 @@
 		.userContent
 			div(layout="column", flex)
 				//h1.md-title Info
-				div(layout="row", flex)
+				div(layout="row")
 					md-input-container(flex="50")
 						label Username
 						input(ng-model="vm.username" ng-disabled="true")
 				div(layout="row")
-					md-input-container(flex)
+					md-input-container(flex="50")
 						label First name
 						input(ng-model="vm.firstNameNew")
-					md-input-container(flex)
+					md-input-container(flex="50")
 						label Last name
 						input(ng-model="vm.lastNameNew")
-				div(layout="row", flex)
+				div(layout="row")
 					md-input-container(flex="50")
 						label Email
 						input(ng-model="vm.emailNew", type="email")
@@ -31,7 +31,7 @@
 
 			div(layout="column")
 				//h1.md-title Password
-				div(layout="row", flex)
+				div(layout="row")
 					md-input-container(flex="50")
 						label Old password
 						input(ng-model="vm.oldPassword", type="password")

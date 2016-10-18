@@ -143,7 +143,11 @@
 					break;
 
 				case "revision":
-					getRevision();
+					if(!vm.revisions){
+						UtilsService.doGet(vm.account + "/" + vm.project.name + "/revisions.json").then(function(response){
+							vm.revisions = response.data;
+						});
+					}
 					UtilsService.showDialog("revisionsDialog.html", $scope, event, true, null, false, dialogCloseToId);
 					break;
 			}
@@ -195,14 +199,14 @@
 		 * When users click upload after selecting
 		 */
 		vm.uploadFile = function () {
-			//vm.onUploadFile({project: vm.project});
-			
+			var revisions;
 			vm.uploadErrorMessage = null;
 
 			if(vm.tag && RevisionsService.isTagFormatInValid(vm.tag)){
 				vm.uploadErrorMessage = 'Invalid revision name';
 			} else {
-				getRevision().then(function(revisions){
+				UtilsService.doGet(vm.account + "/" + vm.project.name + "/revisions.json").then(function(response){
+					revisions = response.data;
 
 					if(vm.tag){
 						revisions.forEach(function(rev){
@@ -369,17 +373,5 @@
 			vm.item = vm.project;
 			UtilsService.showDialog("teamDialog.html", $scope, event, true, null, false, dialogCloseToId);
 		}
-
-		function getRevision(){
-			if(!vm.revisions){
-				return RevisionsService.listAll(vm.account, vm.project.name).then(function(revisions){
-					vm.revisions = revisions;
-					return Promise.resolve(revisions);
-				});
-			} else {
-				return Promise.resolve(vm.revisions);
-			}
-		}
-
 	}
 }());
