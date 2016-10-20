@@ -29,11 +29,11 @@ md-dialog.revisionsDialog(aria-label="Revisions")
 			div(layout="column", flex)
 				p(ng-if="rev.tag") {{rev.tag}}
 				p(ng-if="!rev.tag") {{rev._id}}
-				.revisionsDialogInfo(layout="row", layout-align="space-between", flex)
+				.revisionsDialogInfo(layout="row", layout-align="space-between")
 					p {{rev.author}}
 					p(ng-if="rev.current") (current revision)
 					p {{rev.timestamp | revisionDate }}
-				.revisionsDialogInfo(layout="row", layout-align="space-between", flex)
+				.revisionsDialogInfo(layout="row", layout-align="space-between")
 					p {{rev.desc}}
 
 			md-divider

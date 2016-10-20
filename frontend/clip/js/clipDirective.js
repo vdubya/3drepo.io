@@ -57,7 +57,7 @@
 		vm.account = null;
 		vm.project = null;
 		vm.normal = null;
-		vm.onContentHeightRequest({height: 130});
+		vm.onContentHeightRequest({height: 150});
 
 		function initClippingPlane (account, project, normal, distance) {
 			$timeout(function () {

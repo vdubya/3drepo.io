@@ -294,6 +294,7 @@ issue-comp .issueCompItemStatus {
 issue-comp .issueCompThumbnail {
   position: relative;
   display: inline-block;
+  overflow: auto;
 }
 issue-comp .issueCompThumbnailImage:hover {
   cursor: pointer;

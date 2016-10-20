@@ -9839,7 +9839,7 @@ var ViewerManager = {};
 		vm.account = null;
 		vm.project = null;
 		vm.normal = null;
-		vm.onContentHeightRequest({height: 130});
+		vm.onContentHeightRequest({height: 150});
 
 		function initClippingPlane (account, project, normal, distance) {
 			$timeout(function () {
@@ -17647,7 +17647,6 @@ var Oculus = {};
 		/*
 		 * Init
 		 */
-		vm.pointerEvents = "auto";
 		vm.keysDown = [];
 
 		/*
@@ -17867,9 +17866,7 @@ var Oculus = {};
 					}
 				}
 			}
-			else if (event.type === EventService.EVENT.TOGGLE_ISSUE_AREA_DRAWING) {
-				vm.pointerEvents = event.value.on ? "none" : "auto";
-			} else if (event.type === EventService.EVENT.MEASURE_MODE) {
+			else if (event.type === EventService.EVENT.MEASURE_MODE) {
 				if (event.value) {
 					// Create measure display
 					element = angular.element("<tdr-measure id='tdrMeasure' account='vm.account' project='vm.project' settings='vm.settings' ></tdr-measure>");

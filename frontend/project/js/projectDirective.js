@@ -53,7 +53,6 @@
 		/*
 		 * Init
 		 */
-		vm.pointerEvents = "auto";
 		vm.keysDown = [];
 
 		/*
@@ -273,9 +272,7 @@
 					}
 				}
 			}
-			else if (event.type === EventService.EVENT.TOGGLE_ISSUE_AREA_DRAWING) {
-				vm.pointerEvents = event.value.on ? "none" : "auto";
-			} else if (event.type === EventService.EVENT.MEASURE_MODE) {
+			else if (event.type === EventService.EVENT.MEASURE_MODE) {
 				if (event.value) {
 					// Create measure display
 					element = angular.element("<tdr-measure id='tdrMeasure' account='vm.account' project='vm.project' settings='vm.settings' ></tdr-measure>");

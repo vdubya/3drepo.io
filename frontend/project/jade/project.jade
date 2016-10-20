@@ -17,7 +17,6 @@
 		branch="vm.branch"
 		revision="vm.revision"
 		position="left"
-		style="pointer-events:{{vm.pointerEvents}}"
 		keys-down="vm.keysDown"
 		selected-objects="vm.selectedObjects"
 		set-initial-selected-objects="vm.setInitialSelectedObjects({selectedObjects: selectedObjects})")
@@ -27,11 +26,10 @@
 		project="vm.project"
 		branch="vm.branch"
 		revision="vm.revision"
-		position="right"
-		style="pointer-events:{{vm.pointerEvents}}")
+		position="right")
 
-		right-panel(style="pointer-events:{{vm.pointerEvents}}")
-		bottom-buttons(style="pointer-events:{{vm.pointerEvents}}")
+		right-panel
+		bottom-buttons
 		qr-code-reader
 
 multi-select(

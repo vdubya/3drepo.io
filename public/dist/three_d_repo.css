@@ -1043,7 +1043,7 @@ building {
 clip {
   display: block;
   width: 100%;
-  padding: 20px 0 10px;
+  padding-top: 20px;
 }
 
 clip md-radio-button .md-label {
@@ -1734,6 +1734,7 @@ issue-comp .issueCompItemStatus {
 issue-comp .issueCompThumbnail {
   position: relative;
   display: inline-block;
+  overflow: auto;
 }
 issue-comp .issueCompThumbnailImage:hover {
   cursor: pointer;
@@ -1954,7 +1955,6 @@ panel #buttons .panelButtonGroup label {
 
 #leftPanel {
   left: 0;
-  pointer-events: none;
 }
 #leftPanel #items {
   right: 0;
@@ -1965,7 +1965,6 @@ panel #buttons .panelButtonGroup label {
 
 #rightPanel {
   right: 0;
-  pointer-events: none;
 }
 #rightPanel #items {
   left: 0;
