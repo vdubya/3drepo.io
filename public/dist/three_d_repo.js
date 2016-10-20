@@ -607,6 +607,7 @@ var ClipPlane = {};
 
 			var normal_x3d = new x3dom.fields.SFVec3f(this.normal[0], this.normal[1], this.normal[2]);
 			point = normal_x3d.multiply(-this.distance).toGL();
+<<<<<<< HEAD
 
 			normal_x3d = matrix.multMatrixVec(normal_x3d);
 			normal_x3d.normalize();
@@ -691,6 +692,92 @@ var ClipPlane = {};
 				}).join(","));
 			}
 
+=======
+
+			normal_x3d = matrix.multMatrixVec(normal_x3d);
+			normal_x3d.normalize();
+
+			var planePnt = new x3dom.fields.SFVec3f(point[0], point[1], point[2]);
+			planePnt = matrix.multMatrixPnt(planePnt);
+			var distance = -normal_x3d.dot(planePnt) * BBOX_SCALE;
+			
+
+			var plane = new x3dom.fields.SFVec4f(normal_x3d.x, normal_x3d.y, normal_x3d.z, distance);
+
+
+			if(writeProperties)
+			{				
+
+				// Update the clipping element plane equation
+				clipPlaneElem.setAttribute("plane", plane.toGL().join(" "));
+				//The clip outline doesn't need translation, it should be in the right place
+				//set it to move by a bit so it's not cut off by the clipping plane.
+			
+
+				var translation = [-(max[0]-min[0])*0.001, -(max[1]-min[1])*0.001, -(max[2]-min[0])*0.001];
+				coordinateFrame.setAttribute("translation", translation.join(" "));
+	
+				this.normal = normal_x3d.toGL();
+				this.distance = distance;
+
+			
+
+				//determine the outline of the clipping plane by intersection with the global bounding box	
+
+				var min = sceneBbox.min.multiply(BBOX_SCALE);
+				var max = sceneBbox.max.multiply(BBOX_SCALE);
+	
+				//[pointA, pointB]
+				var bboxOutline = [
+					[new x3dom.fields.SFVec3f(min.x, min.y, min.z), new x3dom.fields.SFVec3f(max.x, min.y, min.z)],
+					[new x3dom.fields.SFVec3f(min.x, min.y, min.z), new x3dom.fields.SFVec3f(min.x, max.y, min.z)],
+					[new x3dom.fields.SFVec3f(min.x, min.y, min.z), new x3dom.fields.SFVec3f(min.x, min.y, max.z)],
+					[new x3dom.fields.SFVec3f(min.x, max.y, min.z), new x3dom.fields.SFVec3f(min.x, max.y, max.z)],
+					[new x3dom.fields.SFVec3f(max.x, max.y, min.z), new x3dom.fields.SFVec3f(max.x, max.y, max.z)],
+					[new x3dom.fields.SFVec3f(max.x, min.y, min.z), new x3dom.fields.SFVec3f(max.x, max.y, min.z)],
+					[new x3dom.fields.SFVec3f(max.x, min.y, min.z), new x3dom.fields.SFVec3f(max.x, min.y, max.z)],
+					[new x3dom.fields.SFVec3f(max.x, min.y, max.z), new x3dom.fields.SFVec3f(max.x, max.y, max.z)],
+					[new x3dom.fields.SFVec3f(min.x, min.y, max.z), new x3dom.fields.SFVec3f(max.x, min.y, max.z)],
+					[new x3dom.fields.SFVec3f(min.x, max.y, max.z), new x3dom.fields.SFVec3f(max.x, max.y, max.z)],
+					[new x3dom.fields.SFVec3f(min.x, max.y, max.z), new x3dom.fields.SFVec3f(min.x, min.y, max.z)],
+					[new x3dom.fields.SFVec3f(min.x, max.y, min.z), new x3dom.fields.SFVec3f(max.x, max.y, min.z)],
+					];
+
+				var outline = [];
+			
+				for(var i = 0; i < bboxOutline.length; ++i)
+				{
+
+					var lineDir = bboxOutline[i][1].subtract(bboxOutline[i][0]);
+					lineDir = lineDir.normalize();
+					var dotProd =lineDir.dot(normal_x3d); 
+					if(Math.abs(dotProd) > 0.000001)
+					{
+						//dot product isn't zero -> has single point intersection
+						var d = (planePnt.subtract(bboxOutline[i][0])).dot(normal_x3d) / dotProd;
+						var intersectPnt = lineDir.multiply(d).add(bboxOutline[i][0]);
+						
+						//the intersection point must lie within the global bbox
+						if(intersectPnt.x >= min.x && intersectPnt.x <= max.x 
+								&& intersectPnt.y >= min.y && intersectPnt.y <= max.y 
+								&& intersectPnt.z >= min.z && intersectPnt.z <= max.z)
+						{
+							outline.push(intersectPnt.toGL());	
+						}	
+
+					}
+	
+				}
+
+				outline = this.determineOutline(outline);
+
+				outlineCoords.setAttribute("point",
+				outline.map(function(item) {
+					return item.join(" ");
+				}).join(","));
+			}
+
+>>>>>>> staging
 
 			return {normal: normal_x3d.toGL(), distance: distance};
 		}
@@ -6699,11 +6786,15 @@ var ViewerManager = {};
 					break;
 
 				case "revision":
+<<<<<<< HEAD
 					if(!vm.revisions){
 						UtilsService.doGet(vm.account + "/" + vm.project.name + "/revisions.json").then(function(response){
 							vm.revisions = response.data;
 						});
 					}
+=======
+					getRevision();
+>>>>>>> staging
 					UtilsService.showDialog("revisionsDialog.html", $scope, event, true, null, false, dialogCloseToId);
 					break;
 			}
@@ -9839,7 +9930,11 @@ var ViewerManager = {};
 		vm.account = null;
 		vm.project = null;
 		vm.normal = null;
+<<<<<<< HEAD
 		vm.onContentHeightRequest({height: 150});
+=======
+		vm.onContentHeightRequest({height: 130});
+>>>>>>> staging
 
 		function initClippingPlane (account, project, normal, distance) {
 			$timeout(function () {
@@ -14071,7 +14166,7 @@ angular.module('3drepo')
 
 			vm.importingBCF = true;
 
-			IssuesService.importBcf(vm.account, vm.project, file).then(function(){
+			IssuesService.importBcf(vm.account, vm.project, vm.revision, file).then(function(){
 
 				return IssuesService.getIssues(vm.account, vm.project, vm.revision);
 
@@ -14099,6 +14194,7 @@ angular.module('3drepo')
 			vm.onShowItem();
 			if (vm.selectedIssue !== null) {
 				deselectPin(vm.selectedIssue._id);
+<<<<<<< HEAD
 			}
 			vm.selectedIssue = issue;
 			vm.toShow = "showIssue";
@@ -14113,6 +14209,22 @@ angular.module('3drepo')
 				deselectPin(vm.selectedIssue._id);
 			}
 			vm.selectedIssue = issue;
+=======
+			}
+			vm.selectedIssue = issue;
+			vm.toShow = "showIssue";
+		};
+
+		/**
+		 * Select issue
+		 * @param issue
+		 */
+		vm.selectIssue = function (issue) {
+			if ((vm.selectedIssue !== null) && (vm.selectedIssue._id !== issue._id)) {
+				deselectPin(vm.selectedIssue._id);
+			}
+			vm.selectedIssue = issue;
+>>>>>>> staging
 		};
 
 		/**
@@ -15085,13 +15197,19 @@ angular.module('3drepo')
 		/**
 		* Import bcf
 		*/
-		obj.importBcf = function(account, project, file){
+		obj.importBcf = function(account, project, revision, file){
 
 			var deferred = $q.defer();
+
+			var url = account + "/" + project + "/issues.bcfzip";
+			if(revision){
+				url = account + "/" + project + "/revision/" + revision + "/issues.bcfzip";
+			}
+
 			var formData = new FormData();
 			formData.append("file", file);
 
-			UtilsService.doPost(formData, account + "/" + project + "/issues.bcfzip", {'Content-Type': undefined}).then(function(res){
+			UtilsService.doPost(formData, url, {'Content-Type': undefined}).then(function(res){
 				
 				console.log(res);
 				if(res.status === 200){
