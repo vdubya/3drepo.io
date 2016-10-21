@@ -25,7 +25,8 @@
 			md-divider
 
 			#issuesListItemEnter(ng-if="issue.selected", ng-click="$ctrl.editIssue(issue)", layout="column", layout-align="center center")
-				md-icon.angular-material-icons arrow_forward
+				md-button.md-icon-button
+					md-icon.angular-material-icons arrow_forward
 
 	// Info
 	.cardInfo(ng-switch-when="info")

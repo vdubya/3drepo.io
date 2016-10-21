@@ -269,6 +269,10 @@ issue-comp #issueCompAll {
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
+issue-comp #issueCompContainer {
+  outline: none;
+}
+
 issue-comp .issueCompItemContainer {
   padding: 10px;
 }

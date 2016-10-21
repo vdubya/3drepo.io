@@ -1,8 +1,8 @@
-div(layout="column", tabindex="0", tdr-focus="true")
+#issueCompContainer(layout="column", tabindex="0", tdr-focus="true")
 	div
 		// Title
 		.issueCompItemContainer(layout="column", layout-align="start")
-			md-input-container.issueComp
+			md-input-container.issueComp(ng-if="!$ctrl.data")
 				label Title
 				input(
 				type="text"
@@ -46,7 +46,7 @@ div(layout="column", tabindex="0", tdr-focus="true")
 	#descriptionAndComments
 		// Description
 		.issueCompItemContainer(layout="column")
-			div(ng-if="!$ctrl.data")
+			div(ng-if="!$ctrl.data", layout="column")
 				md-input-container(ng-if="!$ctrl.hideDescription")
 					label Description
 					textarea(
@@ -54,7 +54,7 @@ div(layout="column", tabindex="0", tdr-focus="true")
 					ng-disabled="$ctrl.data"
 					ng-focus="$ctrl.textInputHasFocus(true)"
 					ng-blur="$ctrl.textInputHasFocus(false)")
-			//#issueCompDescription(ng-if="$ctrl.data", layout="column", ng-click="$ctrl.showViewpoint($event, $ctrl.issueData.viewpoint)")
+			#issueCompDescription(ng-if="$ctrl.data", layout="column", ng-click="$ctrl.showViewpoint($event, $ctrl.issueData.viewpoint)")
 				div(layout='row', layout-align="space-between")
 					label(ng-if="!$ctrl.editingDescription") {{$ctrl.issueData.desc}}
 					md-input-container(ng-if="$ctrl.editingDescription")
@@ -76,11 +76,11 @@ div(layout="column", tabindex="0", tdr-focus="true")
 				img.issueCompThumbnailImage(ng-src="{{$ctrl.descriptionThumbnail}}")
 
 		// Comments
-		//.issueCompItemContainer(layout="column", layout-align="start", flex, ng-if="$ctrl.issueData.comments.length>0")
-			div(ng-repeat="comment in $ctrl.issueData.comments", layout="column", layout-align="start", flex)
-				.issueCompComment(ng-click="$ctrl.showViewpoint($event, comment.viewpoint)", layout="column", layout-align="start", flex)
+		.issueCompItemContainer(layout="column", layout-align="start", ng-if="$ctrl.issueData.comments.length>0")
+			div(ng-repeat="comment in $ctrl.issueData.comments", layout="column", layout-align="start")
+				.issueCompComment(ng-click="$ctrl.showViewpoint($event, comment.viewpoint)", layout="column", layout-align="start")
 					// Text and actions
-					div(layout='row', layout-align="space-between", flex)
+					div(layout='row', layout-align="space-between")
 						label.issueCompCommentTitle(
 						flex
 						ng-if="!comment.editing"
@@ -122,7 +122,7 @@ div(layout="column", tabindex="0", tdr-focus="true")
 
 	// New comment
 	.issueCompItemContainer#issueCompNewComment(layout="column", layout-align="start", ng-if="$ctrl.data")
-		md-input-container.issueComp(flex)
+		md-input-container.issueComp
 			label Comment
 			textarea(
 			ng-model="$ctrl.comment"
