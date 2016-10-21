@@ -1,4 +1,4 @@
-#issueCompContainer(layout="column", tabindex="0", tdr-focus="true")
+#issueCompContainer(layout="column", tabindex="0", tdr-focus="true", layout-fill)
 	div
 		// Title
 		.issueCompItemContainer(layout="column", layout-align="start")
@@ -104,8 +104,7 @@
 					.issueCompCommentOwner(
 					ng-if="$ctrl.data"
 					layout="row"
-					layout-align="space-between"
-					flex)
+					layout-align="space-between")
 						label {{comment.owner}}
 						label {{comment.timeStamp}}
 
@@ -114,14 +113,13 @@
 				layout="row"
 				layout-align="center"
 				ng-if="comment.viewpoint.screenshot"
-				ng-click="$ctrl.showScreenShot($event, comment.viewpoint)"
-				flex)
+				ng-click="$ctrl.showScreenShot($event, comment.viewpoint)")
 					img.issueCompThumbnailImage(ng-src="{{$ctrl.UtilsService.getServerUrl(comment.viewpoint.screenshot)}}")
 
 	md-divider
 
 	// New comment
-	.issueCompItemContainer#issueCompNewComment(layout="column", layout-align="start", ng-if="$ctrl.data")
+	.issueCompItemContainer#issueCompNewComment(layout="column", ng-if="$ctrl.data", flex="none")
 		md-input-container.issueComp
 			label Comment
 			textarea(
@@ -135,7 +133,7 @@
 	md-divider
 
 	// Footer
-	.issueCompItemContainer(layout="row", layout-align="space-between center")
+	.issueCompItemContainer(layout="row", layout-align="space-between center", flex="none")
 		div
 			md-button.md-icon-button(
 			ng-repeat="(action, actionData) in $ctrl.actions"
