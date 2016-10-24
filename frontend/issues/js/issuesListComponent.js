@@ -328,6 +328,8 @@
 			data = {
 				position : issue.viewpoint.position,
 				view_dir : issue.viewpoint.view_dir,
+				type: issue.viewpoint.type,
+				viewToWorldScale: issue.viewpoint.viewToWorldScale,
 				up: issue.viewpoint.up,
 				account: issue.account,
 				project: issue.project

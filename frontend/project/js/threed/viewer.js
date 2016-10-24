@@ -237,7 +237,7 @@ var GOLDEN_RATIO = (1.0 + Math.sqrt(5)) / 2.0;
 				self.setAmbientLight();
 
 				self.createViewpoint(self.name + "_default");
-
+				self.createViewpoint(self.name + "_default_ortho", null, null, null, true);
 				self.nav = document.createElement("navigationInfo");
 				self.nav.setAttribute("headlight", "false");
 				self.setNavMode(self.defaultNavMode);
@@ -1015,6 +1015,7 @@ var GOLDEN_RATIO = (1.0 + Math.sqrt(5)) / 2.0;
 
 		this.loadViewpoints = function() {
 			var viewpointList = document.getElementsByTagName("Viewpoint");
+			viewpointList = viewpointList.concat(document.getElementsByTagName("OrthoViewpoint"));
 
 			for (var v = 0; v < viewpointList.length; v++) {
 				if (viewpointList[v].hasAttribute("id")) {
@@ -1035,10 +1036,18 @@ var GOLDEN_RATIO = (1.0 + Math.sqrt(5)) / 2.0;
 
 		this.loadViewpoint = null;
 
-		this.createViewpoint = function(name, from, at, up ) {
+		this.createViewpoint = function(name, from, at, up, ortho) {
 			var groupName = self.getViewpointGroupAndName(name);
 			if (!(self.viewpoints[groupName.group] && self.viewpoints[groupName.group][groupName.name])) {
-				var newViewPoint = document.createElement("viewpoint");
+
+				var newViewPoint;
+
+				if(ortho){
+					newViewPoint = document.createElement("orthoviewpoint");
+				} else {
+					newViewPoint = document.createElement("viewpoint");
+				}
+				
 				newViewPoint.setAttribute("id", name);
 				newViewPoint.setAttribute("def", name);
 				
@@ -1396,11 +1405,26 @@ var GOLDEN_RATIO = (1.0 + Math.sqrt(5)) / 2.0;
 			self.updateCamera(currentPos, upDir, viewDir, centerOfRotation);
 		};
 
-		this.setCamera = function(pos, viewDir, upDir, centerOfRotation, animate, rollerCoasterMode, account, project) {
-			self.updateCamera(pos, upDir, viewDir, centerOfRotation, animate, rollerCoasterMode, account, project);
+		this.setCamera = function(pos, viewDir, upDir, centerOfRotation, animate, rollerCoasterMode, account, project, cameraType, viewToWorldScale) {
+			self.updateCamera(pos, upDir, viewDir, centerOfRotation, animate, rollerCoasterMode, account, project, cameraType, viewToWorldScale);
 		};
 
-		this.updateCamera = function(pos, up, viewDir, centerOfRotation, animate, rollerCoasterMode, account, project) {
+		this.updateCamera = function(pos, up, viewDir, centerOfRotation, animate, rollerCoasterMode, account, project, cameraType, viewToWorldScale) {
+
+			if(cameraType === 'orthogonal'){
+
+				if(self.currentViewpoint._xmlNode !== self.viewpointsNames[self.name + "_default_ortho"]){
+					self.setCurrentViewpoint(self.name + "_default_ortho");
+				}
+				
+				document.getElementById(self.name + "_default_ortho").setAttribute('fieldofview',[-viewToWorldScale, -viewToWorldScale, viewToWorldScale, viewToWorldScale].join(','));
+			} else {
+
+				if(self.currentViewpoint._xmlNode !== self.viewpointsNames[self.name + "_default"]){
+					self.setCurrentViewpoint(self.name + "_default");
+				}
+			}
+
 			var origViewTrans = null;
 			if(account && project)
 			{

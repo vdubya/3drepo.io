@@ -3245,7 +3245,7 @@ var GOLDEN_RATIO = (1.0 + Math.sqrt(5)) / 2.0;
 				self.setAmbientLight();
 
 				self.createViewpoint(self.name + "_default");
-
+				self.createViewpoint(self.name + "_default_ortho", null, null, null, true);
 				self.nav = document.createElement("navigationInfo");
 				self.nav.setAttribute("headlight", "false");
 				self.setNavMode(self.defaultNavMode);
@@ -4023,6 +4023,7 @@ var GOLDEN_RATIO = (1.0 + Math.sqrt(5)) / 2.0;
 
 		this.loadViewpoints = function() {
 			var viewpointList = document.getElementsByTagName("Viewpoint");
+			viewpointList = viewpointList.concat(document.getElementsByTagName("OrthoViewpoint"));
 
 			for (var v = 0; v < viewpointList.length; v++) {
 				if (viewpointList[v].hasAttribute("id")) {
@@ -4043,10 +4044,18 @@ var GOLDEN_RATIO = (1.0 + Math.sqrt(5)) / 2.0;
 
 		this.loadViewpoint = null;
 
-		this.createViewpoint = function(name, from, at, up ) {
+		this.createViewpoint = function(name, from, at, up, ortho) {
 			var groupName = self.getViewpointGroupAndName(name);
 			if (!(self.viewpoints[groupName.group] && self.viewpoints[groupName.group][groupName.name])) {
-				var newViewPoint = document.createElement("viewpoint");
+
+				var newViewPoint;
+
+				if(ortho){
+					newViewPoint = document.createElement("orthoviewpoint");
+				} else {
+					newViewPoint = document.createElement("viewpoint");
+				}
+				
 				newViewPoint.setAttribute("id", name);
 				newViewPoint.setAttribute("def", name);
 				
@@ -4404,11 +4413,26 @@ var GOLDEN_RATIO = (1.0 + Math.sqrt(5)) / 2.0;
 			self.updateCamera(currentPos, upDir, viewDir, centerOfRotation);
 		};
 
-		this.setCamera = function(pos, viewDir, upDir, centerOfRotation, animate, rollerCoasterMode, account, project) {
-			self.updateCamera(pos, upDir, viewDir, centerOfRotation, animate, rollerCoasterMode, account, project);
+		this.setCamera = function(pos, viewDir, upDir, centerOfRotation, animate, rollerCoasterMode, account, project, cameraType, viewToWorldScale) {
+			self.updateCamera(pos, upDir, viewDir, centerOfRotation, animate, rollerCoasterMode, account, project, cameraType, viewToWorldScale);
 		};
 
-		this.updateCamera = function(pos, up, viewDir, centerOfRotation, animate, rollerCoasterMode, account, project) {
+		this.updateCamera = function(pos, up, viewDir, centerOfRotation, animate, rollerCoasterMode, account, project, cameraType, viewToWorldScale) {
+
+			if(cameraType === 'orthogonal'){
+
+				if(self.currentViewpoint._xmlNode !== self.viewpointsNames[self.name + "_default_ortho"]){
+					self.setCurrentViewpoint(self.name + "_default_ortho");
+				}
+				
+				document.getElementById(self.name + "_default_ortho").setAttribute('fieldofview',[-viewToWorldScale, -viewToWorldScale, viewToWorldScale, viewToWorldScale].join(','));
+			} else {
+
+				if(self.currentViewpoint._xmlNode !== self.viewpointsNames[self.name + "_default"]){
+					self.setCurrentViewpoint(self.name + "_default");
+				}
+			}
+
 			var origViewTrans = null;
 			if(account && project)
 			{
@@ -12625,7 +12649,9 @@ angular.module('3drepo')
 					view_dir : viewpoint.view_dir,
 					up: viewpoint.up,
 					account: self.issueData.account,
-					project: self.issueData.project
+					project: self.issueData.project,
+					type: viewpoint.type,
+					viewToWorldScale: viewpoint.viewToWorldScale,
 				};
 				self.sendEvent({type: EventService.EVENT.VIEWER.SET_CAMERA, value: data});
 
@@ -13473,8 +13499,8 @@ angular.module('3drepo')
 						position: position.toGL(),
 						norm: normal.toGL(),
 						selectedObjectId: changes.event.currentValue.value.id,
-						pickedPos: pickedPos,
-						pickedNorm: pickedNorm,
+						pickedPos: position,
+						pickedNorm: normal,
 						colours: [[0.5, 0, 0]]
 					};
 					self.sendEvent({type: EventService.EVENT.VIEWER.ADD_PIN, value: data});
@@ -14149,6 +14175,8 @@ angular.module('3drepo')
 			EventService.send(EventService.EVENT.VIEWER.SET_CAMERA, {
 				position : issue.viewpoint.position,
 				view_dir : issue.viewpoint.view_dir,
+				type: issue.viewpoint.type,
+				viewToWorldScale: issue.viewpoint.viewToWorldScale,
 				up: issue.viewpoint.up,
 				account: issue.account,
 				project: issue.project
@@ -14527,6 +14555,8 @@ angular.module('3drepo')
 			data = {
 				position : issue.viewpoint.position,
 				view_dir : issue.viewpoint.view_dir,
+				type: issue.viewpoint.type,
+				viewToWorldScale: issue.viewpoint.viewToWorldScale,
 				up: issue.viewpoint.up,
 				account: issue.account,
 				project: issue.project
@@ -18441,7 +18471,9 @@ var Oculus = {};
 								angular.isDefined(event.value.animate) ? event.value.animate : true,
 								event.value.rollerCoasterMode,
 								event.value.account,
-								event.value.project
+								event.value.project,
+								event.value.type,
+								event.value.viewToWorldScale
 							);
 						} else if (event.type === EventService.EVENT.VIEWER.GET_CURRENT_VIEWPOINT) {
 							if (angular.isDefined(event.value.promise)) {

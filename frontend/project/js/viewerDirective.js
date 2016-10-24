@@ -287,7 +287,9 @@
 								angular.isDefined(event.value.animate) ? event.value.animate : true,
 								event.value.rollerCoasterMode,
 								event.value.account,
-								event.value.project
+								event.value.project,
+								event.value.type,
+								event.value.viewToWorldScale
 							);
 						} else if (event.type === EventService.EVENT.VIEWER.GET_CURRENT_VIEWPOINT) {
 							if (angular.isDefined(event.value.promise)) {

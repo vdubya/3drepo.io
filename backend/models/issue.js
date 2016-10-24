@@ -102,7 +102,8 @@ var schema = Schema({
 			type: String, 
 			default: 'perspective', 
 			enum: ['perspective', 'orthogonal']
-		}
+		},
+		viewToWorldScale: Number
 	}],
 
 	group_id: Object,
@@ -1510,7 +1511,7 @@ schema.statics.importBCF = function(account, project, revId, zipPath){
 								-parseFloat(_.get(vpXML, 'VisualizationInfo.OrthogonalCamera[0].CameraViewPoint[0].Y[0]._')) * scale
 							];
 
-							vp.fov = 1.8;
+							vp.viewToWorldScale = _.get(vpXML, 'VisualizationInfo.OrthogonalCamera[0].ViewToWorldScale[0]._');
 
 							vp.type = 'orthogonal';
 						}

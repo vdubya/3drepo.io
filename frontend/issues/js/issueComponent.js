@@ -261,7 +261,9 @@
 					view_dir : viewpoint.view_dir,
 					up: viewpoint.up,
 					account: self.issueData.account,
-					project: self.issueData.project
+					project: self.issueData.project,
+					type: viewpoint.type,
+					viewToWorldScale: viewpoint.viewToWorldScale,
 				};
 				self.sendEvent({type: EventService.EVENT.VIEWER.SET_CAMERA, value: data});
 
