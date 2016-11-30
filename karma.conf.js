@@ -35,7 +35,7 @@
 				'frontend/test/mock_services/notificationService.js',
 				'frontend/test/jasmine/*Spec.js',
 
-				'frontend/**/*.html'
+				'templates/*.html'
 			],
 
 
@@ -46,10 +46,11 @@
 			// preprocess matching files before serving them to the browser
 			// available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
 			preprocessors: {
-				'frontend/**/*.html': ['ng-html2js']
+				'templates/*.html': ['ng-html2js']
 			},
 
 			ngHtml2JsPreprocessor: {
+				stripPrefix: "templates/",
 				moduleName: 'templates'
 			},
 

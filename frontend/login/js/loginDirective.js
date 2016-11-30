@@ -24,7 +24,7 @@
 	function login() {
 		return {
 			restrict: "EA",
-			templateUrl: "frontend/login/jade/test.html",
+			templateUrl: "test.html",
 			scope: {},
 			controller: LoginCtrl,
 			controllerAs: "vm",
