@@ -44,9 +44,9 @@
 			}
 		);
 
-	IssueCompCtrl.$inject = ["$q", "$mdDialog", "$element", "EventService", "IssuesService", "UtilsService", "NotificationService", "Auth", "$timeout", "$scope"];
+	IssueCompCtrl.$inject = ["$q", "$mdDialog", "EventService", "IssuesService", "UtilsService", "NotificationService", "Auth", "$timeout", "$scope"];
 
-	function IssueCompCtrl ($q, $mdDialog, $element, EventService, IssuesService, UtilsService, NotificationService, Auth, $timeout, $scope) {
+	function IssueCompCtrl ($q, $mdDialog, EventService, IssuesService, UtilsService, NotificationService, Auth, $timeout, $scope) {
 		var self = this,
 			savedScreenShot = null,
 			highlightBackground = "#FF9800",
@@ -58,7 +58,7 @@
 			textInputHasFocus = false,
 			savedDescription,
 			savedComment,
-			issueRoleIndicator = angular.element($element[0].querySelector('#issueRoleIndicator'));
+			issueRoleIndicator = angular.element(document.querySelector('#issueRoleIndicator'));
 
 		/*
 		 * Init
@@ -99,7 +99,6 @@
 		this.$onChanges = function (changes) {
 			var i, length,
 				leftArrow = 37;
-			console.log(this.data);
 
 			if(changes.hasOwnProperty('projectSettings')){
 				this.topic_types = this.projectSettings.topicTypes;
@@ -120,12 +119,12 @@
 					});
 
 					this.hideDescription = !this.issueData.hasOwnProperty("desc");
-					if (this.issueData.viewpoint.hasOwnProperty("screenshotSmall")) {
+					if (this.issueData.viewpoint && this.issueData.viewpoint.screenshotSmall) {
 						this.descriptionThumbnail = UtilsService.getServerUrl(this.issueData.viewpoint.screenshotSmall);
 					}
 					// Issue owner or user with same role as issue creator role can update issue
 					this.canUpdate = (Auth.getUsername() === this.issueData.owner);
-					if (!this.canUpdate) {
+					if (!this.canUpdate && this.userRoles) {
 						for (i = 0, length = this.userRoles.length; i < length; i += 1) {
 							if (this.userRoles[i] === this.issueData.creator_role) {
 								this.canUpdate = true;
@@ -138,7 +137,7 @@
 					this.canEditDescription = (this.issueData.comments.length === 0);
 
 					// Role colour
-					if (this.issueData.assigned_roles.length > 0) {
+					if (this.issueData.assigned_roles && (this.issueData.assigned_roles.length > 0)) {
 						setRoleIndicatorColour(this.issueData.assigned_roles[0]);
 					}
 					else {
@@ -772,7 +771,7 @@
 		function setRoleIndicatorColour (role) {
 			var roleColor = IssuesService.getRoleColor(role);
 			if (roleColor !== null) {
-				issueRoleIndicator.css("background", IssuesService.getRoleColor(role));
+				issueRoleIndicator.css("background", roleColor);
 				issueRoleIndicator.css("border", "none");
 			}
 			else {
@@ -886,7 +885,7 @@
 					if(comment.action){
 						comment.comment = IssuesService.convertActionCommentToText(comment);
 					}
-					
+
 					afterNewComment(comment, true);
 
 					//necessary to apply scope.apply and reapply scroll down again here because this function is not triggered from UI
@@ -923,7 +922,7 @@
 
 					self.issueData.comments[deleteIndex].comment = 'This comment has been deleted.'
 
-					
+
 					$scope.$apply();
 					commentAreaScrollToBottom();
 

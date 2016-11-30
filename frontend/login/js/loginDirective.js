@@ -24,7 +24,7 @@
 	function login() {
 		return {
 			restrict: "EA",
-			templateUrl: "login.html",
+			templateUrl: "frontend/login/jade/test.html",
 			scope: {},
 			controller: LoginCtrl,
 			controllerAs: "vm",
@@ -65,7 +65,6 @@
 		$scope.$watch(EventService.currentEvent, function(event) {
 			if (event.type === EventService.EVENT.USER_LOGGED_IN) {
 				// Show an error message for incorrect login
-				console.log(666, event);
 				if (event.value.hasOwnProperty("error") && (event.value.error.place.indexOf("POST") !== -1)) {
 					if (event.value.error.status === 500) {
 						vm.errorMessage = "There is currently a problem with the system. Please try again later.";

@@ -78,7 +78,7 @@ issues .importBCFLoading {
   margin: 10px auto;
 }
 
-issues #issueRoleIndicator {
+issues .issueRoleIndicator {
   width: 8px;
   border: 1px solid #DDDDDD;
   margin-right: 10px;

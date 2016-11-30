@@ -31,9 +31,9 @@
 			}
 		);
 
-	IssuesListItemCtrl.$inject = ["$element", "$timeout", "IssuesService"];
+	IssuesListItemCtrl.$inject = ["$timeout", "IssuesService"];
 
-	function IssuesListItemCtrl ($element, $timeout, IssuesService) {
+	function IssuesListItemCtrl ($timeout, IssuesService) {
 		var self = this,
 			issueRoleIndicator = null;
 
@@ -48,7 +48,8 @@
 		this.$onInit = function () {
 			// Role indicator
 			$timeout(function () {
-				issueRoleIndicator = angular.element($element[0].querySelector('#issueRoleIndicator'));
+				// 'a' is prefixed to the id for querySelector to work, as an id cannot start with a number
+				issueRoleIndicator = angular.element(document.querySelector("#a" + self.data._id));
 				setRoleIndicatorColour();
 			});
 		};

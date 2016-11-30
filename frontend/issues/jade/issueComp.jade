@@ -3,7 +3,9 @@ div(flex, layout="column", layout-fill, tabindex="0", tdr-focus="true")
 		// Title
 		.issueCompItemContainer(layout="column", layout-align="start", flex)
 			div(layout="row", flex)
-				#issueRoleIndicator
+				// The id is used for querySelector
+				.issueRoleIndicator(id="issueRoleIndicator")
+
 				md-input-container#issueCompTitleInput(ng-if="!$ctrl.data", flex)
 					label Title
 					input(

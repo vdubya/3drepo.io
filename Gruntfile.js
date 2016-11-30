@@ -22,7 +22,8 @@ module.exports = function(grunt) {
 				src: [
 					'frontend/project/js/threed/viewerutil.js',
 					'frontend/project/js/threed/*.js',
-					'frontend/**/*.js'
+					'frontend/**/*.js',
+					'!frontend/test/*.js'
 				],
 
 				dest: 'public/dist/three_d_repo.js'
