@@ -1,5 +1,5 @@
 md-menu#accountMenu(md-position-mode="target-right target")
-	md-button.md-icon-button(aria-label="Account Menu", ng-click="vm.openMenu($mdOpenMenu, $event)")
+	md-button.md-icon-button#accountMenuButton(aria-label="Account Menu", ng-click="vm.openMenu($mdOpenMenu, $event)")
 		md-icon.angular-material-icons(md-menu-origin) account_circle
 	md-menu-content#accountMenuContent(width="3")
 		md-menu-item
@@ -7,6 +7,6 @@ md-menu#accountMenu(md-position-mode="target-right target")
 				md-icon.angular-material-icons(md-menu-align-target) view_list
 				| Projects
 		md-menu-item
-			md-button(ng-click="vm.logout()")
+			md-button#logoutButton(ng-click="vm.logout()")
 				md-icon.angular-material-icons exit_to_app
 				| Logout

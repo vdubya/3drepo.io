@@ -63,3 +63,6 @@ tools/release/*.exe
 
 #legal
 jade/legal
+
+#templates
+/templates/

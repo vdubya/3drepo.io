@@ -1,3 +1,5 @@
+**Protractor**
+
 Setup - from the docs (http://www.protractortest.org/#/)
 
 Use npm to install Protractor globally with:
@@ -22,3 +24,10 @@ If there is a "major.minor" java error the following can reolve it
 
 - brew update
 - brew cask install java
+
+__
+
+**Jasmine**
+
+- These tests rely on the file _karma.conf.js_ in the root directory
+- Directory _mock_services_ contains paired down versions of the real services

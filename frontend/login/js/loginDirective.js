@@ -24,7 +24,7 @@
 	function login() {
 		return {
 			restrict: "EA",
-			templateUrl: "test.html",
+			templateUrl: "login.html",
 			scope: {},
 			controller: LoginCtrl,
 			controllerAs: "vm",
@@ -42,6 +42,7 @@
 		 * Init
 		 */
 		vm.version = serverConfig.apiVersion;
+		vm.user = {};
 
 		/**
 		 * Attempt to login

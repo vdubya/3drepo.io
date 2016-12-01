@@ -1,1 +1,0 @@
-These tests rely on the file **karma.conf.js** in the root directory

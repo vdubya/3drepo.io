@@ -15,12 +15,8 @@
 		}));
 
 		it('does something', function() {
-			console.log(controller);
-			controller.user = {
-				username: "blah"
-			};
 			controller.login();
-			expect(true).toBe(true);
+			// expect(element.isolateScope().blah).toEqual(true); - tests scope varaiable
 		});
 	});
 }());

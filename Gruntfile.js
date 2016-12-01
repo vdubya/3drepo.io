@@ -23,7 +23,7 @@ module.exports = function(grunt) {
 					'frontend/project/js/threed/viewerutil.js',
 					'frontend/project/js/threed/*.js',
 					'frontend/**/*.js',
-					'!frontend/test/*.js'
+					'!frontend/test/**/*.js'
 				],
 
 				dest: 'public/dist/three_d_repo.js'
@@ -131,6 +131,19 @@ module.exports = function(grunt) {
 					'public/dist/three_d_repo.min.css': ['public/dist/three_d_repo.css']
 				}
 			}
+		},
+
+		pug: {
+			compile: {
+				options: {
+					data: {
+						debug: false
+					}
+				},
+				files: {
+					'templates/login.html': ['frontend/login/jade/login.jade']
+				}
+			}
 		}
     });
 
@@ -142,9 +155,11 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-webfont');
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
 	grunt.loadNpmTasks('grunt-env');
+	grunt.loadNpmTasks('grunt-contrib-pug');
 
 	grunt.registerTask('default', ['concat', 'uglify', 'webfont', 'concat:allJS','concat:allCSS', 'uglify:allJS', 'cssmin:allCSS']);
 	grunt.registerTask('test', ['mochaTest:unit']);
 	grunt.registerTask('test-integrated', ['env:test', 'mochaTest:integrated']);
 	grunt.registerTask('frontend', ['concat:allJS','concat:allCSS', 'uglify:allJS', 'cssmin:allCSS']);
+	grunt.registerTask('templates', ['pug']);
 };
