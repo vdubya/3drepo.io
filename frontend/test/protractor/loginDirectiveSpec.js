@@ -1,8 +1,24 @@
 (function () {
 	"use strict";
 
+	var text,
+		usernameInput = element(by.model('vm.user.username')),
+		passwordInput = element(by.model('vm.user.password'));
+
 	describe('login page', function() {
 		browser.get('http://staging/');
+
+		it('should allow text input in username field', function() {
+			text = "hello";
+			usernameInput.sendKeys(text);
+			expect(usernameInput.getAttribute('value')).toEqual(text);
+		});
+
+		it('should allow text input in password field', function() {
+			text = "hello";
+			passwordInput.sendKeys(text);
+			expect(passwordInput.getAttribute('value')).toEqual(text);
+		});
 
 		it('should log in', function() {
 			login('france', 'france');
@@ -35,8 +51,12 @@
 	});
 
 	function login (username, password) {
-		element(by.model('vm.user.username')).sendKeys(username);
-		element(by.model('vm.user.password')).sendKeys(password);
-		element(by.id('loginButton')).click();
+		usernameInput.clear().then(function() {
+			passwordInput.clear().then(function() {
+				usernameInput.sendKeys(username);
+				passwordInput.sendKeys(password);
+				element(by.id('loginButton')).click();
+			});
+		});
 	}
 }());
