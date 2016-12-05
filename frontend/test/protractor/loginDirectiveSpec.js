@@ -3,7 +3,8 @@
 
 	var text,
 		usernameInput = element(by.model('vm.user.username')),
-		passwordInput = element(by.model('vm.user.password'));
+		passwordInput = element(by.model('vm.user.password')),
+		config = require('../../../config/protractor/config.json');
 
 	describe('login page', function() {
 		browser.get('http://staging/');
@@ -21,7 +22,7 @@
 		});
 
 		it('should log in', function() {
-			login('france', 'france');
+			login(config.validUser.username, config.validUser.username);
 			element.all(by.css('#account')).then(function(items) {
 				expect(items.length).toEqual(1);
 			});
@@ -32,7 +33,7 @@
 			element(by.id('accountMenuButton')).click();
 			element(by.id('logoutButton')).click();
 
-			login('france', 'blah');
+			login(config.invalidUser.username, config.invalidUser.password);
 			element.all(by.css('#account')).then(function(items) {
 				expect(items.length).toEqual(0);
 			});

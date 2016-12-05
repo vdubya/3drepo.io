@@ -31,8 +31,9 @@
 				'frontend/issues/js/issuesService.js',
 				'frontend/issues/js/issueComponent.js',
 				'frontend/login/js/loginDirective.js',
-				'frontend/test/mock_services/serverConfig.js',
-				'frontend/test/mock_services/notificationService.js',
+				'frontend/test/jasmine/mock_services/serverConfig.js',
+				'frontend/test/jasmine/mock_services/notificationService.js',
+				'frontend/test/jasmine/mock_services/Auth.js',
 				'frontend/test/jasmine/*Spec.js',
 
 				'templates/*.html'
