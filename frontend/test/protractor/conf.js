@@ -4,7 +4,7 @@
 		exports.config = {
 		seleniumAddress: 'http://localhost:4444/wd/hub',
 		specs: [
-			'loginSpec.js',
+			//'loginSpec.js',
 			'passwordForgotSpec.js'
 		],
 		onPrepare: function () {
