@@ -26,7 +26,7 @@
 						md-button.md-accent.md-raised#loginButton(ng-click="vm.login()") Log In
 					h4.loginError {{vm.errorMessage}}
 					div(layout="row", layout-align="start center", flex="none")
-						a.loginLinks(href="passwordForgot") Forgot password?
+						a.loginLinks#loginPasswordForgotLink(href="passwordForgot") Forgot password?
 					div(layout="row", layout-align="start center", flex="none")
-						a.loginLinks(href="pricing") Sign up
+						a.loginLinks#loginSignUpLink(href="pricing") Sign up
 					h2.md-subhead#loginVersion Version: {{vm.version}}

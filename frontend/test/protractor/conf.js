@@ -4,7 +4,8 @@
 		exports.config = {
 		seleniumAddress: 'http://localhost:4444/wd/hub',
 		specs: [
-			'loginDirectiveSpec.js'
+			'loginSpec.js',
+			'passwordForgotSpec.js'
 		],
 		onPrepare: function () {
 			// To bring the browser window to the front
