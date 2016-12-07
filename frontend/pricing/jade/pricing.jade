@@ -18,7 +18,7 @@
 					h3 Demo Project
 			md-divider
 			div(layout="row", layout-align="center center")
-				md-button.md-raised.md-accent(ng-click="vm.showPage('signUp')") Sign Up
+				md-button.md-raised.md-accent#basicSignUpButton(ng-click="vm.showPage('signUp')") Sign Up
 
 	// Advanced
 	md-content.md-whiteframe-8dp(aria-label="Advanced", flex-lg="20", flex-gt-lg="15")
@@ -46,7 +46,7 @@
 					h3 Demo Project
 			md-divider
 			div(layout="row", layout-align="center center")
-				md-button.md-raised.md-accent(ng-click="vm.showPage('signUp', true)") Sign Up
+				md-button.md-raised.md-accent#advancedSignUpButton(ng-click="vm.showPage('signUp', true)") Sign Up
 
 	// Enterprise
 	md-content.md-whiteframe-1dp(aria-label="Enterprise", flex-lg="20", flex-gt-lg="15")

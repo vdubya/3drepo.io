@@ -21,7 +21,7 @@ form
 			p(ng-bind-html="vm.legalText")
 	#loginCaptcha(vc-recaptcha, key="vm.captchaKey", ng-model="vm.reCaptchaResponse", ng-if="vm.useReCapthca")
 	div(layout="row", layout-align="start center")
-		md-button.md-accent.md-raised(ng-click="vm.register()", ng-disabled="vm.registering", flex="none") {{vm.buttonLabel}}
+		md-button.md-accent.md-raised#signUpButton(ng-click="vm.register()", ng-disabled="vm.registering", flex="none") {{vm.buttonLabel}}
 		#registerWait(ng-if="vm.registering", layout="row", layout-align="start center")
 			p Signing up...
 			md-progress-circular(md-mode="indeterminate", md-diameter="20")

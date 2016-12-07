@@ -5,7 +5,8 @@
 		seleniumAddress: 'http://localhost:4444/wd/hub',
 		specs: [
 			//'loginSpec.js',
-			'passwordForgotSpec.js'
+			//'passwordForgotSpec.js',
+			'signUpSpec.js'
 		],
 		onPrepare: function () {
 			// To bring the browser window to the front

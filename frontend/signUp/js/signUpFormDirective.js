@@ -217,7 +217,7 @@
 		}
 
 		function getLegalTextFromLegalItem (legalItem) {
-			return "<a target='_blank' href='/" + legalItem.page + "'>" + legalItem.title + "</a>";
+			return "<a class='" + legalItem.page + "' target='_blank' href='/" + legalItem.page + "'>" + legalItem.title + "</a>";
 		}
 	}
 }());

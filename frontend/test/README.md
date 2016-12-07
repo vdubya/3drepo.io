@@ -25,6 +25,11 @@ If there is a "major.minor" java error the following can resolve it
 - brew update
 - brew cask install java
 
+To run the tests (from **frontend/test/protractor**)
+
+* Edit conf.js to enable/disable test specs (with comment '//')
+* Then run _protractor conf.js_ from the command line
+
 Jasmine
 -
 * These tests rely on the file _karma.conf.js_ in the root directory
