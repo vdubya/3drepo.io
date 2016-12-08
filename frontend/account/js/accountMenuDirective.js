@@ -34,15 +34,14 @@
 		};
 	}
 
-	AccountMenuCtrl.$inject = ["Auth", "EventService"];
+	AccountMenuCtrl.$inject = ["$window", "Auth", "EventService"];
 
-	function AccountMenuCtrl (Auth, EventService) {
+	function AccountMenuCtrl ($window, Auth, EventService) {
 		var vm = this,
-			promise;
+			userManualUrl = "http://3drepo.org/projects/3drepo-io-user-manual/";
 
 		/**
 		 * Open menu
-		 *
 		 * @param $mdOpenMenu
 		 * @param ev
 		 */
@@ -55,6 +54,13 @@
 		 */
 		vm.showProjects = function () {
 			EventService.send(EventService.EVENT.SHOW_PROJECTS);
+		};
+
+		/**
+		 * Show user manual
+		 */
+		vm.showUserManual = function () {
+			$window.open(userManualUrl);
 		};
 
 		/**
