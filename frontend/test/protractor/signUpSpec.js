@@ -10,6 +10,8 @@
 		signUpButton,
 		message;
 
+	const Utils = require('./utils');
+
 	describe('Sign up:', function() {
 		browser.get('http://staging/');
 
@@ -59,15 +61,15 @@
 		});
 
 		it('Clicking the Terms & Conditions link opens the T&Cs in a new tab', function() {
-			openTabAndCheckForTag("terms", "terms");
+			Utils.openTabAndCheckForTag("terms", "terms");
 		});
 
 		it('Clicking the Privacy link opens the Privacy in a new tab', function() {
-			openTabAndCheckForTag("privacy", "privacy");
+			Utils.openTabAndCheckForTag("privacy", "privacy");
 		});
 
 		it('Clicking the Cookies link opens the Cookies in a new tab', function() {
-			openTabAndCheckForTag("cookies", "cookies");
+			Utils.openTabAndCheckForTag("cookies", "cookies");
 		});
 
 		it('Button click should show error for missing username', function() {
@@ -114,7 +116,7 @@
 		});
 
 		it('Clicking the pricing link should open the pricing page in a new tab', function() {
-			openTabAndCheckForTag("pricing", "pricing");
+			Utils.openTabAndCheckForTag("pricing", "pricing");
 		});
 
 		it('Clicking the login link should open the pricing page in a new tab', function() {
@@ -139,25 +141,6 @@
 				usernameInput.sendKeys(username);
 				emailInput.sendKeys(password);
 				requestButton.click();
-			});
-		});
-	}
-
-	function openTabAndCheckForTag (tabPage, tag) {
-		var tcLink = element(by.className(tabPage));
-		// This will open terms in a new tab
-		tcLink.click();
-		// Get all tabs
-		browser.getAllWindowHandles().then(function (handles) {
-			// Switch to new tab
-			browser.switchTo().window(handles[1]).then(function () {
-				element.all(by.tagName(tag)).then(function(items) {
-					expect(items.length).toEqual(1);
-					// Close new tab
-					browser.driver.close();
-					// Go to first tab
-					browser.driver.switchTo().window(handles[0]);
-				});
 			});
 		});
 	}
