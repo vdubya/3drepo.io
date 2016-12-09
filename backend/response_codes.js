@@ -115,7 +115,7 @@
 
 		SIZE_LIMIT: { message: "Single file size exceeded system limit", status: 400 },
 		INVALID_PROJECT_NAME: { message: "Invalid project name", status: 400 },
-		SIGN_UP_INVALID_EMAIL: { message: "Invalid email adress", status: 400 },
+		SIGN_UP_INVALID_EMAIL: { message: "Invalid email address", status: 400 },
 		ALREADY_LOGGED_IN: { message: "You are already logged in", status: 400 },
 		BLACKLISTED_PROJECT_NAME: { message: "Project name reserved", status: 400 },
 

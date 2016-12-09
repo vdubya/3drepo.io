@@ -6,9 +6,9 @@
 		usernameInput,
 		emailInput,
 		passwordInput,
+		tcCheckBox,
 		signUpButton,
-		message = element(by.id('message')),
-		config = require('../../../config/protractor/config.json');
+		message;
 
 	describe('Sign up:', function() {
 		browser.get('http://staging/');
@@ -53,7 +53,7 @@
 		});
 
 		it('User can click the Terms & Conditions checkbox', function() {
-			var tcCheckBox = element(by.model('vm.newUser.tcAgreed'));
+			tcCheckBox = element(by.model('vm.newUser.tcAgreed'));
 			tcCheckBox.click();
 			expect(tcCheckBox.getAttribute('aria-checked')).toBe("true");
 		});
@@ -73,11 +73,55 @@
 		it('Button click should show error for missing username', function() {
 			clearInputs();
 			text = "hello@world.com";
-			emailInput = element(by.model('vm.newUser.email'));
+			emailInput.sendKeys(text);
 			text = "hello";
-			passwordInput = element(by.model('vm.newUser.password'));
+			passwordInput.sendKeys(text);
+			message = element(by.className('registerError'));
 			signUpButton = element(by.id('signUpButton'));
 			signUpButton.click();
+			expect(message.getText()).toEqual("Username not allowed");
+
+		});
+
+		it('Button click should show error for missing email', function() {
+			clearInputs();
+			text = "hello";
+			usernameInput.sendKeys(text);
+			text = "hello";
+			passwordInput.sendKeys(text);
+			signUpButton.click();
+			expect(message.getText()).toEqual("Invalid email address");
+
+		});
+
+		it('Button click should show error for missing password', function() {
+			clearInputs();
+			text = "hello";
+			usernameInput.sendKeys(text);
+			text = "hello@world.com";
+			emailInput.sendKeys(text);
+			signUpButton.click();
+			expect(message.getText()).toEqual("Password is missing");
+
+		});
+
+		it('Button click should show error for unchecked checkbox', function() {
+			text = "hello";
+			passwordInput.sendKeys(text);
+			tcCheckBox.click(); // Clear previous check
+			signUpButton.click();
+			expect(message.getText()).toEqual("You must agree to the terms and conditions");
+		});
+
+		it('Clicking the pricing link should open the pricing page in a new tab', function() {
+			openTabAndCheckForTag("pricing", "pricing");
+		});
+
+		it('Clicking the login link should open the pricing page in a new tab', function() {
+			element(by.className("login")).click();
+			element.all(by.tagName("login")).then(function(items) {
+				expect(items.length).toEqual(1);
+			});
 		});
 	});
 
