@@ -6,7 +6,8 @@
 		specs: [
 			//'loginSpec.js',
 			//'passwordForgotSpec.js',
-			'signUpSpec.js'
+			//'signUpSpec.js',
+			'contactSpec.js'
 		],
 		onPrepare: function () {
 			// To bring the browser window to the front
