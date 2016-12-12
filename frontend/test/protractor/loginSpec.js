@@ -49,13 +49,17 @@
 		it('Clicking "Forgot password" link should take user to password reset page', function() {
 			logout();
 			passwordForgotLink.click();
-			expect(element(by.tagName('password-forgot')));
+			element.all(by.tagName('password-forgot')).then(function(items) {
+				expect(items.length).toEqual(1);
+			});
 		});
 
 		it('Clicking the "Sign up" link should take the user to the pricing page', function() {
 			browser.navigate().back();
 			signUpLink.click();
-			expect(element(by.tagName('pricing')));
+			element.all(by.tagName('pricing')).then(function(items) {
+				expect(items.length).toEqual(1);
+			});
 		});
 
 		it('Version number is correct', function() {

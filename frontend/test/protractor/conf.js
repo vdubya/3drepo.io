@@ -8,7 +8,8 @@
 			//'passwordForgotSpec.js',
 			//'signUpSpec.js',
 			//'contactSpec.js',
-			'bottomLinksSpec.js'
+			//'bottomLinksSpec.js',
+			'clipSpec.js'
 		],
 		onPrepare: function () {
 			// To bring the browser window to the front
