@@ -19,9 +19,7 @@
 
 let request = require('supertest');
 let expect = require('chai').expect;
-let app = require("../../services/api.js").createApp(
-	{ session: require('express-session')({ secret: 'testing'}) }
-);
+let app = require("../../services/api.js").createApp();
 let log_iface = require("../../logger.js");
 let systemLogger = log_iface.systemLogger;
 let responseCodes = require("../../response_codes.js");
@@ -56,6 +54,9 @@ describe('Infrastructure', function () {
 		this.timeout(10000);
 
 		describe('died before app start', function(){
+			
+			let token;
+
 			before(function(done){
 				stopQueue(err => {
 					if(err){
@@ -70,6 +71,7 @@ describe('Infrastructure', function () {
 						.send({ username, password })
 						.expect(200, function(err, res){
 							expect(res.body.username).to.equal(username);
+							token = res.body.token;
 							done(err);
 						});
 
@@ -91,7 +93,7 @@ describe('Infrastructure', function () {
 			});
 		
 			it('should behaves normal for non-queue based API', function(done){
-				agent.get(`/{{username}}.json`)
+				agent.get(`/{{username}}.json`).set('Authorization', `Bearer ${token}`)
 				.expect(200, function(err, res){
 					done(err);
 				})
@@ -99,7 +101,7 @@ describe('Infrastructure', function () {
 
 			it('should report error for queue based api if queue service is not running', function(done){
 
-				agent.post(`/testing/${model}/upload`)
+				agent.post(`/testing/${model}/upload`).set('Authorization', `Bearer ${token}`)
 				.attach('file', __dirname + '/../../statics/3dmodels/8000cubes.obj')
 				.expect(500, function(err, res){
 					done(err);
@@ -110,6 +112,8 @@ describe('Infrastructure', function () {
 
 		describe('died on midway', function(done){
 
+			let token;
+
 			before(function(done){
 				server = app.listen(8080, function () {
 					console.log('API test server is listening on port 8080!');
@@ -119,7 +123,7 @@ describe('Infrastructure', function () {
 					.send({ username, password })
 					.expect(200, function(err, res){
 						expect(res.body.username).to.equal(username);
-						
+						token = res.body.token;
 						if(err){
 							return done(err);
 						}
@@ -133,7 +137,7 @@ describe('Infrastructure', function () {
 
 			it('should report error for queue based api if queue service is not running', function(done){
 
-				agent.post(`/testing/${model}/upload`)
+				agent.post(`/testing/${model}/upload`).set('Authorization', `Bearer ${token}`)
 				.attach('file', __dirname + '/../../statics/3dmodels/8000cubes.obj')
 				.expect(500, function(err, res){
 					done(err);
@@ -142,7 +146,7 @@ describe('Infrastructure', function () {
 			});
 
 			it('should behaves normal for non-queue based API', function(done){
-				agent.get(`/{{username}}.json`)
+				agent.get(`/{{username}}.json`).set('Authorization', `Bearer ${token}`)
 				.expect(200, function(err, res){
 					done(err);
 				})
@@ -154,7 +158,7 @@ describe('Infrastructure', function () {
 						return done(err);
 					}
 
-					agent.post(`/testing/${model}/upload`)
+					agent.post(`/testing/${model}/upload`).set('Authorization', `Bearer ${token}`)
 					.attach('file', __dirname + '/../../statics/3dmodels/8000cubes.obj')
 					.end(function(err, res){
 						expect(res.statusCode).to.not.equal(500);

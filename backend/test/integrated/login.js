@@ -19,9 +19,7 @@
 
 let request = require('supertest');
 let expect = require('chai').expect;
-let app = require("../../services/api.js").createApp(
-	{ session: require('express-session')({ secret: 'testing'}) }
-);
+let app = require("../../services/api.js").createApp();
 let log_iface = require("../../logger.js");
 let systemLogger = log_iface.systemLogger;
 let responseCodes = require("../../response_codes.js");
@@ -65,7 +63,7 @@ describe('Login', function () {
 		return User.createUser(systemLogger, username, password, {
 			email: email('success')
 		}, 200000).then(emailVerifyToken => {
-			return User.verify(username, emailVerifyToken.token, true);
+			return User.verify(username, emailVerifyToken.token, {skipImportToyModel:  true});
 		}).then(user => {
 
 			return new Promise((resolve, reject) => {
@@ -74,6 +72,7 @@ describe('Login', function () {
 				.send({ username, password })
 				.expect(200, function(err, res){
 					expect(res.body.username).to.equal(username);
+					expect(res.body.token).to.exist;
 					err ? reject(err) : resolve();
 				});
 			})
@@ -136,7 +135,10 @@ describe('Login', function () {
 		.end(function(err, res){
 
 			//double login
-			agent.post('/login').send({ username: username , password: password })
+			agent
+			.post('/login')
+			.set('Authorization', `Bearer ${res.body.token}`)
+			.send({ username: username , password: password })
 			.expect(400, function(err, res){
 				expect(res.body.value).to.equal(responseCodes.ALREADY_LOGGED_IN.value);
 				done(err);

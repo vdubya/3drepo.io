@@ -19,9 +19,7 @@
 
 let request = require('supertest');
 let expect = require('chai').expect;
-let app = require("../../services/api.js").createApp(
-	{ session: require('express-session')({ secret: 'testing'}) }
-);
+let app = require("../../services/api.js").createApp();
 let log_iface = require("../../logger.js");
 let systemLogger = log_iface.systemLogger;
 let responseCodes = require("../../response_codes.js");
@@ -36,7 +34,7 @@ describe('Download', function () {
 	let username = 'testing';
 	let password = 'testing';
 	let model = 'testproject';
-
+	let token;
 
 	before(function(done){
 		server = app.listen(8080, function () {
@@ -47,6 +45,7 @@ describe('Download', function () {
 			.send({ username, password })
 			.expect(200, function(err, res){
 				expect(res.body.username).to.equal(username);
+				token = res.body.token;
 				done(err);
 			});
 
@@ -63,7 +62,7 @@ describe('Download', function () {
 
 	it('should succee', function(done){
 
-		agent.get(`/${username}/${model}/download/latest`)
+		agent.get(`/${username}/${model}/download/latest`).set('Authorization', `Bearer ${token}`)
 		.expect(200, function(err, res){
 			done(err);
 		});

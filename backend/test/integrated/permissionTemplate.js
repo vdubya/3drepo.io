@@ -38,6 +38,8 @@ describe('Permission templates', function () {
 	let permission = { _id: 'customA', permissions: ['view_issue', 'view_project']};
 	let permission1 = { _id: 'customB', permissions: ['view_issue', 'view_project', 'create_project', 'create_issue']};
 	let model = 'model1';
+	let token;
+	let token2;
 
 	before(function(done){
 		server = app.listen(8080, function () {
@@ -48,6 +50,7 @@ describe('Permission templates', function () {
 			.send({ username, password })
 			.expect(200, function(err, res){
 				expect(res.body.username).to.equal(username);
+				token = res.body.token;
 				done(err);
 			});
 
@@ -64,7 +67,7 @@ describe('Permission templates', function () {
 
 	it('should able to create new template', function(done){
 
-		agent.post(`/${username}/permission-templates`)
+		agent.post(`/${username}/permission-templates`).set('Authorization', `Bearer ${token}`)
 		.send(permission)
 		.expect(200, function(err, res){
 			done(err);
@@ -74,7 +77,7 @@ describe('Permission templates', function () {
 
 	it('should fail to create duplicated template', function(done){
 
-		agent.post(`/${username}/permission-templates`)
+		agent.post(`/${username}/permission-templates`).set('Authorization', `Bearer ${token}`)
 		.send(permission)
 		.expect(400, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.DUP_PERM_TEMPLATE.value);
@@ -86,7 +89,7 @@ describe('Permission templates', function () {
 
 	it('should able to create another template', function(done){
 
-		agent.post(`/${username}/permission-templates`)
+		agent.post(`/${username}/permission-templates`).set('Authorization', `Bearer ${token}`)
 		.send(permission1)
 		.expect(200, function(err, res){
 			done(err);
@@ -96,7 +99,7 @@ describe('Permission templates', function () {
 
 	it('should fail to create template with invalid permission', function(done){
 
-		agent.post(`/${username}/permission-templates`)
+		agent.post(`/${username}/permission-templates`).set('Authorization', `Bearer ${token}`)
 		.send( { _id: 'customC', permissions: ['nonsense']})
 		.expect(400, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.INVALID_PERM.value);
@@ -108,7 +111,7 @@ describe('Permission templates', function () {
 
 	it('should able to remove template', function(done){
 
-		agent.delete(`/${username}/permission-templates/${permission._id}`)
+		agent.delete(`/${username}/permission-templates/${permission._id}`).set('Authorization', `Bearer ${token}`)
 		.expect(200, function(err, res){
 			done(err);
 		});
@@ -117,7 +120,7 @@ describe('Permission templates', function () {
 
 	it('should fail to remove template that doesnt exist', function(done){
 
-		agent.delete(`/${username}/permission-templates/nonsense`)
+		agent.delete(`/${username}/permission-templates/nonsense`).set('Authorization', `Bearer ${token}`)
 		.expect(404, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.PERM_NOT_FOUND.value);
 			done(err);
@@ -137,7 +140,7 @@ describe('Permission templates', function () {
 		async.series([
 			callback => {
 			
-				agent.post(`/${username}/${model}/permissions`)
+				agent.post(`/${username}/${model}/permissions`).set('Authorization', `Bearer ${token}`)
 				.send(permissions)
 				.expect(200, function(err, res){
 					callback(err);
@@ -146,7 +149,7 @@ describe('Permission templates', function () {
 			}, 
 			callback => {
 
-				agent.get(`/${username}/${model}/permissions`)
+				agent.get(`/${username}/${model}/permissions`).set('Authorization', `Bearer ${token}`)
 				.expect(200, function(err, res){
 
 					permissions.forEach(permission => {
@@ -157,10 +160,13 @@ describe('Permission templates', function () {
 				})
 			},
 			callback => {
-				agent2.post('/login').send({username: 'testing', password: 'testing'}).expect(200, callback);
+				agent2.post('/login').send({username: 'testing', password: 'testing'}).expect(200, (err, res) => {
+					token2 = res.body.token;
+					callback(err);
+				});
 			},
 			callback => {
-				agent2.get(`/testing.json`)
+				agent2.get(`/testing.json`).set('Authorization', `Bearer ${token2}`)
 				.expect(200, function(err, res){
 					const account = res.body.accounts.find(account => account.account === username);
 					expect(account).to.exist;
@@ -178,7 +184,7 @@ describe('Permission templates', function () {
 
 	it('should fail to assign a non existing permission to user', function(done){
 
-		agent.post(`/${username}/${model}/permissions`)
+		agent.post(`/${username}/${model}/permissions`).set('Authorization', `Bearer ${token}`)
 		.send([{ user: 'testing', permission: 'nonsense'}])
 		.expect(404, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.PERM_NOT_FOUND.value);
@@ -189,7 +195,7 @@ describe('Permission templates', function () {
 
 	it('should fail to assign a permission to a non existing user', function(done){
 
-		agent.post(`/${username}/${model}/permissions`)
+		agent.post(`/${username}/${model}/permissions`).set('Authorization', `Bearer ${token}`)
 		.send([{ user: 'nonses', permission: 'customB'}])
 		.expect(404, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.USER_NOT_FOUND.value);
@@ -207,7 +213,7 @@ describe('Permission templates', function () {
 		async.series([
 			callback => {
 			
-				agent.post(`/${username}/model2/permissions`)
+				agent.post(`/${username}/model2/permissions`).set('Authorization', `Bearer ${token}`)
 				.send(permissions)
 				.expect(200, function(err, res){
 					callback(err);
@@ -216,7 +222,7 @@ describe('Permission templates', function () {
 			}, 
 			callback => {
 
-				agent.get(`/${username}/model2/permissions`)
+				agent.get(`/${username}/model2/permissions`).set('Authorization', `Bearer ${token}`)
 				.expect(200, function(err, res){
 
 					expect(res.body).to.deep.equal(permissions);
@@ -225,10 +231,13 @@ describe('Permission templates', function () {
 
 			},
 			callback => {
-				agent2.post('/login').send({username: 'testing', password: 'testing'}).expect(200, callback);
+				agent2.post('/login').send({username: 'testing', password: 'testing'}).expect(200, (err, res) => {
+					token2 = res.body.token;
+					callback(err);
+				});
 			},
 			callback => {
-				agent2.get(`/testing.json`)
+				agent2.get(`/testing.json`).set('Authorization', `Bearer ${token2}`)
 				.expect(200, function(err, res){
 
 					const account = res.body.accounts.find(account => account.account === username);

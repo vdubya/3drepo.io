@@ -56,6 +56,7 @@ describe('Enrolling to a subscription', function () {
 	let email = 'test3drepo_payment@mailinator.com'
 	let billingId = 'I-000000000000';
 
+	let token;
 
 	before(function(done){
 
@@ -85,8 +86,8 @@ describe('Enrolling to a subscription', function () {
 					helpers.signUpAndLogin({
 						server, request, agent, expect, User, systemLogger,
 						username, password, email,
-						done: function(err, _agent){
-							agent = _agent;
+						done: function(err, data){
+							agent = data.agent;
 							if (err) return done(err);
 
 							agent = request.agent(server);
@@ -94,6 +95,7 @@ describe('Enrolling to a subscription', function () {
 							.send({ username, password })
 							.expect(200, function(err, res){
 								expect(res.body.username).to.equal(username);
+								token = res.body.token;
 								done(err);
 							});
 						}
@@ -154,7 +156,7 @@ describe('Enrolling to a subscription', function () {
 
 		delete plans.billingAddress.vat;
 
-		agent.post(`/${username}/subscriptions`)
+		agent.post(`/${username}/subscriptions`).set('Authorization', `Bearer ${token}`)
 		.send(plans)
 		.expect(200, function(err, res){
 			done(err);
@@ -186,7 +188,7 @@ describe('Enrolling to a subscription', function () {
 			}
 		};
 
-		agent.post(`/${username}/subscriptions`)
+		agent.post(`/${username}/subscriptions`).set('Authorization', `Bearer ${token}`)
 		.send(plans)
 		.expect(200, function(err, res){
 			done(err);
@@ -217,7 +219,7 @@ describe('Enrolling to a subscription', function () {
 			}
 		};
 
-		agent.post(`/${username}/subscriptions`)
+		agent.post(`/${username}/subscriptions`).set('Authorization', `Bearer ${token}`)
 		.send(plans)
 		.expect(200, function(err, res){
 			done(err);
@@ -230,7 +232,7 @@ describe('Enrolling to a subscription', function () {
 
 		this.timeout(20000);
 
-		agent.post(`/${username}/subscriptions`)
+		agent.post(`/${username}/subscriptions`).set('Authorization', `Bearer ${token}`)
 		.send(plans)
 		.expect(200, function(err, res){
 			//console.log(res.body);
@@ -328,7 +330,7 @@ describe('Enrolling to a subscription', function () {
 
 				// it should have a pending billing with SO-1 as invoice number.
 				return new Promise((resolve, reject) => {
-					agent.get(`/${username}/invoices`)
+					agent.get(`/${username}/invoices`).set('Authorization', `Bearer ${token}`)
 					.expect(200, function(err, res){
 						//console.log('billings', res.body);
 						expect(res.body).to.be.an('array').and.to.have.length(1);
@@ -357,7 +359,7 @@ describe('Enrolling to a subscription', function () {
 		after(function(done){
 			stub.restore();
 
-			agent.post('/logout')
+			agent.post('/logout').set('Authorization', `Bearer ${token}`)
 			.send({})
 			.expect(200, function(err, res){
 				done(err);
@@ -442,7 +444,7 @@ describe('Enrolling to a subscription', function () {
 		it('after 1st IPN it should have a confirmed invoice SO-1 generated', function(done){
 			// it should have a confirmed billing with SO-1 as invoice number.
 
-			agent.get(`/${username}/invoices`)
+			agent.get(`/${username}/invoices`).set('Authorization', `Bearer ${token}`)
 			.expect(200, function(err, res){
 				//console.log('billings', res.body);
 				expect(res.body).to.be.an('array').and.to.have.length(1);
@@ -494,7 +496,7 @@ describe('Enrolling to a subscription', function () {
 		let subscriptions;
 		it('and the subscription should be active and filled with quota', function(done){
 
-			agent.get(`/${username}/subscriptions`)
+			agent.get(`/${username}/subscriptions`).set('Authorization', `Bearer ${token}`)
 			.expect(200, function(err, res){
 
 				expect(res.body).to.be.an('array').and.to.have.length(3);
@@ -526,7 +528,7 @@ describe('Enrolling to a subscription', function () {
 
 
 			it('should fail if subscription id does not exist', function(done){
-				agent.post(`/${username}/subscriptions/000000000000000000000000/assign`)
+				agent.post(`/${username}/subscriptions/000000000000000000000000/assign`).set('Authorization', `Bearer ${token}`)
 				.send({ user: username2})
 				.expect(404, function(err, res){
 					expect(res.body.value).to.equal(responseCodes.SUBSCRIPTION_NOT_FOUND.value);
@@ -535,7 +537,7 @@ describe('Enrolling to a subscription', function () {
 			});
 
 			it('to a non existing user should fail', function(done){
-				agent.post(`/${username}/subscriptions/${subscriptions[1]._id}/assign`)
+				agent.post(`/${username}/subscriptions/${subscriptions[1]._id}/assign`).set('Authorization', `Bearer ${token}`)
 				.send({ user: 'payment_non_existing'})
 				.expect(404, function(err, res){
 					expect(res.body.value).to.equal(responseCodes.USER_NOT_FOUND.value);
@@ -544,7 +546,7 @@ describe('Enrolling to a subscription', function () {
 			});
 
 			it('to a existing user should success', function(done){
-				agent.post(`/${username}/subscriptions/${subscriptions[1]._id}/assign`)
+				agent.post(`/${username}/subscriptions/${subscriptions[1]._id}/assign`).set('Authorization', `Bearer ${token}`)
 				.send({ user: username2 })
 				.expect(200, function(err, res){
 					done(err);
@@ -552,7 +554,7 @@ describe('Enrolling to a subscription', function () {
 			});
 
 			it('to a user assgined to another license should fail', function(done){
-				agent.post(`/${username}/subscriptions/${subscriptions[2]._id}/assign`)
+				agent.post(`/${username}/subscriptions/${subscriptions[2]._id}/assign`).set('Authorization', `Bearer ${token}`)
 				.send({ user: username2 })
 				.expect(400, function(err, res){
 					expect(res.body.value).to.equal(responseCodes.USER_ALREADY_ASSIGNED.value);
@@ -561,7 +563,7 @@ describe('Enrolling to a subscription', function () {
 			});
 
 			it('to an other existing user again should fail', function(done){
-				agent.post(`/${username}/subscriptions/${subscriptions[1]._id}/assign`)
+				agent.post(`/${username}/subscriptions/${subscriptions[1]._id}/assign`).set('Authorization', `Bearer ${token}`)
 				.send({ user: username3 })
 				.expect(400, function(err, res){
 					expect(res.body.value).to.equal(responseCodes.SUBSCRIPTION_ALREADY_ASSIGNED.value);
@@ -573,7 +575,7 @@ describe('Enrolling to a subscription', function () {
 
 
 				it('should fail if subscription id does not exist', function(done){
-					agent.delete(`/${username}/subscriptions/000000000000000000000000/assign`)
+					agent.delete(`/${username}/subscriptions/000000000000000000000000/assign`).set('Authorization', `Bearer ${token}`)
 					.send({})
 					.expect(404, function(err, res){
 						expect(res.body.value).to.equal(responseCodes.SUBSCRIPTION_NOT_FOUND.value);
@@ -582,7 +584,7 @@ describe('Enrolling to a subscription', function () {
 				});
 
 				it('should success', function(done){
-					agent.delete(`/${username}/subscriptions/${subscriptions[1]._id}/assign`)
+					agent.delete(`/${username}/subscriptions/${subscriptions[1]._id}/assign`).set('Authorization', `Bearer ${token}`)
 					.send({})
 					.expect(200, function(err, res){
 						done(err);
@@ -590,7 +592,7 @@ describe('Enrolling to a subscription', function () {
 				});
 
 				it('should fail if try to remove itself', function(done){
-					agent.delete(`/${username}/subscriptions/${subscriptions[0]._id}/assign`)
+					agent.delete(`/${username}/subscriptions/${subscriptions[0]._id}/assign`).set('Authorization', `Bearer ${token}`)
 					.send({})
 					.expect(400, function(err, res){
 						expect(res.body.value).to.equal(responseCodes.SUBSCRIPTION_CANNOT_REMOVE_SELF.value);
@@ -600,7 +602,7 @@ describe('Enrolling to a subscription', function () {
 
 
 				it('should fail if license havent been assigned to anyone', function(done){
-					agent.delete(`/${username}/subscriptions/${subscriptions[2]._id}/assign`)
+					agent.delete(`/${username}/subscriptions/${subscriptions[2]._id}/assign`).set('Authorization', `Bearer ${token}`)
 					.send({})
 					.expect(400, function(err, res){
 						expect(res.body.value).to.equal(responseCodes.SUBSCRIPTION_NOT_ASSIGNED.value);
@@ -661,6 +663,7 @@ describe('Enrolling to a subscription', function () {
 					.send({ username, password})
 					.expect(200, function(err, res){
 						expect(res.body.username).to.equal(username);
+						token = res.body.token;
 						done(err);
 					});
 
@@ -670,7 +673,7 @@ describe('Enrolling to a subscription', function () {
 		});
 
 		after(function(done){
-			agent.post('/logout')
+			agent.post('/logout').set('Authorization', `Bearer ${token}`)
 			.send({})
 			.expect(200, function(err, res){
 				done(err);
@@ -678,7 +681,7 @@ describe('Enrolling to a subscription', function () {
 		});
 
 		it('should have credit note created with number CN-1', function(done){
-			agent.get(`/${username}/invoices`)
+			agent.get(`/${username}/invoices`).set('Authorization', `Bearer ${token}`)
 			.expect(200, function(err, res){
 
 				expect(res.body).to.be.an('array');
@@ -748,6 +751,7 @@ describe('Enrolling to a subscription', function () {
 					.send({ username, password})
 					.expect(200, function(err, res){
 						expect(res.body.username).to.equal(username);
+						token = res.body.token;
 						done(err);
 					});
 
@@ -757,7 +761,7 @@ describe('Enrolling to a subscription', function () {
 		});
 
 		after(function(done){
-			agent.post('/logout')
+			agent.post('/logout').set('Authorization', `Bearer ${token}`)
 			.send({})
 			.expect(200, function(err, res){
 				done(err);
@@ -765,7 +769,7 @@ describe('Enrolling to a subscription', function () {
 		});
 
 		it('should have invoice created with number SO-2', function(done){
-			agent.get(`/${username}/invoices`)
+			agent.get(`/${username}/invoices`).set('Authorization', `Bearer ${token}`)
 			.expect(200, function(err, res){
 
 				expect(res.body).to.be.an('array');
@@ -824,6 +828,7 @@ describe('Enrolling to a subscription', function () {
 			.send({ username: username3, password: password3 })
 			.expect(200, function(err, res){
 				expect(res.body.username).to.equal(username3);
+				token = res.body.token;
 				done(err);
 			});
 		});
@@ -831,7 +836,7 @@ describe('Enrolling to a subscription', function () {
 		after(function(done){
 			stub.restore();
 
-			agent.post('/logout')
+			agent.post('/logout').set('Authorization', `Bearer ${token}`)
 			.send({})
 			.expect(200, function(err, res){
 				done(err);
@@ -848,7 +853,7 @@ describe('Enrolling to a subscription', function () {
 
 			this.timeout(20000);
 
-			agent.post(`/${username3}/subscriptions`)
+			agent.post(`/${username3}/subscriptions`).set('Authorization', `Bearer ${token}`)
 			.send(plans)
 			.expect(200, function(err, res){
 				expect(res.body).to.have.property('url');
@@ -936,7 +941,7 @@ describe('Enrolling to a subscription', function () {
 
 				// it should have a pending billing with SO-3 as invoice number.
 				return new Promise((resolve, reject) => {
-					agent.get(`/${username3}/invoices`)
+					agent.get(`/${username3}/invoices`).set('Authorization', `Bearer ${token}`)
 					.expect(200, function(err, res){
 						//console.log('billings', res.body);
 						expect(res.body).to.be.an('array').and.to.have.length(1);

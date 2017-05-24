@@ -19,9 +19,7 @@
 
 let request = require('supertest');
 let expect = require('chai').expect;
-let app = require("../../services/api.js").createApp(
-	{ session: require('express-session')({ secret: 'testing'}) }
-);
+let app = require("../../services/api.js").createApp();
 let log_iface = require("../../logger.js");
 let systemLogger = log_iface.systemLogger;
 let responseCodes = require("../../response_codes.js");
@@ -31,6 +29,7 @@ let async = require('async');
 let Role = require('../../models/role');
 let ModelSetting = require('../../models/modelSetting');
 let User = require('../../models/user');
+
 describe('Model', function () {
 	let User = require('../../models/user');
 	let server;
@@ -43,7 +42,7 @@ describe('Model', function () {
 	let type = 'type';
 	let unit = 'm';
 	let code = '00011';
-
+	let token;
 
 	before(function(done){
 
@@ -55,6 +54,7 @@ describe('Model', function () {
 			.send({ username, password })
 			.expect(200, function(err, res){
 				expect(res.body.username).to.equal(username);
+				token = res.body.token;
 				done(err);
 			});
 			
@@ -77,7 +77,7 @@ describe('Model', function () {
 		async.series([
 			callback => {
 
-				agent.post(`/${username}/${model}`)
+				agent.post(`/${username}/${model}`).set('Authorization', `Bearer ${token}`)
 				.send({ desc, type, unit, code, project })
 				.expect(200, function(err ,res) {
 					expect(res.body.model).to.equal(model);
@@ -86,7 +86,7 @@ describe('Model', function () {
 
 			},
 			callback => {
-				agent.get(`/${username}/${model}.json`)
+				agent.get(`/${username}/${model}.json`).set('Authorization', `Bearer ${token}`)
 				.expect(200, function(err, res){
 					expect(res.body.desc).to.equal(desc);
 					expect(res.body.type).to.equal(type);
@@ -97,7 +97,7 @@ describe('Model', function () {
 			},
 
 			callback => {
-				agent.get(`/${username}.json`)
+				agent.get(`/${username}.json`).set('Authorization', `Bearer ${token}`)
 				.expect(200, function(err, res){
 
 					const account = res.body.accounts.find(account => account.account === username);
@@ -122,7 +122,7 @@ describe('Model', function () {
 
 	it('model added to a project should be listed on top level models array', function(done){
 
-		agent.get(`/${username}.json`)
+		agent.get(`/${username}.json`).set('Authorization', `Bearer ${token}`)
 		.expect(200, function(err, res){
 
 			const account = res.body.accounts.find(account => account.account === username);
@@ -140,7 +140,7 @@ describe('Model', function () {
 
 	it('should fail if project supplied is not found', function(done){
 
-		agent.post(`/${username}/model2`)
+		agent.post(`/${username}/model2`).set('Authorization', `Bearer ${token}`)
 		.send({ desc, type, unit, code, project: 'noexist' })
 		.expect(404, function(err ,res) {
 			expect(res.body.value).to.equal(responseCodes.PROJECT_NOT_FOUND.value);
@@ -151,7 +151,7 @@ describe('Model', function () {
 
 	it('should fail if no unit specified', function(done){
 
-		agent.post(`/${username}/model3`)
+		agent.post(`/${username}/model3`).set('Authorization', `Bearer ${token}`)
 		.send({ desc, type })
 		.expect(400, function(err ,res) {
 
@@ -168,7 +168,7 @@ describe('Model', function () {
 
 			let model = 'project4';
 
-			agent.put(`/${username}/${model}/settings`)
+			agent.put(`/${username}/${model}/settings`).set('Authorization', `Bearer ${token}`)
 			.send({code}).expect(400, function(err ,res) {
 				expect(res.body.value).to.equal(responseCodes.INVALID_MODEL_CODE.value);
 				done(err);
@@ -190,7 +190,7 @@ describe('Model', function () {
 
 			let model = 'project5';
 
-			agent.put(`/${username}/${model}/settings`)
+			agent.put(`/${username}/${model}/settings`).set('Authorization', `Bearer ${token}`)
 			.send({
 				topicTypes: ['For Info', 'for info']
 			}).expect(400, function(err ,res) {
@@ -238,7 +238,7 @@ describe('Model', function () {
 		};
 
 		let mymodel = "project6";
-		agent.put(`/${username}/${mymodel}/settings`)
+		agent.put(`/${username}/${mymodel}/settings`).set('Authorization', `Bearer ${token}`)
 		.send(body).expect(200, function(err ,res) {
 
 			expect(res.body).to.deep.equal(expectedReturn);
@@ -247,7 +247,7 @@ describe('Model', function () {
 				return done(err);
 			}
 
-			agent.get(`/${username}/${mymodel}.json`)
+			agent.get(`/${username}/${mymodel}.json`).set('Authorization', `Bearer ${token}`)
 			.expect(200, function(err, res){
 				expect(res.body.properties).to.deep.equal(expectedReturn);
 				done(err);
@@ -262,7 +262,7 @@ describe('Model', function () {
 
 		let model = 'project7';
 		
-		agent.post(`/${username}/${model}`)
+		agent.post(`/${username}/${model}`).set('Authorization', `Bearer ${token}`)
 		.send({ desc, type, unit })
 		.expect(400, function(err ,res) {
 			expect(res.body.value).to.equal(responseCodes.MODEL_EXIST.value);
@@ -287,7 +287,7 @@ describe('Model', function () {
 				return done();
 			}
 
-			agent.post(`/${username}/${modelName}`)
+			agent.post(`/${username}/${modelName}`).set('Authorization', `Bearer ${token}`)
 			.send({ desc, type, unit })
 			.expect(400, function(err ,res) {
 				expect(res.body.value).to.equal(responseCodes.BLACKLISTED_MODEL_NAME.value);
@@ -301,7 +301,7 @@ describe('Model', function () {
 
 	it('should return error message if model name contains spaces', function(done){
 
-		agent.post('/' + username + '/you%20are%20genius')
+		agent.post('/' + username + '/you%20are%20genius').set('Authorization', `Bearer ${token}`)
 		.send({ desc, type, unit })
 		.expect(400, function(err ,res) {
 			expect(res.body.value).to.equal(responseCodes.INVALID_MODEL_NAME.value);
@@ -312,7 +312,7 @@ describe('Model', function () {
 
 	it('should return error if creating a model in a database that doesn\'t exists or not authorized for', function(done){
 
-		agent.post(`/${username}_someonelese/${model}`)
+		agent.post(`/${username}_someonelese/${model}`).set('Authorization', `Bearer ${token}`)
 		.send({ desc, type, unit })
 		.expect(401, function(err ,res) {
 			done(err);
@@ -328,18 +328,22 @@ describe('Model', function () {
 		before(function(done){
 			async.series([
 				function logout(done){
-					agent.post('/logout').send({}).expect(200, done);
+					agent.post('/logout').set('Authorization', `Bearer ${token}`).send({}).expect(200, done);
 				},
 				function login(done){
 					agent.post('/login').send({
 						username, password
-					}).expect(200, done);
+					})
+					.expect(200, function(err, res){
+						token = res.body.token;
+						done(err);
+					});
 				}
 			], done);
 		});
 
 		it('should success and get the latest file', function(done){
-			agent.get(`/${username}/${model}/download/latest`).expect(200, function(err, res){
+			agent.get(`/${username}/${model}/download/latest`).set('Authorization', `Bearer ${token}`).expect(200, function(err, res){
 
 				expect(res.headers['content-disposition']).to.equal('attachment;filename=3DrepoBIM.obj');
 				
@@ -361,12 +365,16 @@ describe('Model', function () {
 		before(function(done){
 			async.series([
 				function logout(done){
-					agent.post('/logout').send({}).expect(200, done);
+					agent.post('/logout').set('Authorization', `Bearer ${token}`).send({}).expect(200, done);
 				},
 				function login(done){
 					agent.post('/login').send({
 						username, password
-					}).expect(200, done);
+					})
+					.expect(200, function(err, res){
+						token = res.body.token;
+						done(err);
+					});
 				},
 
 			], done);
@@ -375,11 +383,11 @@ describe('Model', function () {
 
 
 		it('should success', function(done){
-			agent.delete(`/${username}/${model}`).expect(200, done);
+			agent.delete(`/${username}/${model}`).set('Authorization', `Bearer ${token}`).expect(200, done);
 		});
 
 		it('should fail if delete again', function(done){
-			agent.delete(`/${username}/${model}`).expect(404, function(err, res){
+			agent.delete(`/${username}/${model}`).set('Authorization', `Bearer ${token}`).expect(404, function(err, res){
 				expect(res.body.value).to.equal(responseCodes.MODEL_NOT_FOUND.value);
 				done(err);
 			});
@@ -409,13 +417,18 @@ describe('Model', function () {
 		it('should be removed from collaborator\'s model listing', function(done){
 
 			const agent2 = request.agent(server);
+			let token2;
 
 			async.series([
 				callback => {
-					agent2.post('/login').send({ username: 'testing', password: 'testing' }).expect(200, callback);
+					agent2.post('/login').send({ username: 'testing', password: 'testing' })
+					.expect(200, function(err, res){
+						token2 = res.body.token;
+						callback(err);
+					});
 				},
 				callback => {
-					agent2.get(`/testing.json`).expect(200, function(err, res){
+					agent2.get(`/testing.json`).set('Authorization', `Bearer ${token2}`).expect(200, function(err, res){
 						
 						const account = res.body.accounts.find(account => account.account === username);
 						expect(account).to.not.exist;
@@ -432,7 +445,7 @@ describe('Model', function () {
 		});
 
 		it('should be removed from model group', function(done){
-			agent.get(`/${username}.json`).expect(200, function(err, res){
+			agent.get(`/${username}.json`).set('Authorization', `Bearer ${token}`).expect(200, function(err, res){
 				
 				const account = res.body.accounts.find(account => account.account === username);
 				expect(account).to.exist;

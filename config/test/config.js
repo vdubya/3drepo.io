@@ -25,6 +25,11 @@ module.exports = {
 		secret: "a",
 		parser_secret : "b"
 	},
+	jwt:{
+		"secret": "a", // secret key for HS256
+		"algorithm": "HS256",
+		"expiresIn": "2h", //https://github.com/zeit/ms
+	},
 	servers: [
 		{
 			service: "api",

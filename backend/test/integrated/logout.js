@@ -19,9 +19,7 @@
 
 let request = require('supertest');
 let expect = require('chai').expect;
-let app = require("../../services/api.js").createApp(
-	{ session: require('express-session')({ secret: 'testing'}) }
-);
+let app = require("../../services/api.js").createApp();
 let log_iface = require("../../logger.js");
 let systemLogger = log_iface.systemLogger;
 let responseCodes = require("../../response_codes.js");
@@ -71,14 +69,15 @@ describe('Logout', function () {
 
 	it('should be successful if logged in', function(done){
 		let agent = request.agent(server);
-
+		let token;
 		agent.post('/login')
 		.send({ username, password })
 		.expect(200, function(err, res){
 			if(err){
 				done(err)
 			} else {
-				agent.post('/logout')
+				token = res.body.token;
+				agent.post('/logout').set('Authorization', `Bearer ${token}`)
 				.send({})
 				.expect(200, function(err, res){
 					expect(res.body.username).to.equal(username);
@@ -90,14 +89,15 @@ describe('Logout', function () {
 
 	it('and view user profile should fail', function(done){
 		let agent = request.agent(server);
-
+		let token;
 		agent.post('/login')
 		.send({ username, password })
 		.expect(200, function(err, res){
 			if(err){
 				done(err)
 			} else {
-				agent.post('/logout')
+				token = res.body.token;
+				agent.post('/logout').set('Authorization', `Bearer ${token}`)
 				.send({})
 				.expect(200, function(err, res){
 					expect(res.body.username).to.equal(username);

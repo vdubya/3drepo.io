@@ -19,9 +19,7 @@
 
 let request = require('supertest');
 let expect = require('chai').expect;
-let app = require("../../services/api.js").createApp(
-	{ session: require('express-session')({ secret: 'testing'}) }
-);
+let app = require("../../services/api.js").createApp();
 let log_iface = require("../../logger.js");
 let systemLogger = log_iface.systemLogger;
 let responseCodes = require("../../response_codes.js");
@@ -46,6 +44,7 @@ describe('Federated Model', function () {
 	let desc = 'desc';
 	let type = 'type';
 	let fedModel = 'fedproj';
+	let token;
 
 	before(function(done){
 
@@ -57,6 +56,7 @@ describe('Federated Model', function () {
 			.send({ username, password })
 			.expect(200, function(err, res){
 				expect(res.body.username).to.equal(username);
+				token = res.body.token;
 				done(err);
 			});
 
@@ -109,7 +109,7 @@ describe('Federated Model', function () {
 
 		}, 1000);
 
-		agent.post(`/${username}/${fedModel}`)
+		agent.post(`/${username}/${fedModel}`).set('Authorization', `Bearer ${token}`)
 		.send({ 
 			desc, 
 			type,
@@ -129,7 +129,7 @@ describe('Federated Model', function () {
 
 			async.series([
 				done => {
-					agent.get(`/${username}/${fedModel}.json`)
+					agent.get(`/${username}/${fedModel}.json`).set('Authorization', `Bearer ${token}`)
 					.expect(200, function(err, res){
 						expect(res.body.desc).to.equal(desc);
 						expect(res.body.type).to.equal(type);
@@ -137,7 +137,7 @@ describe('Federated Model', function () {
 					})
 				},
 				done => {
-					agent.get(`/${username}.json`)
+					agent.get(`/${username}.json`).set('Authorization', `Bearer ${token}`)
 					.expect(200, function(err, res){
 						let account = res.body.accounts.find(a => a.account === username);
 						let fed = account.fedModels.find(m => m.model === fedModel);
@@ -157,7 +157,7 @@ describe('Federated Model', function () {
 	it('should be created successfully even if no sub models are specified', function(done){
 		let emptyFed = 'emptyFed';
 
-		agent.post(`/${username}/${emptyFed}`)
+		agent.post(`/${username}/${emptyFed}`).set('Authorization', `Bearer ${token}`)
 		.send({ 
 			desc, 
 			type, 
@@ -174,7 +174,7 @@ describe('Federated Model', function () {
 
 			async.series([
 				done => {
-					agent.get(`/${username}/${emptyFed}.json`)
+					agent.get(`/${username}/${emptyFed}.json`).set('Authorization', `Bearer ${token}`)
 					.expect(200, function(err, res){
 						expect(res.body.desc).to.equal(desc);
 						expect(res.body.type).to.equal(type);
@@ -182,7 +182,7 @@ describe('Federated Model', function () {
 					})
 				},
 				done => {
-					agent.get(`/${username}.json`)
+					agent.get(`/${username}.json`).set('Authorization', `Bearer ${token}`)
 					.expect(200, function(err, res){
 						let account = res.body.accounts.find(a => a.account === username);
 						let fed = account.fedModels.find(p => p.model === emptyFed);
@@ -201,7 +201,7 @@ describe('Federated Model', function () {
 	it('should fail if create federation using existing model name (fed or model)', function(done){
 
 
-		agent.post(`/${username}/${subModels[0]}`)
+		agent.post(`/${username}/${subModels[0]}`).set('Authorization', `Bearer ${token}`)
 		.send({ 
 			desc, 
 			type, 
@@ -222,7 +222,7 @@ describe('Federated Model', function () {
 	it('should fail if create federation using invalid model name', function(done){
 
 
-		agent.post(`/${username}/a%20c`)
+		agent.post(`/${username}/a%20c`).set('Authorization', `Bearer ${token}`)
 		.send({ 
 			desc, 
 			type, 
@@ -243,7 +243,7 @@ describe('Federated Model', function () {
 
 	it('should fail if create federation from models in a different database', function(done){
 
-		agent.post(`/${username}/badfed`)
+		agent.post(`/${username}/badfed`).set('Authorization', `Bearer ${token}`)
 		.send({ 
 			desc, 
 			type, 
@@ -313,7 +313,7 @@ describe('Federated Model', function () {
 		q.channel.assertQueue(q.workerQName, { durable: true }).then(() => {
 			return q.channel.purgeQueue(q.workerQName);
 		}).then(() => {
-			agent.post(`/${username}/dupfed`)
+			agent.post(`/${username}/dupfed`).set('Authorization', `Bearer ${token}`)
 			.send({ 
 				desc, 
 				type, 
@@ -336,7 +336,7 @@ describe('Federated Model', function () {
 
 
 	it('should fail if create fed of fed', function(done){
-		agent.post(`/${username}/fedfed`)
+		agent.post(`/${username}/fedfed`).set('Authorization', `Bearer ${token}`)
 		.send({ 
 			desc, 
 			type, 
@@ -356,7 +356,7 @@ describe('Federated Model', function () {
 
 	it('update should fail if model is not a fed', function(done){
 
-		agent.put(`/${username}/${subModels[0]}`)
+		agent.put(`/${username}/${subModels[0]}`).set('Authorization', `Bearer ${token}`)
 		.send({ 
 			desc, 
 			type, 
@@ -375,7 +375,7 @@ describe('Federated Model', function () {
 	});
 
 	it('update should fail if model does not exist', function(done){
-		agent.put(`/${username}/nonexistmodel`)
+		agent.put(`/${username}/nonexistmodel`).set('Authorization', `Bearer ${token}`)
 		.send({ 
 			desc, 
 			type, 
@@ -425,7 +425,7 @@ describe('Federated Model', function () {
 
 		}, 1000);
 
-		agent.put(`/${username}/${fedModel}`)
+		agent.put(`/${username}/${fedModel}`).set('Authorization', `Bearer ${token}`)
 		.send({ 
 			desc, 
 			type, 

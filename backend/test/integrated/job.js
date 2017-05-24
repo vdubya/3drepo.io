@@ -19,9 +19,7 @@
 
 const request = require('supertest');
 const expect = require('chai').expect;
-const app = require("../../services/api.js").createApp(
-	{ session: require('express-session')({ secret: 'testing'}) }
-);
+const app = require("../../services/api.js").createApp();
 const log_iface = require("../../logger.js");
 const systemLogger = log_iface.systemLogger;
 const responseCodes = require("../../response_codes.js");
@@ -36,7 +34,7 @@ describe('Job', function () {
 	let password = 'job';
 	let job = { _id: 'job1', color: '000000'};
 	let job2 = { _id: 'job2', color: '000000'};
-
+	let token;
 	let subId = '58ecfbf94804d17bee4cdbbc';
 
 
@@ -49,6 +47,7 @@ describe('Job', function () {
 			.send({ username, password })
 			.expect(200, function(err, res){
 				expect(res.body.username).to.equal(username);
+				token = res.body.token;
 				done(err);
 			});
 
@@ -65,7 +64,7 @@ describe('Job', function () {
 
 	it('should able to create new job', function(done){
 
-		agent.post(`/${username}/jobs`)
+		agent.post(`/${username}/jobs`).set('Authorization', `Bearer ${token}`)
 		.send(job)
 		.expect(200, function(err, res){
 			done(err);
@@ -75,7 +74,7 @@ describe('Job', function () {
 
 	it('should able to create second job', function(done){
 
-		agent.post(`/${username}/jobs`)
+		agent.post(`/${username}/jobs`).set('Authorization', `Bearer ${token}`)
 		.send(job2)
 		.expect(200, function(err, res){
 			done(err);
@@ -85,7 +84,7 @@ describe('Job', function () {
 
 	it('should not able to create duplicated job', function(done){
 
-		agent.post(`/${username}/jobs`)
+		agent.post(`/${username}/jobs`).set('Authorization', `Bearer ${token}`)
 		.send(job)
 		.expect(400 , function(err, res){
 			expect(res.body.value).to.equal(responseCodes.DUP_JOB.value);
@@ -95,7 +94,7 @@ describe('Job', function () {
 	});
 
 	it('should able to list the job created', function(done){
-		agent.get(`/${username}.json`)
+		agent.get(`/${username}.json`).set('Authorization', `Bearer ${token}`)
 		.expect(200, function(err, res){
 			expect(res.body.jobs).to.deep.equal([job, job2]);
 			done(err);
@@ -103,7 +102,7 @@ describe('Job', function () {
 	});
 
 	it('should fail to assign a job that doesnt exist to a licence(user)', function(done){
-		agent.post(`/${username}/subscriptions/${subId}/assign`)
+		agent.post(`/${username}/subscriptions/${subId}/assign`).set('Authorization', `Bearer ${token}`)
 		.send({ user: 'testing', job: `nonsense`})
 		.expect(404, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.JOB_NOT_FOUND.value);
@@ -115,7 +114,7 @@ describe('Job', function () {
 
 		async.series([
 			callback => {
-				agent.post(`/${username}/subscriptions/${subId}/assign`)
+				agent.post(`/${username}/subscriptions/${subId}/assign`).set('Authorization', `Bearer ${token}`)
 				.send({ user: 'testing', job: job._id})
 				.expect(200, function(err, res){
 					callback(err);
@@ -123,7 +122,7 @@ describe('Job', function () {
 			},
 
 			callback => {
-				agent.get(`/${username}/subscriptions`)
+				agent.get(`/${username}/subscriptions`).set('Authorization', `Bearer ${token}`)
 				.expect(200, function(err, res){
 					expect(res.body.find(sub => sub._id === subId).job).to.equal(job._id);
 					callback(err);
@@ -135,7 +134,7 @@ describe('Job', function () {
 	});
 
 	it('should fail to change assignment to a job that doesnt exist to a licence(user)', function(done){
-		agent.put(`/${username}/subscriptions/${subId}/assign`)
+		agent.put(`/${username}/subscriptions/${subId}/assign`).set('Authorization', `Bearer ${token}`)
 		.send({ job: `nonsense`})
 		.expect(404, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.JOB_NOT_FOUND.value);
@@ -146,7 +145,7 @@ describe('Job', function () {
 	it('should able to change assignment to another job', function(done){
 		async.series([
 			callback => {
-				agent.put(`/${username}/subscriptions/${subId}/assign`)
+				agent.put(`/${username}/subscriptions/${subId}/assign`).set('Authorization', `Bearer ${token}`)
 				.send({ job: job2._id})
 				.expect(200, function(err, res){
 					callback(err);
@@ -154,7 +153,7 @@ describe('Job', function () {
 			},
 
 			callback => {
-				agent.get(`/${username}/subscriptions`)
+				agent.get(`/${username}/subscriptions`).set('Authorization', `Bearer ${token}`)
 				.expect(200, function(err, res){
 					expect(res.body.find(sub => sub._id === subId).job).to.equal(job2._id);
 					callback(err);
@@ -170,7 +169,7 @@ describe('Job', function () {
 		let subId = '591063b613f4b994b72df324';
 		async.series([
 			callback => {
-				agent.put(`/${username}/subscriptions/${subId}/assign`)
+				agent.put(`/${username}/subscriptions/${subId}/assign`).set('Authorization', `Bearer ${token}`)
 				.send({ job: ''})
 				.expect(200, function(err, res){
 					callback(err);
@@ -178,7 +177,7 @@ describe('Job', function () {
 			},
 
 			callback => {
-				agent.get(`/${username}/subscriptions`)
+				agent.get(`/${username}/subscriptions`).set('Authorization', `Bearer ${token}`)
 				.expect(200, function(err, res){
 					expect(res.body.find(sub => sub._id === subId).job).to.not.exist;
 					callback(err);
@@ -189,7 +188,7 @@ describe('Job', function () {
 	});
 
 	it('should fail to remove a job if it is assigned to someone', function(done){
-		agent.delete(`/${username}/jobs/${job2._id}`)
+		agent.delete(`/${username}/jobs/${job2._id}`).set('Authorization', `Bearer ${token}`)
 		.expect(400, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.JOB_ASSIGNED.value);
 			done(err);
@@ -197,14 +196,14 @@ describe('Job', function () {
 	});
 
 	it('should able to remove a job', function(done){
-		agent.delete(`/${username}/jobs/${job._id}`)
+		agent.delete(`/${username}/jobs/${job._id}`).set('Authorization', `Bearer ${token}`)
 		.expect(200, function(err, res){
 			done(err);
 		});	
 	});
 
 	it('should not able to remove a job that doesnt exist', function(done){
-		agent.delete(`/${username}/jobs/nonsense`)
+		agent.delete(`/${username}/jobs/nonsense`).set('Authorization', `Bearer ${token}`)
 		.expect(404, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.JOB_NOT_FOUND.value);
 			done(err);
@@ -212,7 +211,7 @@ describe('Job', function () {
 	})
 
 	it('job should be removed from the list', function(done){
-		agent.get(`/${username}.json`)
+		agent.get(`/${username}.json`).set('Authorization', `Bearer ${token}`)
 		.expect(200, function(err, res){
 			expect(res.body.jobs).to.deep.equal([job2]);
 			done(err);

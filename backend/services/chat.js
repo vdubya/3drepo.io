@@ -34,17 +34,19 @@ module.exports.createApp = function (server, serverConfig){
 	//let sharedSession = require("express-socket.io-session");
 	let _ = require('lodash');
 
-	io.use((socket, next) => {
-		if(socket.handshake.query['connect.sid'] && !socket.handshake.headers.cookie){
-			socket.handshake.headers.cookie = 'connect.sid=' + socket.handshake.query['connect.sid'] + '; '; 
-		}
-		//console.log(socket.handshake.headers.cookie);
+	// io.use((socket, next) => {
+	// 	if(socket.handshake.query['connect.sid'] && !socket.handshake.headers.cookie){
+	// 		socket.handshake.headers.cookie = 'connect.sid=' + socket.handshake.query['connect.sid'] + '; '; 
+	// 	}
+	// 	//console.log(socket.handshake.headers.cookie);
 
-		next();
-	});
+	// 	next();
+	// });
 
 	//io.use(sharedSession(session, { autoSave: true }));
-	io.use(middlewares.verifyJWT);
+	io.use((socket, next) => {
+		middlewares.verifyJWT(socket.handshake, null, next);
+	});
 
 	io.use((socket, next) => {
 		// init the singleton db connection

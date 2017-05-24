@@ -40,6 +40,8 @@ describe('Uploading a model', function () {
 	let desc = 'desc';
 	let type = 'type';
 	let unit = 'meter';
+	let token;
+	let token2;
 
 	before(function(done){
 
@@ -49,8 +51,9 @@ describe('Uploading a model', function () {
 			helpers.signUpAndLoginAndCreateModel({
 				server, request, agent, expect, User, systemLogger,
 				username, password, email, model, desc, type, noBasicPlan: true, unit,
-				done: function(err, _agent){
-					agent = _agent;
+				done: function(err, data){
+					agent = data.agent;
+					token = data.token;
 					done(err);
 				}
 			});
@@ -74,7 +77,7 @@ describe('Uploading a model', function () {
 	describe('without quota', function(){
 
 		it('should return error (no subscriptions)', function(done){
-			agent.post(`/${username}/${model}/upload`)
+			agent.post(`/${username}/${model}/upload`).set('Authorization', `Bearer ${token}`)
 			.attach('file', __dirname + '/../../statics/3dmodels/8000cubes.obj')
 			.expect(400, function(err, res){
 				expect(res.body.value).to.equal(responseCodes.SIZE_LIMIT_PAY.value);
@@ -89,14 +92,14 @@ describe('Uploading a model', function () {
 			.send({ username: 'testing', password: 'testing' })
 			.expect(200, function(err, res){
 				expect(res.body.username).to.equal('testing');
-				
+				token2 = res.body.token;
 				if(err){
 					return done(err);
 				}
 
 				//create a model
 				let myModel = 'testproject';
-				agent2.post(`/testing/${myModel}/upload`)
+				agent2.post(`/testing/${myModel}/upload`).set('Authorization', `Bearer ${token2}`)
 				.attach('file', __dirname + '/../../statics/3dmodels/8000cubes.obj')
 				.expect(400, function(err, res){
 					expect(res.body.value).to.equal(responseCodes.SIZE_LIMIT_PAY.value);
@@ -118,7 +121,7 @@ describe('Uploading a model', function () {
 		});
 
 		it('should succee', function(done){
-			agent.post(`/${username}/${model}/upload`)
+			agent.post(`/${username}/${model}/upload`).set('Authorization', `Bearer ${token}`)
 			.attach('file', __dirname + '/../../statics/3dmodels/8000cubes.obj')
 			.expect(200, function(err, res){
 				done(err);
@@ -148,7 +151,7 @@ describe('Uploading a model', function () {
 		});
 
 		it('should succee (uppercase extension)', function(done){
-			agent.post(`/${username}/${model}/upload`)
+			agent.post(`/${username}/${model}/upload`).set('Authorization', `Bearer ${token}`)
 			.attach('file', __dirname + '/../../statics/3dmodels/upper.OBJ')
 			.expect(200, function(err, res){
 				done(err);
@@ -157,7 +160,7 @@ describe('Uploading a model', function () {
 		
 		it('but empty file size should fail', function(done){
 
-			agent.post(`/${username}/${model}/upload`)
+			agent.post(`/${username}/${model}/upload`).set('Authorization', `Bearer ${token}`)
 			.attach('file', __dirname + '/../../statics/3dmodels/empty.ifc')
 			.expect(400, function(err, res){
 				expect(res.body.value).to.equal(responseCodes.FILE_FORMAT_NOT_SUPPORTED.value);
@@ -168,7 +171,7 @@ describe('Uploading a model', function () {
 
 		it('but unaccepted extension should failed', function(done){
 
-			agent.post(`/${username}/${model}/upload`)
+			agent.post(`/${username}/${model}/upload`).set('Authorization', `Bearer ${token}`)
 			.attach('file', __dirname + '/../../statics/3dmodels/toy.abc')
 			.expect(400, function(err, res){
 				expect(res.body.value).to.equal(responseCodes.FILE_FORMAT_NOT_SUPPORTED.value);
@@ -179,7 +182,7 @@ describe('Uploading a model', function () {
 
 		it('but no extension should failed', function(done){
 
-			agent.post(`/${username}/${model}/upload`)
+			agent.post(`/${username}/${model}/upload`).set('Authorization', `Bearer ${token}`)
 			.attach('file', __dirname + '/../../statics/3dmodels/toy')
 			.expect(400, function(err, res){
 				expect(res.body.value).to.equal(responseCodes.FILE_NO_EXT.value);
@@ -190,7 +193,7 @@ describe('Uploading a model', function () {
 
 		it('but file size exceeded fixed single file size limit should fail', function(done){
 
-			agent.post(`/${username}/${model}/upload`)
+			agent.post(`/${username}/${model}/upload`).set('Authorization', `Bearer ${token}`)
 			.attach('file', __dirname + '/../../statics/3dmodels/toy.ifc')
 			.expect(400, function(err, res){
 				expect(res.body.value).to.equal(responseCodes.SIZE_LIMIT.value);

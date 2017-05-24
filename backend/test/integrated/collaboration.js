@@ -19,9 +19,7 @@
 
 const request = require('supertest');
 const expect = require('chai').expect;
-const app = require("../../services/api.js").createApp(
-	{ session: require('express-session')({ secret: 'testing'}) }
-);
+const app = require("../../services/api.js").createApp();
 const log_iface = require("../../logger.js");
 const systemLogger = log_iface.systemLogger;
 const responseCodes = require("../../response_codes.js");
@@ -110,6 +108,8 @@ describe('Sharing/Unsharing a model', function () {
 
 	describe('for view only', function(){
 
+		let token;
+
 		before(function(done){
 
 			agent = request.agent(server);
@@ -117,6 +117,7 @@ describe('Sharing/Unsharing a model', function () {
 			.send({ username, password })
 			.expect(200, function(err, res){
 				expect(res.body.username).to.equal(username);
+				token = res.body.token;
 				done(err);
 			});
 			
@@ -124,7 +125,7 @@ describe('Sharing/Unsharing a model', function () {
 
 		after(function(done){
 
-			agent.post('/logout')
+			agent.post('/logout').set('Authorization', `Bearer ${token}`)
 			.send({})
 			.expect(200, done);
 		});
@@ -138,7 +139,7 @@ describe('Sharing/Unsharing a model', function () {
 			async.series([
 				function share(done){
 
-					agent.post(`/${username}/${model}/permissions`)
+					agent.post(`/${username}/${model}/permissions`).set('Authorization', `Bearer ${token}`)
 					.send(permissions)
 					.expect(200, function(err, res){
 						done(err);
@@ -146,7 +147,7 @@ describe('Sharing/Unsharing a model', function () {
 				},
 				function logout(done){
 
-					agent.post('/logout')
+					agent.post('/logout').set('Authorization', `Bearer ${token}`)
 					.send({})
 					.expect(200, function(err, res){
 						expect(res.body.username).to.equal(username);
@@ -159,12 +160,13 @@ describe('Sharing/Unsharing a model', function () {
 					.send({ username: username_viewer, password: password_viewer })
 					.expect(200, function(err, res){
 						expect(res.body.username).to.equal(username_viewer);
+						token = res.body.token;
 						done(err);
 					});
 				},
 				function checkSharedModelInList(done){
 
-					agent.get(`/${username_viewer}.json`)
+					agent.get(`/${username_viewer}.json`).set('Authorization', `Bearer ${token}`)
 					.expect(200, function(err, res){
 
 						expect(res.body).to.have.property('accounts').that.is.an('array');
@@ -179,7 +181,7 @@ describe('Sharing/Unsharing a model', function () {
 				},
 				function ableToViewModel(done){
 
-					agent.get(`/${username}/${model}/revision/master/head.x3d.mp`)
+					agent.get(`/${username}/${model}/revision/master/head.x3d.mp`).set('Authorization', `Bearer ${token}`)
 					.expect(200, function(err ,res){
 						done(err);
 					});
@@ -190,7 +192,7 @@ describe('Sharing/Unsharing a model', function () {
 		});
 
 		it('model info api shows correct permissions', function(done){
-			agent.get(`/${username}/${model}.json`).
+			agent.get(`/${username}/${model}.json`).set('Authorization', `Bearer ${token}`).
 			expect(200, function(err, res){
 				expect(res.body.permissions).to.deep.equal(C.VIEWER_TEMPLATE_PERMISSIONS);
 				done(err);
@@ -198,28 +200,28 @@ describe('Sharing/Unsharing a model', function () {
 		});
 
 		it('and the viewer should be able to see list of issues', function(done){
-			agent.get(`/${username}/${model}/issues.json`)
+			agent.get(`/${username}/${model}/issues.json`).set('Authorization', `Bearer ${token}`)
 			.expect(200, done);
 		});
 
 		it('and the viewer should not be able to download the model', function(done){
-			agent.get(`/${username}/${model}/download/latest`).expect(401, done);
+			agent.get(`/${username}/${model}/download/latest`).set('Authorization', `Bearer ${token}`).expect(401, done);
 		});
 
 		it('and the viewer should NOT be able to upload model', function(done){
-			agent.post(`/${username}/${model}/upload`)
+			agent.post(`/${username}/${model}/upload`).set('Authorization', `Bearer ${token}`)
 			.attach('file', __dirname + '/../../statics/3dmodels/8000cubes.obj')
 			.expect(401, done);
 		});
 
 		it('and the viewer should NOT be able to see raise issue', function(done){
-			agent.post(`/${username}/${model}/issues.json`)
+			agent.post(`/${username}/${model}/issues.json`).set('Authorization', `Bearer ${token}`)
 			.send({})
 			.expect(401 , done);
 		});
 
 		it('and the viewer should NOT be able to delete the model', function(done){
-			agent.delete(`/${username}/${model}`)
+			agent.delete(`/${username}/${model}`).set('Authorization', `Bearer ${token}`)
 			.send({})
 			.expect(401 , done);
 		});
@@ -236,7 +238,7 @@ describe('Sharing/Unsharing a model', function () {
 
 			};
 			
-			agent.put(`/${username}/${model}/settings`)
+			agent.put(`/${username}/${model}/settings`).set('Authorization', `Bearer ${token}`)
 			.send(body).expect(401 , done);
 		});
 
@@ -246,7 +248,7 @@ describe('Sharing/Unsharing a model', function () {
 				async.waterfall([
 					function logout(done){
 
-						agent.post('/logout')
+						agent.post('/logout').set('Authorization', `Bearer ${token}`)
 						.send({})
 						.expect(200, function(err, res){
 							expect(res.body.username).to.equal(username_viewer);
@@ -259,6 +261,7 @@ describe('Sharing/Unsharing a model', function () {
 						.send({ username, password })
 						.expect(200, function(err, res){
 							expect(res.body.username).to.equal(username);
+							token = res.body.token;
 							done(err);
 						});
 					}
@@ -272,7 +275,7 @@ describe('Sharing/Unsharing a model', function () {
 				async.waterfall([
 					function remove(done){
 
-						agent.post(`/${username}/${model}/permissions`)
+						agent.post(`/${username}/${model}/permissions`).set('Authorization', `Bearer ${token}`)
 						.send(permissions)
 						.expect(200, function(err, res){
 							done(err);
@@ -280,7 +283,7 @@ describe('Sharing/Unsharing a model', function () {
 					},
 					function logout(done){
 
-						agent.post('/logout')
+						agent.post('/logout').set('Authorization', `Bearer ${token}`)
 						.send({})
 						.expect(200, function(err, res){
 							expect(res.body.username).to.equal(username);
@@ -293,12 +296,13 @@ describe('Sharing/Unsharing a model', function () {
 						.send({ username: username_viewer, password: password_viewer })
 						.expect(200, function(err, res){
 							expect(res.body.username).to.equal(username_viewer);
+							token = res.body.token;
 							done(err);
 						});
 					},
 					function checkSharedModelInList(done){
 
-						agent.get(`/${username_viewer}.json`)
+						agent.get(`/${username_viewer}.json`).set('Authorization', `Bearer ${token}`)
 						.expect(200, function(err, res){
 
 							expect(res.body).to.have.property('accounts').that.is.an('array');
@@ -310,7 +314,7 @@ describe('Sharing/Unsharing a model', function () {
 					},
 					function notAbleToViewModel(done){
 
-						agent.get(`/${username}/${model}/revision/master/head.x3d.mp`)
+						agent.get(`/${username}/${model}/revision/master/head.x3d.mp`).set('Authorization', `Bearer ${token}`)
 						.expect(401, function(err ,res){
 							done(err);
 						});
@@ -320,7 +324,7 @@ describe('Sharing/Unsharing a model', function () {
 			});
 
 			it('and the viewer should NOT be able to see raise issue', function(done){
-				agent.post(`/${username}/${model}/issues.json`)
+				agent.post(`/${username}/${model}/issues.json`).set('Authorization', `Bearer ${token}`)
 				.send({})
 				.expect(401 , done);
 			});
@@ -329,6 +333,8 @@ describe('Sharing/Unsharing a model', function () {
 
 	describe('for comment only', function(){
 
+		let token;
+
 		before(function(done){
 
 			agent = request.agent(server);
@@ -336,6 +342,7 @@ describe('Sharing/Unsharing a model', function () {
 			.send({ username, password })
 			.expect(200, function(err, res){
 				expect(res.body.username).to.equal(username);
+				token = res.body.token;
 				done(err);
 			});
 			
@@ -343,7 +350,7 @@ describe('Sharing/Unsharing a model', function () {
 
 		after(function(done){
 
-			agent.post('/logout')
+			agent.post('/logout').set('Authorization', `Bearer ${token}`)
 			.send({})
 			.expect(200, done);
 		});
@@ -357,7 +364,7 @@ describe('Sharing/Unsharing a model', function () {
 			async.series([
 				function share(done){
 
-					agent.post(`/${username}/${model}/permissions`)
+					agent.post(`/${username}/${model}/permissions`).set('Authorization', `Bearer ${token}`)
 					.send(permissions)
 					.expect(200, function(err, res){
 						done(err);
@@ -365,7 +372,7 @@ describe('Sharing/Unsharing a model', function () {
 				},
 				function logout(done){
 
-					agent.post('/logout')
+					agent.post('/logout').set('Authorization', `Bearer ${token}`)
 					.send({})
 					.expect(200, function(err, res){
 						expect(res.body.username).to.equal(username);
@@ -378,12 +385,13 @@ describe('Sharing/Unsharing a model', function () {
 					.send({ username: username_commenter, password: password_commenter })
 					.expect(200, function(err, res){
 						expect(res.body.username).to.equal(username_commenter);
+						token = res.body.token;
 						done(err);
 					});
 				},
 				function checkSharedModelInList(done){
 
-					agent.get(`/${username_commenter}.json`)
+					agent.get(`/${username_commenter}.json`).set('Authorization', `Bearer ${token}`)
 					.expect(200, function(err, res){
 
 						expect(res.body).to.have.property('accounts').that.is.an('array');
@@ -398,7 +406,7 @@ describe('Sharing/Unsharing a model', function () {
 				},
 				function ableToViewModel(done){
 
-					agent.get(`/${username}/${model}/revision/master/head.x3d.mp`)
+					agent.get(`/${username}/${model}/revision/master/head.x3d.mp`).set('Authorization', `Bearer ${token}`)
 					.expect(200, function(err ,res){
 						done(err);
 					});
@@ -409,7 +417,7 @@ describe('Sharing/Unsharing a model', function () {
 		});
 
 		it('model info api shows correct permissions', function(done){
-			agent.get(`/${username}/${model}.json`).
+			agent.get(`/${username}/${model}.json`).set('Authorization', `Bearer ${token}`).
 			expect(200, function(err, res){
 				expect(res.body.permissions).to.deep.equal(C.COMMENTER_TEMPLATE_PERMISSIONS);
 				done(err);
@@ -417,12 +425,12 @@ describe('Sharing/Unsharing a model', function () {
 		});
 
 		it('and the commenter should be able to see list of issues', function(done){
-			agent.get(`/${username}/${model}/issues.json`)
+			agent.get(`/${username}/${model}/issues.json`).set('Authorization', `Bearer ${token}`)
 			.expect(200, done);
 		});
 
 		it('and the commenter should not be able to download the model', function(done){
-			agent.get(`/${username}/${model}/download/latest`).expect(401, done);
+			agent.get(`/${username}/${model}/download/latest`).set('Authorization', `Bearer ${token}`).expect(401, done);
 		});
 
 		it('and the commenter should be able to see raise issue', function(done){
@@ -449,19 +457,19 @@ describe('Sharing/Unsharing a model', function () {
 				"assigned_roles":["testproject.collaborator"],
 			};
 
-			agent.post(`/${username}/${model}/issues.json`)
+			agent.post(`/${username}/${model}/issues.json`).set('Authorization', `Bearer ${token}`)
 			.send(issue)
 			.expect(200 , done);
 		});
 
 		it('and the commenter should NOT be able to upload model', function(done){
-			agent.post(`/${username}/${model}/upload`)
+			agent.post(`/${username}/${model}/upload`).set('Authorization', `Bearer ${token}`)
 			.attach('file', __dirname + '/../../statics/3dmodels/8000cubes.obj')
 			.expect(401, done);
 		});
 
 		it('and the commenter should NOT be able to delete the model', function(done){
-			agent.delete(`/${username}/${model}`)
+			agent.delete(`/${username}/${model}`).set('Authorization', `Bearer ${token}`)
 			.send({})
 			.expect(401 , done);
 		});
@@ -478,7 +486,7 @@ describe('Sharing/Unsharing a model', function () {
 
 			};
 			
-			agent.put(`/${username}/${model}/settings`)
+			agent.put(`/${username}/${model}/settings`).set('Authorization', `Bearer ${token}`)
 			.send(body).expect(401 , done);
 		});
 
@@ -487,7 +495,7 @@ describe('Sharing/Unsharing a model', function () {
 				async.waterfall([
 					function logout(done){
 
-						agent.post('/logout')
+						agent.post('/logout').set('Authorization', `Bearer ${token}`)
 						.send({})
 						.expect(200, function(err, res){
 							expect(res.body.username).to.equal(username_commenter);
@@ -500,6 +508,7 @@ describe('Sharing/Unsharing a model', function () {
 						.send({ username, password })
 						.expect(200, function(err, res){
 							expect(res.body.username).to.equal(username);
+							token = res.body.token;
 							done(err);
 						});
 					}
@@ -513,7 +522,7 @@ describe('Sharing/Unsharing a model', function () {
 				async.waterfall([
 					function remove(done){
 
-						agent.post(`/${username}/${model}/permissions`)
+						agent.post(`/${username}/${model}/permissions`).set('Authorization', `Bearer ${token}`)
 						.send(permissions)
 						.expect(200, function(err, res){
 							done(err);
@@ -521,7 +530,7 @@ describe('Sharing/Unsharing a model', function () {
 					},
 					function logout(done){
 
-						agent.post('/logout')
+						agent.post('/logout').set('Authorization', `Bearer ${token}`)
 						.send({})
 						.expect(200, function(err, res){
 							expect(res.body.username).to.equal(username);
@@ -534,12 +543,13 @@ describe('Sharing/Unsharing a model', function () {
 						.send({ username: username_commenter, password: password_commenter })
 						.expect(200, function(err, res){
 							expect(res.body.username).to.equal(username_commenter);
+							token = res.body.token;
 							done(err);
 						});
 					},
 					function checkSharedModelInList(done){
 
-						agent.get(`/${username_commenter}.json`)
+						agent.get(`/${username_commenter}.json`).set('Authorization', `Bearer ${token}`)
 						.expect(200, function(err, res){
 
 							expect(res.body).to.have.property('accounts').that.is.an('array');
@@ -551,7 +561,7 @@ describe('Sharing/Unsharing a model', function () {
 					},
 					function notAbleToViewModel(done){
 
-						agent.get(`/${username}/${model}/revision/master/head.x3d.mp`)
+						agent.get(`/${username}/${model}/revision/master/head.x3d.mp`).set('Authorization', `Bearer ${token}`)
 						.expect(401, function(err ,res){
 							done(err);
 						});
@@ -561,7 +571,7 @@ describe('Sharing/Unsharing a model', function () {
 			});
 
 			it('and the commenter should NOT be able to see raise issue', function(done){
-				agent.post(`/${username}/${model}/issues.json`)
+				agent.post(`/${username}/${model}/issues.json`).set('Authorization', `Bearer ${token}`)
 				.send({ })
 				.expect(401 , done);
 			});
@@ -569,6 +579,9 @@ describe('Sharing/Unsharing a model', function () {
 	});
 
 	describe('for collaborator', function(){
+
+		let token;
+
 		before(function(done){
 
 			agent = request.agent(server);
@@ -576,6 +589,7 @@ describe('Sharing/Unsharing a model', function () {
 			.send({ username, password })
 			.expect(200, function(err, res){
 				expect(res.body.username).to.equal(username);
+				token = res.body.token;
 				done(err);
 			});
 			
@@ -583,7 +597,7 @@ describe('Sharing/Unsharing a model', function () {
 
 		after(function(done){
 
-			agent.post('/logout')
+			agent.post('/logout').set('Authorization', `Bearer ${token}`)
 			.send({})
 			.expect(200, done);
 		});
@@ -597,7 +611,7 @@ describe('Sharing/Unsharing a model', function () {
 			async.series([
 				function share(done){
 
-					agent.post(`/${username}/${model}/permissions`)
+					agent.post(`/${username}/${model}/permissions`).set('Authorization', `Bearer ${token}`)
 					.send(permissions)
 					.expect(200, function(err, res){
 						done(err);
@@ -605,7 +619,7 @@ describe('Sharing/Unsharing a model', function () {
 				},
 				function logout(done){
 
-					agent.post('/logout')
+					agent.post('/logout').set('Authorization', `Bearer ${token}`)
 					.send({})
 					.expect(200, function(err, res){
 						expect(res.body.username).to.equal(username);
@@ -618,12 +632,13 @@ describe('Sharing/Unsharing a model', function () {
 					.send({ username: username_editor, password: password_editor })
 					.expect(200, function(err, res){
 						expect(res.body.username).to.equal(username_editor);
+						token = res.body.token;
 						done(err);
 					});
 				},
 				function checkSharedModelInList(done){
 
-					agent.get(`/${username_editor}.json`)
+					agent.get(`/${username_editor}.json`).set('Authorization', `Bearer ${token}`)
 					.expect(200, function(err, res){
 
 						expect(res.body).to.have.property('accounts').that.is.an('array');
@@ -638,7 +653,7 @@ describe('Sharing/Unsharing a model', function () {
 				},
 				function ableToViewModel(done){
 
-					agent.get(`/${username}/${model}/revision/master/head.x3d.mp`)
+					agent.get(`/${username}/${model}/revision/master/head.x3d.mp`).set('Authorization', `Bearer ${token}`)
 					.expect(200, function(err ,res){
 						done(err);
 					});
@@ -649,7 +664,7 @@ describe('Sharing/Unsharing a model', function () {
 		});
 
 		it('model info api shows correct permissions', function(done){
-			agent.get(`/${username}/${model}.json`).
+			agent.get(`/${username}/${model}.json`).set('Authorization', `Bearer ${token}`).
 			expect(200, function(err, res){
 				expect(res.body.permissions).to.deep.equal(C.COLLABORATOR_TEMPLATE_PERMISSIONS);
 				done(err);
@@ -658,7 +673,7 @@ describe('Sharing/Unsharing a model', function () {
 		
 
 		it('and the editor should be able to see list of issues', function(done){
-			agent.get(`/${username}/${model}/issues.json`)
+			agent.get(`/${username}/${model}/issues.json`).set('Authorization', `Bearer ${token}`)
 			.expect(200, done);
 		});
 
@@ -686,24 +701,24 @@ describe('Sharing/Unsharing a model', function () {
 				"assigned_roles":["testproject.collaborator"],
 			};
 
-			agent.post(`/${username}/${model}/issues.json`)
+			agent.post(`/${username}/${model}/issues.json`).set('Authorization', `Bearer ${token}`)
 			.send(issue)
 			.expect(200 , done);
 		});
 
 		it('and the collaborator should be able to upload model', function(done){
-			agent.post(`/${username}/${model}/upload`)
+			agent.post(`/${username}/${model}/upload`).set('Authorization', `Bearer ${token}`)
 			.attach('file', __dirname + '/../../statics/3dmodels/8000cubes.obj')
 			.expect(200, done);
 		});
 
 
 		it('and the collaborator should be able to download the model', function(done){
-			agent.get(`/${username}/${model}/download/latest`).expect(200, done);
+			agent.get(`/${username}/${model}/download/latest`).set('Authorization', `Bearer ${token}`).expect(200, done);
 		});
 
 		it('and the collaborator should NOT be able to delete the model', function(done){
-			agent.delete(`/${username}/${model}`)
+			agent.delete(`/${username}/${model}`).set('Authorization', `Bearer ${token}`)
 			.send({})
 			.expect(401 , done);
 		});
@@ -720,7 +735,7 @@ describe('Sharing/Unsharing a model', function () {
 
 			};
 			
-			agent.put(`/${username}/${model}/settings`)
+			agent.put(`/${username}/${model}/settings`).set('Authorization', `Bearer ${token}`)
 			.send(body).expect(401 , done);
 		});
 
@@ -729,7 +744,7 @@ describe('Sharing/Unsharing a model', function () {
 				async.waterfall([
 					function logout(done){
 
-						agent.post('/logout')
+						agent.post('/logout').set('Authorization', `Bearer ${token}`)
 						.send({})
 						.expect(200, function(err, res){
 							expect(res.body.username).to.equal(username_editor);
@@ -742,6 +757,7 @@ describe('Sharing/Unsharing a model', function () {
 						.send({ username, password })
 						.expect(200, function(err, res){
 							expect(res.body.username).to.equal(username);
+							token = res.body.token;
 							done(err);
 						});
 					}
@@ -755,7 +771,7 @@ describe('Sharing/Unsharing a model', function () {
 				async.waterfall([
 					function remove(done){
 
-						agent.post(`/${username}/${model}/permissions`)
+						agent.post(`/${username}/${model}/permissions`).set('Authorization', `Bearer ${token}`)
 						.send(permissions)
 						.expect(200, function(err, res){
 							done(err);
@@ -763,7 +779,7 @@ describe('Sharing/Unsharing a model', function () {
 					},
 					function logout(done){
 
-						agent.post('/logout')
+						agent.post('/logout').set('Authorization', `Bearer ${token}`)
 						.send({})
 						.expect(200, function(err, res){
 							expect(res.body.username).to.equal(username);
@@ -776,12 +792,13 @@ describe('Sharing/Unsharing a model', function () {
 						.send({ username: username_editor, password: password_editor })
 						.expect(200, function(err, res){
 							expect(res.body.username).to.equal(username_editor);
+							token = res.body.token;
 							done(err);
 						});
 					},
 					function checkSharedModelInList(done){
 
-						agent.get(`/${username_editor}.json`)
+						agent.get(`/${username_editor}.json`).set('Authorization', `Bearer ${token}`)
 						.expect(200, function(err, res){
 
 							expect(res.body).to.have.property('accounts').that.is.an('array');
@@ -793,7 +810,7 @@ describe('Sharing/Unsharing a model', function () {
 					},
 					function notAbleToViewModel(done){
 
-						agent.get(`/${username}/${model}/revision/master/head.x3d.mp`)
+						agent.get(`/${username}/${model}/revision/master/head.x3d.mp`).set('Authorization', `Bearer ${token}`)
 						.expect(401, function(err ,res){
 							done(err);
 						});
@@ -803,7 +820,7 @@ describe('Sharing/Unsharing a model', function () {
 			});
 
 			it('and the editor should NOT be able to raise issue', function(done){
-				agent.post(`/${username}/${model}/issues.json`)
+				agent.post(`/${username}/${model}/issues.json`).set('Authorization', `Bearer ${token}`)
 				.send({})
 				.expect(401 , done);
 			});
@@ -843,6 +860,7 @@ describe('Sharing/Unsharing a model', function () {
 	describe('for non-existing user', function(){
 
 		let agent;
+		let token;
 
 		before(function(done){
 
@@ -851,6 +869,7 @@ describe('Sharing/Unsharing a model', function () {
 			.send({ username, password })
 			.expect(200, function(err, res){
 				expect(res.body.username).to.equal(username);
+				token = res.body.token;
 				done(err);
 			});
 			
@@ -860,7 +879,7 @@ describe('Sharing/Unsharing a model', function () {
 
 			const permissions = [{ user: username_viewer + '99', permission: 'collaborator'}];
 
-			agent.post(`/${username}/${model}/permissions`)
+			agent.post(`/${username}/${model}/permissions`).set('Authorization', `Bearer ${token}`)
 			.send(permissions)
 			.expect(404, function(err, res){
 				expect(res.body.value).to.equal(responseCodes.USER_NOT_FOUND.value);
@@ -941,6 +960,7 @@ describe('Sharing/Unsharing a model', function () {
 	describe('to the same user twice', function(){
 
 		let agent;
+		let token;
 
 		before(function(done){
 
@@ -949,6 +969,8 @@ describe('Sharing/Unsharing a model', function () {
 			.send({ username, password })
 			.expect(200, function(err, res){
 				expect(res.body.username).to.equal(username);
+				token = res.body.token;
+
 				done(err);
 			});
 			
@@ -963,14 +985,14 @@ describe('Sharing/Unsharing a model', function () {
 
 			async.series([
 				done => {
-					agent.post(`/${username}/${model}/permissions`)
+					agent.post(`/${username}/${model}/permissions`).set('Authorization', `Bearer ${token}`)
 					.send(permissions)
 					.expect(200, function(err, res){
 						done(err);
 					});
 				},
 				done => {
-					agent.get(`/${username}/${model}/permissions`)
+					agent.get(`/${username}/${model}/permissions`).set('Authorization', `Bearer ${token}`)
 					.expect(200, function(err, res){
 						expect(res.body).to.deep.equal([{ user: username_viewer, permission: 'viewer'}]);
 						done(err);

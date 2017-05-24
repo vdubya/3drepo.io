@@ -37,6 +37,7 @@ describe('Updating user info', function () {
 	let email = 'test3drepo_updateinfo@mailinator.com';
 	let newEmail = 'test3drepo_updateinfo_1@mailinator.com';
 	let takenEmail = 'test3drepo@mailinator.com';
+	let token;
 
 	before(function(done){
 
@@ -46,8 +47,9 @@ describe('Updating user info', function () {
 			helpers.signUpAndLogin({
 				server, request, agent, expect, User, systemLogger,
 				username, password, email,
-				done: function(err, _agent){
-					agent = _agent;
+				done: function(err, data){
+					agent = data.agent;
+					token = data.token;
 					done(err);
 				}
 			});
@@ -69,13 +71,13 @@ describe('Updating user info', function () {
 		let lastName = 'def';
 		async.series([
 			function update(done){
-				agent.put(`/${username}`)
+				agent.put(`/${username}`).set('Authorization', `Bearer ${token}`)
 				.send({ firstName, lastName, email })
 				.expect(200, done);
 			},
 
 			function check(done){
-				agent.get(`/${username}.json`)
+				agent.get(`/${username}.json`).set('Authorization', `Bearer ${token}`)
 				.expect(200, function(err, res){
 					expect(res.body.firstName).to.equal(firstName);
 					expect(res.body.lastName).to.equal(lastName);
@@ -93,13 +95,13 @@ describe('Updating user info', function () {
 		let lastName = 'def';
 		async.series([
 			function update(done){
-				agent.put(`/${username}`)
+				agent.put(`/${username}`).set('Authorization', `Bearer ${token}`)
 				.send({ firstName, lastName, email: newEmail})
 				.expect(200, done);
 			},
 
 			function check(done){
-				agent.get(`/${username}.json`)
+				agent.get(`/${username}.json`).set('Authorization', `Bearer ${token}`)
 				.expect(200, function(err, res){
 					expect(res.body.firstName).to.equal(firstName);
 					expect(res.body.lastName).to.equal(lastName);
@@ -117,7 +119,7 @@ describe('Updating user info', function () {
 		let lastName = 'def';
 
 
-		agent.put(`/${username}`)
+		agent.put(`/${username}`).set('Authorization', `Bearer ${token}`)
 		.send({ firstName, lastName, email: takenEmail })
 		.expect(400, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.EMAIL_EXISTS.value);

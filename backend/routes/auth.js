@@ -127,11 +127,9 @@
 
 		var username = req.session.user.username;
 
-		req.session.destroy(function() {
-			req[C.REQ_REPO].logger.logDebug("User has logged out.");
-			//res.clearCookie("connect.sid", { domain: config.cookie.domain, path: "/" });
-			responseCodes.respond("Logout POST", req, res, next, responseCodes.OK, {username: username});
-		});
+		req[C.REQ_REPO].logger.logDebug("User has logged out.");
+		responseCodes.respond("Logout POST", req, res, next, responseCodes.OK, {username: username});
+
 	}
 
 	function updateUser(req, res, next){

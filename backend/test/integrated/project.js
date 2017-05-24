@@ -34,6 +34,7 @@ describe('Projects', function () {
 	let agent;
 	let username = 'projectuser';
 	let password = 'projectuser';
+	let token;
 
 	before(function(done){
 		server = app.listen(8080, function () {
@@ -44,6 +45,8 @@ describe('Projects', function () {
 			.send({ username, password })
 			.expect(200, function(err, res){
 				expect(res.body.username).to.equal(username);
+				token = res.body.token;
+				
 				done(err);
 			});
 
@@ -67,7 +70,7 @@ describe('Projects', function () {
 		async.series([
 			
 			callback => {
-				agent.post(`/${username}/projects`)
+				agent.post(`/${username}/projects`).set('Authorization', `Bearer ${token}`)
 				.send(project)
 				.expect(200, function(err, res){
 					callback(err);
@@ -75,7 +78,7 @@ describe('Projects', function () {
 			},
 
 			callback => {
-				agent.get(`/${username}.json`)
+				agent.get(`/${username}.json`).set('Authorization', `Bearer ${token}`)
 				.expect(200, function(err, res){
 
 					const account = res.body.accounts.find(account => account.account === username);
@@ -93,7 +96,7 @@ describe('Projects', function () {
 
 
 	it('should fail to create project with name default', function(done){
-		agent.post(`/${username}/projects`)
+		agent.post(`/${username}/projects`).set('Authorization', `Bearer ${token}`)
 		.send({name: 'default'})
 		.expect(400, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.INVALID_PROJECT_NAME.value);
@@ -108,7 +111,7 @@ describe('Projects', function () {
 			name: 'project_exists'
 		};
 
-		agent.post(`/${username}/projects`)
+		agent.post(`/${username}/projects`).set('Authorization', `Bearer ${token}`)
 		.send(project)
 		.expect(400, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.PROJECT_EXIST.value);
@@ -131,7 +134,7 @@ describe('Projects', function () {
 		async.series([
 			
 			callback => {
-				agent.put(`/${username}/projects/${project.name}`)
+				agent.put(`/${username}/projects/${project.name}`).set('Authorization', `Bearer ${token}`)
 				.send(project)
 				.expect(200, function(err, res){
 					callback(err);
@@ -139,7 +142,7 @@ describe('Projects', function () {
 			},
 
 			callback => {
-				agent.get(`/${username}.json`)
+				agent.get(`/${username}.json`).set('Authorization', `Bearer ${token}`)
 				.expect(200, function(err, res){
 
 
@@ -168,7 +171,7 @@ describe('Projects', function () {
 		async.series([
 			
 			callback => {
-				agent.put(`/${username}/projects/project2`)
+				agent.put(`/${username}/projects/project2`).set('Authorization', `Bearer ${token}`)
 				.send(project)
 				.expect(200, function(err, res){
 					callback(err);
@@ -176,7 +179,7 @@ describe('Projects', function () {
 			},
 
 			callback => {
-				agent.get(`/${username}.json`)
+				agent.get(`/${username}.json`).set('Authorization', `Bearer ${token}`)
 				.expect(200, function(err, res){
 
 
@@ -203,7 +206,7 @@ describe('Projects', function () {
 			}]
 		};
 
-		agent.put(`/${username}/projects/${project.name}`)
+		agent.put(`/${username}/projects/${project.name}`).set('Authorization', `Bearer ${token}`)
 		.send(project)
 		.expect(400, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.INVALID_PERM.value);
@@ -221,7 +224,7 @@ describe('Projects', function () {
 		async.series([
 			
 			callback => {
-				agent.delete(`/${username}/projects/${project.name}`)
+				agent.delete(`/${username}/projects/${project.name}`).set('Authorization', `Bearer ${token}`)
 				.expect(200, function(err, res){
 					callback(err);
 				});
@@ -229,7 +232,7 @@ describe('Projects', function () {
 			},
 
 			callback => {
-				agent.get(`/${username}.json`)
+				agent.get(`/${username}.json`).set('Authorization', `Bearer ${token}`)
 				.expect(200, function(err, res){
 
 					const account = res.body.accounts.find(account => account.account === username);
@@ -247,7 +250,7 @@ describe('Projects', function () {
 	});
 
 	it('should fail to update a project that doesnt exist', function(done){
-		agent.put(`/${username}/projects/notexist`)
+		agent.put(`/${username}/projects/notexist`).set('Authorization', `Bearer ${token}`)
 		.send({})
 		.expect(404, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.PROJECT_NOT_FOUND.value);
@@ -256,7 +259,7 @@ describe('Projects', function () {
 	});
 
 	it('should fail to delete a project that doesnt exist', function(done){
-		agent.delete(`/${username}/projects/notexist`)
+		agent.delete(`/${username}/projects/notexist`).set('Authorization', `Bearer ${token}`)
 		.expect(404, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.PROJECT_NOT_FOUND.value);
 			done(err);

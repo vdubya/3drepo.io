@@ -31,8 +31,7 @@ function signUpAndLogin(params){
 			.send({ username, password })
 			.expect(200, function(err, res){
 				expect(res.body.username).to.equal(username);
-				console.log(typeof done)
-				done(err, agent);
+				done(err, {agent, token: res.body.token});
 
 			});
 
@@ -65,19 +64,20 @@ function signUpAndLoginAndCreateModel(params){
 	signUpAndLogin({
 		server, request, agent, expect, User, systemLogger,
 		username, password, email, noBasicPlan, 
-		done: function(err, _agent){
+		done: function(err, data){
 
-			agent = _agent;
+			agent = data.agent;
+			let token = data.token;
 
 			if(err){
-				return done(err, agent);
+				return done(err, {agent, token});
 			}
 
 			//create a model
-			agent.post(`/${username}/${model}`)
+			agent.post(`/${username}/${model}`).set('Authorization', `Bearer ${token}`)
 			.send({ type, desc, unit })
 			.expect(200, function(err, res){
-				done(err, agent);
+				done(err, {agent, token});
 			});
 		}
 	});

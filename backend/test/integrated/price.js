@@ -40,7 +40,8 @@ describe('Billing agreement price from PayPal', function () {
 	let username = 'price_testing';
 	let password = 'price_testing';
 	let email = 'price_testing@mailinator.com';
-
+	let token;
+	
 	before(function(done){
 
 		server = app.listen(8080, function () {
@@ -49,8 +50,9 @@ describe('Billing agreement price from PayPal', function () {
 			helpers.signUpAndLogin({
 				server, request, agent, expect, User, systemLogger,
 				username, password, email,
-				done: function(err, _agent){
-					agent = _agent;
+				done: function(err, data){
+					agent = data.agent;
+					token = data.token
 					done(err);
 				}
 			});
@@ -88,7 +90,7 @@ describe('Billing agreement price from PayPal', function () {
 			}
 		};
 
-		agent.post(`/${username}/subscriptions`)
+		agent.post(`/${username}/subscriptions`).set('Authorization', `Bearer ${token}`)
 		.send(plans)
 		.expect(200, function(err, res){
 			expect(res.body).to.have.property('url');

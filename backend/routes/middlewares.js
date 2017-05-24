@@ -32,7 +32,11 @@
 	const getPermissionsAdapter = require('../middlewares/getPermissionsAdapter');
 	const checkPermissionsHelper = require('../middlewares/checkPermissions');
 	const Auth = require('../models/auth');
-	//const _ = require('lodash');
+
+	const log_iface = require("../logger.js");
+	const systemLogger = log_iface.systemLogger;
+
+	const _ = require('lodash');
 
 	function checkPermissions(permsRequest){
 
@@ -187,6 +191,7 @@
 		);
 	}
 
+
 	function verifyJWT(req, res, next){
 		req.session = {};
 
@@ -199,8 +204,11 @@
 				req.session = data;
 				next();
 			}).catch(err => {
-				req[C.REQ_REPO].logger.logError(err);
-				responseCodes.respond(utils.APIInfo(req), req, res, next, responseCodes.AUTH_ERROR, {});
+				
+				const logger =  _.get(req, `${C.REQ_REPO}.logger`) || systemLogger;
+				logger.logError(err);
+
+				next();
 			});
 
 		}

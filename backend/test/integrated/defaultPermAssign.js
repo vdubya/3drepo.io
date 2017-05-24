@@ -19,9 +19,7 @@
 
 const request = require('supertest');
 const expect = require('chai').expect;
-const app = require("../../services/api.js").createApp(
-	{ session: require('express-session')({ secret: 'testing'}) }
-);
+const app = require("../../services/api.js").createApp();
 const log_iface = require("../../logger.js");
 const systemLogger = log_iface.systemLogger;
 const responseCodes = require("../../response_codes.js");
@@ -39,6 +37,7 @@ describe('Default permission assignment', function () {
 	const password = 'defaultperm';
 	const email = 'test-defaultperm@3drepo.org'
 	const helpers = require('./helpers');
+	let token;
 
 	before(function(done){
 		server = app.listen(8080, function () {
@@ -46,8 +45,9 @@ describe('Default permission assignment', function () {
 			helpers.signUpAndLogin({
 				server, request, agent, expect, User, systemLogger,
 				username, password, email,
-				done: function(err, _agent){
-					agent = _agent;
+				done: function(err, data){
+					agent = data.agent;
+					token = data.token;
 					done(err);
 				}
 			});
@@ -62,7 +62,7 @@ describe('Default permission assignment', function () {
 	});
 
 	it('user should be an admin of your own teamspace', function(done){
-		agent.get(`/${username}.json`)
+		agent.get(`/${username}.json`).set('Authorization', `Bearer ${token}`)
 		.expect(200, function(err, res){
 			
 			const account = res.body.accounts.find(account => account.account === username);
@@ -74,7 +74,7 @@ describe('Default permission assignment', function () {
 
 	it('user should be able to create project', function(done){
 
-		agent.post(`/${username}/projects`)
+		agent.post(`/${username}/projects`).set('Authorization', `Bearer ${token}`)
 		.send({name: 'project1'})
 		.expect(200, function(err, res){
 			done(err);
@@ -83,7 +83,7 @@ describe('Default permission assignment', function () {
 
 
 	it('user should be able to create model', function(done){
-		agent.post(`/${username}/model1`)
+		agent.post(`/${username}/model1`).set('Authorization', `Bearer ${token}`)
 		.send({unit: 'm'})
 		.expect(200, function(err, res){
 			done(err);
@@ -91,7 +91,7 @@ describe('Default permission assignment', function () {
 	});
 
 	it('the model created should filled with correct permissions (account listing)', function(done){
-		agent.get(`/${username}.json`)
+		agent.get(`/${username}.json`).set('Authorization', `Bearer ${token}`)
 		.expect(200, function(err, res){
 			
 			const account = res.body.accounts.find(account => account.account === username);
@@ -106,7 +106,7 @@ describe('Default permission assignment', function () {
 
 
 	it('the model created should filled with correct permissions (model info)', function(done){
-		agent.get(`/${username}/model1.json`)
+		agent.get(`/${username}/model1.json`).set('Authorization', `Bearer ${token}`)
 		.expect(200, function(err, res){
 			expect(res.body.permissions).to.deep.equal(C.MODEL_PERM_LIST);
 			done(err);
@@ -114,7 +114,7 @@ describe('Default permission assignment', function () {
 	});
 
 	it('user should have default permission templates created', function(done){
-		agent.get(`/${username}/permission-templates`)
+		agent.get(`/${username}/permission-templates`).set('Authorization', `Bearer ${token}`)
 		.expect(200, function(err, res){
 
 			const viewer = res.body.find(t => t._id === C.VIEWER_TEMPLATE);

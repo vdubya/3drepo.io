@@ -28,7 +28,7 @@ let systemLogger = log_iface.systemLogger;
 let responseCodes = require("../../response_codes.js");
 let async = require('async');
 let http = require('http');
-let newXhr = require('socket.io-client-cookie'); 
+//let newXhr = require('../../libs/socket.io-client-cookie.js'); 
 let io = require('socket.io-client');
 
 describe('Notification', function () {
@@ -64,7 +64,8 @@ describe('Notification', function () {
 		"assigned_roles":["testproject.collaborator"],
 	};
 
-	let connectSid;
+	let token;
+	let token2;
 
 	before(function(done){
 		server = app.listen(8080, function () {
@@ -85,16 +86,7 @@ describe('Notification', function () {
 						agent.post('/login')
 						.send({ username, password })
 						.expect(200, function(err, res){
-							cookies = res.header['set-cookie'][0];
-
-							cookies.split(';').forEach(keyval => {
-								if(keyval){
-									keyval = keyval.split('=');
-									if(keyval[0] === 'connect.sid'){
-										connectSid = keyval[1];
-									}
-								}
-							});
+							token = res.body.token;
 							done(err);
 						});
 					},
@@ -102,7 +94,10 @@ describe('Notification', function () {
 						agent2 = request.agent(server);
 						agent2.post('/login')
 						.send({ username: username, password: password })
-						.expect(200, done);
+						.expect(200, function(err, res){
+							token2 = res.body.token;
+							done(err);
+						});
 					}
 				], done);
 
@@ -123,9 +118,13 @@ describe('Notification', function () {
 
 		//https://gist.github.com/jfromaniello/4087861
 		//socket-io.client send the cookies!
+		//console.log(`connect.sid=${connectSid}; `);
+		//console.log(newXhr);
+		//newXhr.setCookies(`connect.sid=${connectSid}; `);
+		socket = io(config.chat_server.chat_host, {path: '/' + config.chat_server.subdirectory, extraHeaders:{
+			Authorization: `Bearer ${token}`
+		}});
 
-		newXhr.setCookies(`connect.sid=${connectSid}; `);
-		socket = io(config.chat_server.chat_host, {path: '/' + config.chat_server.subdirectory});
 		socket.on('connect', function(data){
 
 			socket.emit('join', {account: username, model: model});
@@ -147,10 +146,12 @@ describe('Notification', function () {
 
 	it('join a room that user has no access to should fail', function(done){
 
-		newXhr.setCookies(`connect.sid=${connectSid}; `);
+		//newXhr.setCookies(`connect.sid=${connectSid}; `);
 		
 		//https://github.com/socketio/socket.io-client/issues/318 force new connection
-		let mySocket = io(config.chat_server.chat_host, {path: '/' + config.chat_server.subdirectory, 'force new connection': true});
+		let mySocket = io(config.chat_server.chat_host, {path: '/' + config.chat_server.subdirectory, 'force new connection': true, extraHeaders:{
+			Authorization: `Bearer ${token}`
+		}});
 
 		mySocket.on('connect', function(data){
 			console.log('on connect')
@@ -196,7 +197,7 @@ describe('Notification', function () {
 			done();
 		});
 
-		agent2.post(`/${username}/${model}/issues.json`)
+		agent2.post(`/${username}/${model}/issues.json`).set('Authorization', `Bearer ${token2}`)
 		.send(issue)
 		.expect(200 , function(err, res){
 			issueId = res.body._id;
@@ -229,7 +230,7 @@ describe('Notification', function () {
 			done();
 		});
 
-		agent2.put(`/${username}/${model}/issues/${issueId}.json`)
+		agent2.put(`/${username}/${model}/issues/${issueId}.json`).set('Authorization', `Bearer ${token2}`)
 		.send(comment)
 		.expect(200 , function(err, res){
 			expect(err).to.not.exist;
@@ -246,7 +247,7 @@ describe('Notification', function () {
 			done();
 		});
 
-		agent2.put(`/${username}/${model}/issues/${issueId}.json`)
+		agent2.put(`/${username}/${model}/issues/${issueId}.json`).set('Authorization', `Bearer ${token2}`)
 		.send(comment)
 		.expect(200 , function(err, res){
 			expect(err).to.not.exist;
@@ -263,7 +264,7 @@ describe('Notification', function () {
 			done();
 		});
 
-		agent2.put(`/${username}/${model}/issues/${issueId}.json`)
+		agent2.put(`/${username}/${model}/issues/${issueId}.json`).set('Authorization', `Bearer ${token2}`)
 		.send(comment)
 		.expect(200 , function(err, res){
 			expect(err).to.not.exist;
@@ -296,7 +297,7 @@ describe('Notification', function () {
 
 
 
-		agent2.put(`/${username}/${model}/issues/${issueId}.json`)
+		agent2.put(`/${username}/${model}/issues/${issueId}.json`).set('Authorization', `Bearer ${token2}`)
 		.send(status)
 		.expect(200 , function(err, res){
 			expect(err).to.not.exist;
