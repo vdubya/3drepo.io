@@ -28,7 +28,7 @@ let systemLogger = log_iface.systemLogger;
 let responseCodes = require("../../response_codes.js");
 let async = require('async');
 let http = require('http');
-let newXhr = require('../../lib/socket.io-client-cookie.js'); 
+let newXhr = require('../../libs/socket.io-client-cookie.js'); 
 let io = require('socket.io-client');
 
 describe('Notification', function () {
