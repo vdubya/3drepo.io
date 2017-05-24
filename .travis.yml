@@ -14,6 +14,7 @@ addons:
     packages:
       - g++-4.8
 before_install:
+    - npm i -g npm@4.6.1
     - mkdir -p submodules
     - cd submodules
     - git clone https://$TESTS_USER:$TESTS_PASSWORD@github.com/3drepo/tests.git
