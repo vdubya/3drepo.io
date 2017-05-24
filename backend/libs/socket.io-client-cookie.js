@@ -1,11 +1,11 @@
-// // XMLHttpRequest to override.
-// var xhrPath = '../socket.io-client/node_modules/engine.io-client/node_modules/xmlhttprequest';
+// XMLHttpRequest to override.
+var xhrPath = '../../node_modules/socket.io-client/node_modules/xmlhttprequest';
 
 //Require it for the first time to store it in the require.cache
-require('xmlhttprequest');
+require(xhrPath);
 
 //Get the resolved filename which happens to be the key of the module in the cache object
-var xhrName = require.resolve('xmlhttprequest');
+var xhrName = require.resolve(xhrPath);
 
 //Get the cached xhr module
 var cachedXhr = require.cache[xhrName].exports;
@@ -23,7 +23,7 @@ var newXhr = function () {
         stdOpen.apply(this, arguments);
         this.setRequestHeader('Cookie', cookies);
 
-    };
+    }
 };
 
 newXhr.XMLHttpRequest = newXhr;

@@ -28,7 +28,7 @@ let systemLogger = log_iface.systemLogger;
 let responseCodes = require("../../response_codes.js");
 let async = require('async');
 let http = require('http');
-let newXhr = require('socket.io-client-cookie'); 
+let newXhr = require('../../lib/socket.io-client-cookie.js'); 
 let io = require('socket.io-client');
 
 describe('Notification', function () {
@@ -119,11 +119,12 @@ describe('Notification', function () {
 	});
 
 	it('connect to chat server and join room should succee', function(done){
-		this.timeout(2000);
+		this.timeout(5000);
 
 		//https://gist.github.com/jfromaniello/4087861
 		//socket-io.client send the cookies!
-
+		console.log(`connect.sid=${connectSid}; `);
+		console.log(newXhr);
 		newXhr.setCookies(`connect.sid=${connectSid}; `);
 		socket = io(config.chat_server.chat_host, {path: '/' + config.chat_server.subdirectory});
 		socket.on('connect', function(data){
