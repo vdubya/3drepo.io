@@ -22,15 +22,16 @@ module.exports.createApp = function (server, serverConfig){
 	//var server = require('http').Server(app);
 
 	let config = require('../config');
-	let session = require('./session').session(config);
+	//let session = require('./session').session(config);
 	
 	let log_iface = require("../logger.js");
 	let middlewares = require('../routes/middlewares');
 	let systemLogger = log_iface.systemLogger;
 
+
 	//console.log(serverConfig);
 	let io = require("socket.io")(server, { path: '/' + serverConfig.subdirectory });
-	let sharedSession = require("express-socket.io-session");
+	//let sharedSession = require("express-socket.io-session");
 	let _ = require('lodash');
 
 	io.use((socket, next) => {
@@ -42,7 +43,8 @@ module.exports.createApp = function (server, serverConfig){
 		next();
 	});
 
-	io.use(sharedSession(session, { autoSave: true }));
+	//io.use(sharedSession(session, { autoSave: true }));
+	io.use(middlewares.verifyJWT);
 
 	io.use((socket, next) => {
 		// init the singleton db connection

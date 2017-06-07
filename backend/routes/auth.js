@@ -29,6 +29,7 @@
 	var addressMeta = require("../models/addressMeta");
 	var Mailer = require("../mailer/mailer");
 	var httpsPost = require("../libs/httpsReq").post;
+	const Auth = require("../models/auth");
 	//var Role = require('../models/role');
 	//var crypto = require('crypto');
 
@@ -63,24 +64,35 @@
 	// 	}
 	// }
 
+	// function createSession(place, req, res, next, user){
+	// 	req.session.regenerate(function(err) {
+	// 		if(err) {
+	// 			responseCodes.respond(place, responseCodes.EXTERNAL_ERROR(err), res, {username: user.username});
+	// 		} else {
+	// 			req[C.REQ_REPO].logger.logDebug("Authenticated user and signed token.");
+
+	// 			req.session[C.REPO_SESSION_USER] = user;
+	// 			req.session.cookie.domain        = config.cookie_domain;
+
+	// 			if (config.cookie.maxAge)
+	// 			{
+	// 				req.session.cookie.maxAge = config.cookie.maxAge;
+	// 			}
+
+	// 			responseCodes.respond(place, req, res, next, responseCodes.OK, {username: user.username, roles: user.roles});
+	// 		}
+	// 	});
+	// }
+
 	function createSession(place, req, res, next, user){
-		req.session.regenerate(function(err) {
-			if(err) {
-				responseCodes.respond(place, responseCodes.EXTERNAL_ERROR(err), res, {username: user.username});
-			} else {
-				req[C.REQ_REPO].logger.logDebug("Authenticated user and signed token.");
+		Auth.signJwtToken(user).then(token => {
 
-				req.session[C.REPO_SESSION_USER] = user;
-				req.session.cookie.domain        = config.cookie_domain;
-
-				if (config.cookie.maxAge)
-				{
-					req.session.cookie.maxAge = config.cookie.maxAge;
-				}
-
-				responseCodes.respond(place, req, res, next, responseCodes.OK, {username: user.username, roles: user.roles});
-			}
+			req[C.REQ_REPO].logger.logDebug("Authenticated user and signed token.");
+			responseCodes.respond(place, req, res, next, responseCodes.OK, {username: user.username, token: token });
+		}).catch(err => {
+			responseCodes.respond(place, req, res, next, err.resCode ? err.resCode: err, err.resCode ? err.resCode: err);
 		});
+
 	}
 
 	function login(req, res, next){

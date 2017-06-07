@@ -280,6 +280,11 @@
 	config.vat = coalesce(config.vat, {});
 	config.vat.checkUrl = coalesce(config.vat.checkUrl, "http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl");
 
+	// jwt setting
+	config.jwt = coalesce(config.jwt, {});
+	config.jwt.expiresIn = coalesce(config.jwt.expiresIn, "2h");
+	config.jwt.algorithm = coalesce(config.jwt.algorithm, "HS256");
+
 	//get frontend base url
 	config.getBaseURL = function (useNonPublicPort) {
 

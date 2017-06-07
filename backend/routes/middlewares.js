@@ -31,6 +31,8 @@
 	const importQueue = require('../services/queue');
 	const getPermissionsAdapter = require('../middlewares/getPermissionsAdapter');
 	const checkPermissionsHelper = require('../middlewares/checkPermissions');
+	const Auth = require('../models/auth');
+	//const _ = require('lodash');
 
 	function checkPermissions(permsRequest){
 
@@ -68,7 +70,7 @@
 	}
 
 	function loggedIn(req, res, next){
-
+		
 		if (!req.session || !req.session.hasOwnProperty(C.REPO_SESSION_USER)) {
 			responseCodes.respond("Check logged in middleware", req, res, next, responseCodes.AUTH_ERROR, null, req.params);
 		} else {
@@ -185,8 +187,30 @@
 		);
 	}
 
+	function verifyJWT(req, res, next){
+		req.session = {};
+
+		const authHeader = req.headers.authorization && req.headers.authorization.split(' ');
+
+		if(authHeader && authHeader[0] === "Bearer"){
+
+			const token = authHeader[1];
+			return Auth.verifyJwtToken(token).then(data => {
+				req.session = data;
+				next();
+			}).catch(err => {
+				req[C.REQ_REPO].logger.logError(err);
+				responseCodes.respond(utils.APIInfo(req), req, res, next, responseCodes.AUTH_ERROR, {});
+			});
+
+		}
+
+		next();
+	}
+
 	var middlewares = {
 
+		verifyJWT,
 
 		//issues
 		hasWriteAccessToIssue: checkPermissions([C.PERM_CREATE_ISSUE]),

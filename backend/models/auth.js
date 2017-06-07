@@ -26,7 +26,7 @@
 		const opts = { "expiresIn": config.jwt.expiresIn, "algorithm": config.jwt.algorithm };
 
 		try {
-			return Promise.resolve(jwt.sign({username: user}, config.jwt.secret, opts));
+			return Promise.resolve(jwt.sign({user: user}, config.jwt.secret, opts));
 		} catch(e){
 			return Promise.reject(e);
 		}

@@ -24,9 +24,9 @@
 	 * @param {Object} serverConfig - Configuration for server
 	 * @returns
 	 */
-	module.exports.createApp = function (serverConfig) {
+	module.exports.createApp = function () {
 
-		const sharedSession = serverConfig.session;
+		//const sharedSession = serverConfig.session;
 		const log_iface = require("../logger.js");
 		const express = require("express");
 		//const routes = require("../routes/routes.js")();
@@ -36,6 +36,8 @@
 		const cors = require("cors");
 		const bodyParser = require("body-parser");
 		const utils = require("../utils");
+		const middlewares = require("../routes/middlewares");
+
 		// Express app
 		let app = express();
 
@@ -46,11 +48,13 @@
 		// 	.route(routes);
 
 		// Configure various middleware
-		app.use(sharedSession);
+		//app.use(sharedSession);
 		app.use(cors({ origin: true, credentials: true }));
+
 
 		// put logger in req object
 		app.use(log_iface.startRequest);
+		app.use(middlewares.verifyJWT);
 
 		// init the singleton db connection for modelFactory
 		app.use((req, res, next) => {
@@ -76,9 +80,9 @@
 		app.set("view_engine", "jade");
 
 		app.use(bodyParser.json({ limit: "2mb" }));
-		app.use(function (req, res, next) {
-			sharedSession(req, res, next);
-		});
+		// app.use(function (req, res, next) {
+		// 	sharedSession(req, res, next);
+		// });
 		app.use(compress());
 
 		app.use(function (req, res, next) {
