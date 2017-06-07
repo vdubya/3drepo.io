@@ -225,6 +225,13 @@
         
           <h1 id="authentication">Authentication</h1>
 
+<p>To authenicate
+put </p>
+
+<p><code class="prettyprint">Authorization: Bearer &lt;token&gt;</code></p>
+
+<p>in your HTTP Header</p>
+
 <h2 id="login">Login</h2>
 
 <blockquote>
@@ -240,23 +247,17 @@
 <p>Example Responses</p>
 </blockquote>
 <pre class="highlight http tab-http"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
-<span class="na">set-cookie</span><span class="p">:</span><span class="s">connect.sid=12345678901234567890; </span>
 
 </code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"username"</span><span class="p">:</span><span class="w"> </span><span class="s2">"repoman"</span><span class="w">
+    </span><span class="s2">"token"</span><span class="p">:</span><span class="w"> </span><span class="s2">"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJuYW1lIjoiZmVkIiwicm9sZXMiOlt7InJvbGUiOiJwcm9qMi5jb2xsYWJvcmF0b3IiLCJkYiI6ImZlZCJ9LHsicm9sZSI6InByb2oxLmNvbGxhYm9yYXRvciIsImRiIjoiZmVkIn0seyJyb2xlIjoiYWRtaW4iLCJkYiI6ImZlZCJ9XX0sImlhdCI6MTQ5Njg1MDMzMSwiZXhwIjoxNDk2ODU3NTMxfQ.Z9goqD9RWAO_jyUIOiLkBiVkHTbDMrVRKRfIDsoASkU"</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 <h3 id="post-login">POST /login</h3>
 
-<p>All 3D Repo APIs use cookie-based authentication. To authenicate subsequent API calls
-simply put </p>
+<p>To generate a json web token, you need to post user credential to this API</p>
 
-<p><code class="prettyprint">Cookie: connect.sid=123456</code></p>
-
-<p>in your HTTP Header</p>
-
-<p>To generate a token and used it in cookie-based authentication, you need to
-post user information to this API</p>
+<p>The payload of the json web token includes a field named <code class="prettyprint">exp</code> which is a timestamp indicating when this token will expire.</p>
 
 <h3 id="request-attributes">Request Attributes</h3>
 
@@ -276,17 +277,13 @@ post user information to this API</p>
 </tr>
 </tbody></table>
 
-<aside class="notice">
-If you use modern browser&rsquo;s XMLHttpRequest object to make API calls, you
-don&rsquo;t need to take care of the authenication process after calling to /login
-</aside>
-
 <h2 id="get-current-username">Get current username</h2>
 
 <blockquote>
 <p>Example Request</p>
 </blockquote>
 <pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/login</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJuYW1lIjoiZmVkIiwicm9sZXMiOlt7InJvbGUiOiJwcm9qMi5jb2xsYWJvcmF0b3IiLCJkYiI6ImZlZCJ9LHsicm9sZSI6InByb2oxLmNvbGxhYm9yYXRvciIsImRiIjoiZmVkIn0seyJyb2xlIjoiYWRtaW4iLCJkYiI6ImZlZCJ9XX0sImlhdCI6MTQ5Njg1MDMzMSwiZXhwIjoxNDk2ODU3NTMxfQ.Z9goqD9RWAO_jyUIOiLkBiVkHTbDMrVRKRfIDsoASkU</span>
 </code></pre>
 <blockquote>
 <p>Example Responses</p>

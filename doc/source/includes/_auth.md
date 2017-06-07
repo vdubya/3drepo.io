@@ -1,5 +1,12 @@
 # Authentication
 
+To authenicate
+put 
+
+`Authorization: Bearer <token>`
+
+in your HTTP Header
+
 ## Login
 
 > Example Request
@@ -21,28 +28,22 @@ POST /login HTTP/1.1
 
 ```http
 HTTP/1.1 200 OK
-set-cookie:connect.sid=12345678901234567890; 
 
 ```
 
 ```json
 {
 	"username": "repoman"
+	"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJuYW1lIjoiZmVkIiwicm9sZXMiOlt7InJvbGUiOiJwcm9qMi5jb2xsYWJvcmF0b3IiLCJkYiI6ImZlZCJ9LHsicm9sZSI6InByb2oxLmNvbGxhYm9yYXRvciIsImRiIjoiZmVkIn0seyJyb2xlIjoiYWRtaW4iLCJkYiI6ImZlZCJ9XX0sImlhdCI6MTQ5Njg1MDMzMSwiZXhwIjoxNDk2ODU3NTMxfQ.Z9goqD9RWAO_jyUIOiLkBiVkHTbDMrVRKRfIDsoASkU"
 }
 ```
 
 ### POST /login
 
-All 3D Repo APIs use cookie-based authentication. To authenicate subsequent API calls
-simply put 
 
-`Cookie: connect.sid=123456`
+To generate a json web token, you need to post user credential to this API
 
-in your HTTP Header
-
-To generate a token and used it in cookie-based authentication, you need to
-post user information to this API
-
+The payload of the json web token includes a field named `exp` which is a timestamp indicating when this token will expire.
 ### Request Attributes
 
 Attribute | Required
@@ -50,10 +51,6 @@ Attribute | Required
 username | Yes
 password | Yes 
 
-<aside class="notice">
-If you use modern browser's XMLHttpRequest object to make API calls, you
-don't need to take care of the authenication process after calling to /login
-</aside>
 
 ## Get current username
 
@@ -61,6 +58,7 @@ don't need to take care of the authenication process after calling to /login
 
 ```http
 GET /login HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJuYW1lIjoiZmVkIiwicm9sZXMiOlt7InJvbGUiOiJwcm9qMi5jb2xsYWJvcmF0b3IiLCJkYiI6ImZlZCJ9LHsicm9sZSI6InByb2oxLmNvbGxhYm9yYXRvciIsImRiIjoiZmVkIn0seyJyb2xlIjoiYWRtaW4iLCJkYiI6ImZlZCJ9XX0sImlhdCI6MTQ5Njg1MDMzMSwiZXhwIjoxNDk2ODU3NTMxfQ.Z9goqD9RWAO_jyUIOiLkBiVkHTbDMrVRKRfIDsoASkU
 ```
 
 > Example Responses
