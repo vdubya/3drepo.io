@@ -95,6 +95,8 @@
 		app.use("/", require("../routes/plan"));
 		//auth handler
 		app.use("/", require("../routes/auth"));
+		//teamspace handler
+		app.use("/", require("../routes/teamspace"));
 		// subscriptions handler
 		app.use("/:account", require("../routes/subscriptions"));
 		// invoices handler
