@@ -96,43 +96,43 @@
 		//auth handler
 		app.use("/", require("../routes/auth"));
 		//teamspace handler
-		app.use("/", require("../routes/teamspace"));
+		app.use("/teamspaces", require("../routes/teamspace"));
 		// subscriptions handler
-		app.use("/:account", require("../routes/subscriptions"));
+		app.use("/teamspaces/:account", require("../routes/subscriptions"));
 		// invoices handler
-		app.use("/:account", require("../routes/invoice"));
+		app.use("/teamspaces/:account", require("../routes/invoice"));
 		// os api handler
 		app.use("/os", require("../routes/osBuilding"));
 		// payment api header
 		app.use("/payment", require("../routes/payment"));
 
-		app.use("/:account", require("../routes/job"));
-		app.use("/:account", require("../routes/permissionTemplate"));
-		app.use("/:account", require("../routes/accountPermission"));
+		app.use("/teamspaces/:account", require("../routes/job"));
+		app.use("/teamspaces/:account", require("../routes/permissionTemplate"));
+		app.use("/teamspaces/:account", require("../routes/accountPermission"));
 		
 		// projects handlers
-		app.use("/:account", require("../routes/project"));
+		app.use("/teamspaces/:account", require("../routes/project"));
 
 		//models handlers
-		app.use("/:account", require("../routes/model"));
+		app.use("/teamspaces/:account", require("../routes/model"));
 
 		//metadata handler
-		app.use("/:account/:model", require("../routes/meta"));
+		app.use("/teamspaces/:account/:model", require("../routes/meta"));
 
 		//groups handler
-		app.use("/:account/:model/groups", require("../routes/group"));
+		app.use("/teamspaces/:account/:model/groups", require("../routes/group"));
 		
 		//issues handler
-		app.use("/:account/:model", require("../routes/issueAnalytic"));
-		app.use("/:account/:model", require("../routes/issue"));
+		app.use("/teamspaces/:account/:model", require("../routes/issueAnalytic"));
+		app.use("/teamspaces/:account/:model", require("../routes/issue"));
 
 		//mesh handler
-		app.use("/:account/:model", require("../routes/mesh"));
+		app.use("/teamspaces/:account/:model", require("../routes/mesh"));
 		//texture handler
-		app.use("/:account/:model", require("../routes/texture"));
+		app.use("/teamspaces/:account/:model", require("../routes/texture"));
 
 		//history handler
-		app.use("/:account/:model", require("../routes/history"));
+		app.use("/teamspaces/:account/:model", require("../routes/history"));
 
 		//app.use("/", routes.router);
 

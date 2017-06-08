@@ -59,7 +59,7 @@ describe('Account permission', function () {
 	});
 
 	it('should fail to assign permissions to a user that doesnt exist', function(done){
-		agent.post(`/${username}/permissions`)
+		agent.post(`/teamspaces/${username}/permissions`)
 		.send({ user: 'nonsense', permissions: ['create_project']})
 		.expect(404, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.USER_NOT_FOUND.value);
@@ -68,7 +68,7 @@ describe('Account permission', function () {
 	});
 
 	it('should fail to assign non team space permissions to a user', function(done){
-		agent.post(`/${username}/permissions`)
+		agent.post(`/teamspaces/${username}/permissions`)
 		.send({ user: 'user1', permissions: ['view_issue']})
 		.expect(400, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.INVALID_PERM.value);
@@ -82,7 +82,7 @@ describe('Account permission', function () {
 
 		async.series([
 			callback => {
-				agent.post(`/${username}/permissions`)
+				agent.post(`/teamspaces/${username}/permissions`)
 				.send(permission)
 				.expect(200, function(err, res){
 					callback(err);
@@ -90,7 +90,7 @@ describe('Account permission', function () {
 			},
 
 			callback => {
-				agent.get(`/${username}/permissions`)
+				agent.get(`/teamspaces/${username}/permissions`)
 				.expect(200, function(err, res){
 
 					expect(res.body.find(perm => perm.user === permission.user)).to.deep.equal(permission);
@@ -107,7 +107,7 @@ describe('Account permission', function () {
 
 		async.series([
 			callback => {
-				agent.put(`/${username}/permissions/user2`)
+				agent.put(`/teamspaces/${username}/permissions/user2`)
 				.send({ permissions: []})
 				.expect(200, function(err, res){
 					callback(err);
@@ -115,7 +115,7 @@ describe('Account permission', function () {
 			},
 
 			callback => {
-				agent.get(`/${username}/permissions`)
+				agent.get(`/teamspaces/${username}/permissions`)
 				.expect(200, function(err, res){
 					expect(res.body.find(perm => perm.user === 'user2')).to.deep.equal({user: 'user2', permissions:[]});
 					callback(err);
@@ -131,7 +131,7 @@ describe('Account permission', function () {
 
 		async.series([
 			callback => {
-				agent.put(`/${username}/permissions/user2`)
+				agent.put(`/teamspaces/${username}/permissions/user2`)
 				.send({ permissions: ['create_project']})
 				.expect(200, function(err, res){
 					callback(err);
@@ -139,7 +139,7 @@ describe('Account permission', function () {
 			},
 
 			callback => {
-				agent.get(`/${username}/permissions`)
+				agent.get(`/teamspaces/${username}/permissions`)
 				.expect(200, function(err, res){
 					expect(res.body.find(perm => perm.user === 'user2')).to.deep.equal({user: 'user2', permissions:['create_project']});
 					callback(err);
@@ -152,7 +152,7 @@ describe('Account permission', function () {
 
 
 	it('should fail to update non team space permissions', function(done){
-		agent.put(`/${username}/permissions/user2`)
+		agent.put(`/teamspaces/${username}/permissions/user2`)
 		.send({ permissions: ['view_issue']})
 		.expect(400, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.INVALID_PERM.value);
@@ -161,7 +161,7 @@ describe('Account permission', function () {
 	});
 
 	it('should fail to assign permissions to a user twice', function(done){
-		agent.post(`/${username}/permissions`)
+		agent.post(`/teamspaces/${username}/permissions`)
 		.send({ user: 'user3', permissions: ['create_project']})
 		.expect(400, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.DUP_ACCOUNT_PERM.value);
@@ -170,7 +170,7 @@ describe('Account permission', function () {
 	});
 
 	it('should fail to update permission for an non existing record', function(done){
-		agent.put(`/${username}/permissions/user4`)
+		agent.put(`/teamspaces/${username}/permissions/user4`)
 		.send({ permissions: ['create_project']})
 		.expect(404, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.ACCOUNT_PERM_NOT_FOUND.value);
@@ -179,7 +179,7 @@ describe('Account permission', function () {
 	});
 
 	it('should fail to remove permission for an non existing record', function(done){
-		agent.delete(`/${username}/permissions/user4`)
+		agent.delete(`/teamspaces/${username}/permissions/user4`)
 		.expect(404, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.ACCOUNT_PERM_NOT_FOUND.value);
 			done(err);
@@ -190,14 +190,14 @@ describe('Account permission', function () {
 
 		async.series([
 			callback => {
-				agent.delete(`/${username}/permissions/user3`)
+				agent.delete(`/teamspaces/${username}/permissions/user3`)
 				.expect(200, function(err, res){
 					callback(err);
 				});
 			},
 
 			callback => {
-				agent.get(`/${username}/permissions`)
+				agent.get(`/teamspaces/${username}/permissions`)
 				.expect(200, function(err, res){
 					console.log(res.body)
 					expect(res.body.find(perm => perm.user === 'user3')).to.not.exist;

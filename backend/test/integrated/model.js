@@ -38,6 +38,8 @@ describe('Model', function () {
 	let username = 'project_username';
 	let password = 'project_username';
 	let model = 'model12345';
+	let modelId;
+	let modelFed = 'projectFed1';
 	let project = 'projectgroup'
 	let desc = 'desc';
 	let type = 'type';
@@ -77,16 +79,18 @@ describe('Model', function () {
 		async.series([
 			callback => {
 
-				agent.post(`/${username}/${model}`)
+				agent.post(`/teamspaces/${username}/${model}`)
 				.send({ desc, type, unit, code, project })
 				.expect(200, function(err ,res) {
-					expect(res.body.model).to.equal(model);
+					console.log(res.body);
+					expect(res.body.name).to.equal(model);
+					modelId = res.body.model;
 					callback(err);
 				});
 
 			},
 			callback => {
-				agent.get(`/${username}/${model}.json`)
+				agent.get(`/teamspaces/${username}/${modelId}.json`)
 				.expect(200, function(err, res){
 					expect(res.body.desc).to.equal(desc);
 					expect(res.body.type).to.equal(type);
@@ -97,7 +101,7 @@ describe('Model', function () {
 			},
 
 			callback => {
-				agent.get(`/${username}.json`)
+				agent.get(`/teamspaces/${username}.json`)
 				.expect(200, function(err, res){
 
 					const account = res.body.accounts.find(account => account.account === username);
@@ -108,10 +112,9 @@ describe('Model', function () {
 					const pg = account.projects.find(pg => pg.name === project);
 					expect(pg).to.exist;
 
-					const myModel = pg.models.find(_model => _model.model === model);
-
+					const myModel = pg.models.find(_model => _model.model === modelId);
 					expect(myModel).to.exist;
-					expect(myModel.model).to.equal(model);
+					expect(myModel.name).to.equal(model);
 
 					callback(err);
 				});
@@ -122,7 +125,7 @@ describe('Model', function () {
 
 	it('model added to a project should be listed on top level models array', function(done){
 
-		agent.get(`/${username}.json`)
+		agent.get(`/teamspaces/${username}.json`)
 		.expect(200, function(err, res){
 
 			const account = res.body.accounts.find(account => account.account === username);
@@ -140,7 +143,7 @@ describe('Model', function () {
 
 	it('should fail if project supplied is not found', function(done){
 
-		agent.post(`/${username}/model2`)
+		agent.post(`/teamspaces/${username}/model2`)
 		.send({ desc, type, unit, code, project: 'noexist' })
 		.expect(404, function(err ,res) {
 			expect(res.body.value).to.equal(responseCodes.PROJECT_NOT_FOUND.value);
@@ -151,7 +154,7 @@ describe('Model', function () {
 
 	it('should fail if no unit specified', function(done){
 
-		agent.post(`/${username}/model3`)
+		agent.post(`/teamspaces/${username}/model3`)
 		.send({ desc, type })
 		.expect(400, function(err ,res) {
 
@@ -168,7 +171,7 @@ describe('Model', function () {
 
 			let model = 'project4';
 
-			agent.put(`/${username}/${model}/settings`)
+			agent.put(`/teamspaces/${username}/${model}/settings`)
 			.send({code}).expect(400, function(err ,res) {
 				expect(res.body.value).to.equal(responseCodes.INVALID_MODEL_CODE.value);
 				done(err);
@@ -190,7 +193,7 @@ describe('Model', function () {
 
 			let model = 'project5';
 
-			agent.put(`/${username}/${model}/settings`)
+			agent.put(`/teamspaces/${username}/${model}/settings`)
 			.send({
 				topicTypes: ['For Info', 'for info']
 			}).expect(400, function(err ,res) {
@@ -238,7 +241,7 @@ describe('Model', function () {
 		};
 
 		let mymodel = "project6";
-		agent.put(`/${username}/${mymodel}/settings`)
+		agent.put(`/teamspaces/${username}/${mymodel}/settings`)
 		.send(body).expect(200, function(err ,res) {
 
 			expect(res.body).to.deep.equal(expectedReturn);
@@ -247,7 +250,7 @@ describe('Model', function () {
 				return done(err);
 			}
 
-			agent.get(`/${username}/${mymodel}.json`)
+			agent.get(`/teamspaces/${username}/${mymodel}.json`)
 			.expect(200, function(err, res){
 				expect(res.body.properties).to.deep.equal(expectedReturn);
 				done(err);
@@ -262,7 +265,7 @@ describe('Model', function () {
 
 		let model = 'project7';
 		
-		agent.post(`/${username}/${model}`)
+		agent.post(`/teamspaces/${username}/${model}`)
 		.send({ desc, type, unit })
 		.expect(400, function(err ,res) {
 			expect(res.body.value).to.equal(responseCodes.MODEL_EXIST.value);
@@ -287,7 +290,7 @@ describe('Model', function () {
 				return done();
 			}
 
-			agent.post(`/${username}/${modelName}`)
+			agent.post(`/teamspaces/${username}/${modelName}`)
 			.send({ desc, type, unit })
 			.expect(400, function(err ,res) {
 				expect(res.body.value).to.equal(responseCodes.BLACKLISTED_MODEL_NAME.value);
@@ -301,7 +304,7 @@ describe('Model', function () {
 
 	it('should return error message if model name contains spaces', function(done){
 
-		agent.post('/' + username + '/you%20are%20genius')
+		agent.post('/teamspaces/' + username + '/you%20are%20genius')
 		.send({ desc, type, unit })
 		.expect(400, function(err ,res) {
 			expect(res.body.value).to.equal(responseCodes.INVALID_MODEL_NAME.value);
@@ -312,7 +315,7 @@ describe('Model', function () {
 
 	it('should return error if creating a model in a database that doesn\'t exists or not authorized for', function(done){
 
-		agent.post(`/${username}_someonelese/${model}`)
+		agent.post(`/teamspaces/${username}_someonelese/${model}`)
 		.send({ desc, type, unit })
 		.expect(401, function(err ,res) {
 			done(err);
@@ -339,7 +342,7 @@ describe('Model', function () {
 		});
 
 		it('should success and get the latest file', function(done){
-			agent.get(`/${username}/${model}/download/latest`).expect(200, function(err, res){
+			agent.get(`/teamspaces/${username}/${model}/download/latest`).expect(200, function(err, res){
 
 				expect(res.headers['content-disposition']).to.equal('attachment;filename=3DrepoBIM.obj');
 				
@@ -375,11 +378,11 @@ describe('Model', function () {
 
 
 		it('should success', function(done){
-			agent.delete(`/${username}/${model}`).expect(200, done);
+			agent.delete(`/teamspaces/${username}/${model}`).expect(200, done);
 		});
 
 		it('should fail if delete again', function(done){
-			agent.delete(`/${username}/${model}`).expect(404, function(err, res){
+			agent.delete(`/teamspaces/${username}/${model}`).expect(404, function(err, res){
 				expect(res.body.value).to.equal(responseCodes.MODEL_NOT_FOUND.value);
 				done(err);
 			});
@@ -415,7 +418,7 @@ describe('Model', function () {
 					agent2.post('/login').send({ username: 'testing', password: 'testing' }).expect(200, callback);
 				},
 				callback => {
-					agent2.get(`/testing.json`).expect(200, function(err, res){
+					agent2.get(`/teamspaces/testing.json`).expect(200, function(err, res){
 						
 						const account = res.body.accounts.find(account => account.account === username);
 						expect(account).to.not.exist;
@@ -432,7 +435,7 @@ describe('Model', function () {
 		});
 
 		it('should be removed from model group', function(done){
-			agent.get(`/${username}.json`).expect(200, function(err, res){
+			agent.get(`/teamspaces/${username}.json`).expect(200, function(err, res){
 				
 				const account = res.body.accounts.find(account => account.account === username);
 				expect(account).to.exist;
