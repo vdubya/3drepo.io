@@ -91,7 +91,7 @@ describe('Infrastructure', function () {
 			});
 		
 			it('should behaves normal for non-queue based API', function(done){
-				agent.get(`/{{username}}.json`)
+				agent.get(`/teamspaces/{{username}}.json`)
 				.expect(200, function(err, res){
 					done(err);
 				})
@@ -99,7 +99,7 @@ describe('Infrastructure', function () {
 
 			it('should report error for queue based api if queue service is not running', function(done){
 
-				agent.post(`/testing/${model}/upload`)
+				agent.post(`/teamspaces/testing/models/${model}/upload`)
 				.attach('file', __dirname + '/../../statics/3dmodels/8000cubes.obj')
 				.expect(500, function(err, res){
 					done(err);
@@ -133,7 +133,7 @@ describe('Infrastructure', function () {
 
 			it('should report error for queue based api if queue service is not running', function(done){
 
-				agent.post(`/testing/${model}/upload`)
+				agent.post(`/teamspaces/testing/models/${model}/upload`)
 				.attach('file', __dirname + '/../../statics/3dmodels/8000cubes.obj')
 				.expect(500, function(err, res){
 					done(err);
@@ -142,7 +142,7 @@ describe('Infrastructure', function () {
 			});
 
 			it('should behaves normal for non-queue based API', function(done){
-				agent.get(`/{{username}}.json`)
+				agent.get(`/teamspaces/{{username}}.json`)
 				.expect(200, function(err, res){
 					done(err);
 				})
@@ -154,7 +154,7 @@ describe('Infrastructure', function () {
 						return done(err);
 					}
 
-					agent.post(`/testing/${model}/upload`)
+					agent.post(`/teamspaces/testing/models/${model}/upload`)
 					.attach('file', __dirname + '/../../statics/3dmodels/8000cubes.obj')
 					.end(function(err, res){
 						expect(res.statusCode).to.not.equal(500);

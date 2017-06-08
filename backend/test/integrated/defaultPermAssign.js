@@ -62,7 +62,7 @@ describe('Default permission assignment', function () {
 	});
 
 	it('user should be an admin of your own teamspace', function(done){
-		agent.get(`/${username}.json`)
+		agent.get(`/teamspaces/${username}.json`)
 		.expect(200, function(err, res){
 			
 			const account = res.body.accounts.find(account => account.account === username);
@@ -74,7 +74,7 @@ describe('Default permission assignment', function () {
 
 	it('user should be able to create project', function(done){
 
-		agent.post(`/${username}/projects`)
+		agent.post(`/teamspaces/${username}/projects`)
 		.send({name: 'project1'})
 		.expect(200, function(err, res){
 			done(err);
@@ -86,7 +86,7 @@ describe('Default permission assignment', function () {
 
 	it('user should be able to create model', function(done){
 
-		agent.post(`/${username}/model1`)
+		agent.post(`/teamspaces/${username}/models/model1`)
 		.send({unit: 'm'})
 		.expect(200, function(err, res){
 			modelId = res.body.model;
@@ -95,7 +95,7 @@ describe('Default permission assignment', function () {
 	});
 
 	it('the model created should filled with correct permissions (account listing)', function(done){
-		agent.get(`/${username}.json`)
+		agent.get(`/teamspaces/${username}.json`)
 		.expect(200, function(err, res){
 			
 			const account = res.body.accounts.find(account => account.account === username);
@@ -110,7 +110,7 @@ describe('Default permission assignment', function () {
 
 
 	it('the model created should filled with correct permissions (model info)', function(done){
-		agent.get(`/${username}/${modelId}.json`)
+		agent.get(`/teamspaces/${username}/models/${modelId}.json`)
 		.expect(200, function(err, res){
 			expect(res.body.permissions).to.deep.equal(C.MODEL_PERM_LIST);
 			done(err);
@@ -118,7 +118,7 @@ describe('Default permission assignment', function () {
 	});
 
 	it('user should have default permission templates created', function(done){
-		agent.get(`/${username}/permission-templates`)
+		agent.get(`/teamspaces/${username}/permission-templates`)
 		.expect(200, function(err, res){
 
 			const viewer = res.body.find(t => t._id === C.VIEWER_TEMPLATE);

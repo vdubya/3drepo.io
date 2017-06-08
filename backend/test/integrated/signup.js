@@ -60,7 +60,7 @@ describe('Sign up', function(){
 	it('with available username should return success', function(done){
 
 		request(server)
-		.post(`/${username}`)
+		.post(`/teamspaces/${username}`)
 		.send({
 
 			"email": email,
@@ -98,7 +98,7 @@ describe('Sign up', function(){
 	it('with username that already exists should fail', function(done){
 
 		request(server)
-		.post(`/${username}`)
+		.post(`/teamspaces/${username}`)
 		.send({
 
 			"email": email,
@@ -121,7 +121,7 @@ describe('Sign up', function(){
 			}
 			
 			request(server)
-			.post(`/${username}`)
+			.post(`/teamspaces/${username}`)
 			.send({
 
 				"email": email,
@@ -136,7 +136,7 @@ describe('Sign up', function(){
 
 	it('with invalid email address - abc@b should fail', function(done){
 			request(server)
-			.post('/signup_somebaduser')
+			.post('/teamspaces/signup_somebaduser')
 			.send({
 
 				"email": "abc@b",
@@ -151,7 +151,7 @@ describe('Sign up', function(){
 
 	it('with invalid email address - abc should fail', function(done){
 			request(server)
-			.post('/signup_somebaduser')
+			.post('/teamspaces/signup_somebaduser')
 			.send({
 
 				"email": "abc",
@@ -166,7 +166,7 @@ describe('Sign up', function(){
 
 	it('without email should fail', function(done){
 			request(server)
-			.post('/signup_somebaduser')
+			.post('/teamspaces/signup_somebaduser')
 			.send({
 
 				"email": "",
@@ -181,7 +181,7 @@ describe('Sign up', function(){
 
 	it('without password should fail', function(done){
 			request(server)
-			.post('/signup_somebaduser')
+			.post('/teamspaces/signup_somebaduser')
 			.send({
 
 				"email": email,

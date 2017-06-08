@@ -1126,8 +1126,8 @@ schema.methods.clean = function(typePrefix, modelCode){
 		cleaned.viewpoints[i].guid = uuidToString(cleaned.viewpoints[i].guid);
 		
 		if(_.get(cleaned, `viewpoints[${i}].screenshot.flag`)){
-			cleaned.viewpoints[i].screenshot = cleaned.account + '/' + cleaned.model +'/issues/' + cleaned._id + '/viewpoints/' + cleaned.viewpoints[i].guid + '/screenshot.png';
-			cleaned.viewpoints[i].screenshotSmall = cleaned.account + '/' + cleaned.model +'/issues/' + cleaned._id + '/viewpoints/' + cleaned.viewpoints[i].guid + '/screenshotSmall.png';
+			cleaned.viewpoints[i].screenshot = 'teamspaces/' + cleaned.account + '/models/' + cleaned.model +'/issues/' + cleaned._id + '/viewpoints/' + cleaned.viewpoints[i].guid + '/screenshot.png';
+			cleaned.viewpoints[i].screenshotSmall = 'teamspaces/' + cleaned.account + '/models/' + cleaned.model +'/issues/' + cleaned._id + '/viewpoints/' + cleaned.viewpoints[i].guid + '/screenshotSmall.png';
 		}
 
 		if(cleaned.viewpoints[i].up.length === 0){
@@ -1147,7 +1147,7 @@ schema.methods.clean = function(typePrefix, modelCode){
 	});
 
 	if(_.get(cleaned, `thumbnail.flag`)){
-		cleaned.thumbnail = cleaned.account + '/' + cleaned.model +'/issues/' + cleaned._id + '/thumbnail.png';
+		cleaned.thumbnail = 'teamspaces/' + cleaned.account + '/models/' + cleaned.model +'/issues/' + cleaned._id + '/thumbnail.png';
 	}
 
 	cleaned.comments && cleaned.comments.forEach( (comment, i) => {

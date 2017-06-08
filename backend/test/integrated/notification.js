@@ -196,7 +196,7 @@ describe('Notification', function () {
 			done();
 		});
 
-		agent2.post(`/${username}/${model}/issues.json`)
+		agent2.post(`/teamspaces/${username}/models/${model}/issues.json`)
 		.send(issue)
 		.expect(200 , function(err, res){
 			issueId = res.body._id;
@@ -229,7 +229,7 @@ describe('Notification', function () {
 			done();
 		});
 
-		agent2.put(`/${username}/${model}/issues/${issueId}.json`)
+		agent2.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 		.send(comment)
 		.expect(200 , function(err, res){
 			expect(err).to.not.exist;
@@ -246,7 +246,7 @@ describe('Notification', function () {
 			done();
 		});
 
-		agent2.put(`/${username}/${model}/issues/${issueId}.json`)
+		agent2.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 		.send(comment)
 		.expect(200 , function(err, res){
 			expect(err).to.not.exist;
@@ -263,7 +263,7 @@ describe('Notification', function () {
 			done();
 		});
 
-		agent2.put(`/${username}/${model}/issues/${issueId}.json`)
+		agent2.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 		.send(comment)
 		.expect(200 , function(err, res){
 			expect(err).to.not.exist;
@@ -296,7 +296,7 @@ describe('Notification', function () {
 
 
 
-		agent2.put(`/${username}/${model}/issues/${issueId}.json`)
+		agent2.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 		.send(status)
 		.expect(200 , function(err, res){
 			expect(err).to.not.exist;

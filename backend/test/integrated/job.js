@@ -65,7 +65,7 @@ describe('Job', function () {
 
 	it('should able to create new job', function(done){
 
-		agent.post(`/${username}/jobs`)
+		agent.post(`/teamspaces/${username}/jobs`)
 		.send(job)
 		.expect(200, function(err, res){
 			done(err);
@@ -75,7 +75,7 @@ describe('Job', function () {
 
 	it('should able to create second job', function(done){
 
-		agent.post(`/${username}/jobs`)
+		agent.post(`/teamspaces/${username}/jobs`)
 		.send(job2)
 		.expect(200, function(err, res){
 			done(err);
@@ -85,7 +85,7 @@ describe('Job', function () {
 
 	it('should not able to create duplicated job', function(done){
 
-		agent.post(`/${username}/jobs`)
+		agent.post(`/teamspaces/${username}/jobs`)
 		.send(job)
 		.expect(400 , function(err, res){
 			expect(res.body.value).to.equal(responseCodes.DUP_JOB.value);
@@ -95,7 +95,7 @@ describe('Job', function () {
 	});
 
 	it('should able to list the job created', function(done){
-		agent.get(`/${username}.json`)
+		agent.get(`/teamspaces/${username}.json`)
 		.expect(200, function(err, res){
 			expect(res.body.jobs).to.deep.equal([job, job2]);
 			done(err);
@@ -103,7 +103,7 @@ describe('Job', function () {
 	});
 
 	it('should fail to assign a job that doesnt exist to a licence(user)', function(done){
-		agent.post(`/${username}/subscriptions/${subId}/assign`)
+		agent.post(`/teamspaces/${username}/subscriptions/${subId}/assign`)
 		.send({ user: 'testing', job: `nonsense`})
 		.expect(404, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.JOB_NOT_FOUND.value);
@@ -115,7 +115,7 @@ describe('Job', function () {
 
 		async.series([
 			callback => {
-				agent.post(`/${username}/subscriptions/${subId}/assign`)
+				agent.post(`/teamspaces/${username}/subscriptions/${subId}/assign`)
 				.send({ user: 'testing', job: job._id})
 				.expect(200, function(err, res){
 					callback(err);
@@ -123,7 +123,7 @@ describe('Job', function () {
 			},
 
 			callback => {
-				agent.get(`/${username}/subscriptions`)
+				agent.get(`/teamspaces/${username}/subscriptions`)
 				.expect(200, function(err, res){
 					expect(res.body.find(sub => sub._id === subId).job).to.equal(job._id);
 					callback(err);
@@ -135,7 +135,7 @@ describe('Job', function () {
 	});
 
 	it('should fail to change assignment to a job that doesnt exist to a licence(user)', function(done){
-		agent.put(`/${username}/subscriptions/${subId}/assign`)
+		agent.put(`/teamspaces/${username}/subscriptions/${subId}/assign`)
 		.send({ job: `nonsense`})
 		.expect(404, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.JOB_NOT_FOUND.value);
@@ -146,7 +146,7 @@ describe('Job', function () {
 	it('should able to change assignment to another job', function(done){
 		async.series([
 			callback => {
-				agent.put(`/${username}/subscriptions/${subId}/assign`)
+				agent.put(`/teamspaces/${username}/subscriptions/${subId}/assign`)
 				.send({ job: job2._id})
 				.expect(200, function(err, res){
 					callback(err);
@@ -154,7 +154,7 @@ describe('Job', function () {
 			},
 
 			callback => {
-				agent.get(`/${username}/subscriptions`)
+				agent.get(`/teamspaces/${username}/subscriptions`)
 				.expect(200, function(err, res){
 					expect(res.body.find(sub => sub._id === subId).job).to.equal(job2._id);
 					callback(err);
@@ -170,7 +170,7 @@ describe('Job', function () {
 		let subId = '591063b613f4b994b72df324';
 		async.series([
 			callback => {
-				agent.put(`/${username}/subscriptions/${subId}/assign`)
+				agent.put(`/teamspaces/${username}/subscriptions/${subId}/assign`)
 				.send({ job: ''})
 				.expect(200, function(err, res){
 					callback(err);
@@ -178,7 +178,7 @@ describe('Job', function () {
 			},
 
 			callback => {
-				agent.get(`/${username}/subscriptions`)
+				agent.get(`/teamspaces/${username}/subscriptions`)
 				.expect(200, function(err, res){
 					expect(res.body.find(sub => sub._id === subId).job).to.not.exist;
 					callback(err);
@@ -189,7 +189,7 @@ describe('Job', function () {
 	});
 
 	it('should fail to remove a job if it is assigned to someone', function(done){
-		agent.delete(`/${username}/jobs/${job2._id}`)
+		agent.delete(`/teamspaces/${username}/jobs/${job2._id}`)
 		.expect(400, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.JOB_ASSIGNED.value);
 			done(err);
@@ -197,14 +197,14 @@ describe('Job', function () {
 	});
 
 	it('should able to remove a job', function(done){
-		agent.delete(`/${username}/jobs/${job._id}`)
+		agent.delete(`/teamspaces/${username}/jobs/${job._id}`)
 		.expect(200, function(err, res){
 			done(err);
 		});	
 	});
 
 	it('should not able to remove a job that doesnt exist', function(done){
-		agent.delete(`/${username}/jobs/nonsense`)
+		agent.delete(`/teamspaces/${username}/jobs/nonsense`)
 		.expect(404, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.JOB_NOT_FOUND.value);
 			done(err);
@@ -212,7 +212,7 @@ describe('Job', function () {
 	})
 
 	it('job should be removed from the list', function(done){
-		agent.get(`/${username}.json`)
+		agent.get(`/teamspaces/${username}.json`)
 		.expect(200, function(err, res){
 			expect(res.body.jobs).to.deep.equal([job2]);
 			done(err);

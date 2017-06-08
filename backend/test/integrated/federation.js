@@ -110,7 +110,7 @@ describe('Federated Model', function () {
 
 		}, 1000);
 
-		agent.post(`/${username}/${fedModelName}`)
+		agent.post(`/teamspaces/${username}/models/${fedModelName}`)
 		.send({ 
 			desc, 
 			type,
@@ -131,7 +131,7 @@ describe('Federated Model', function () {
 
 			async.series([
 				done => {
-					agent.get(`/${username}/${fedModelId}.json`)
+					agent.get(`/teamspaces/${username}/models/${fedModelId}.json`)
 					.expect(200, function(err, res){
 						expect(res.body.desc).to.equal(desc);
 						expect(res.body.type).to.equal(type);
@@ -139,7 +139,7 @@ describe('Federated Model', function () {
 					})
 				},
 				done => {
-					agent.get(`/${username}.json`)
+					agent.get(`/teamspaces/${username}.json`)
 					.expect(200, function(err, res){
 						let account = res.body.accounts.find(a => a.account === username);
 						let fed = account.fedModels.find(m => m.model === fedModelId);
@@ -160,7 +160,7 @@ describe('Federated Model', function () {
 		let emptyFed = 'emptyFed';
 		let emptyFedId;
 
-		agent.post(`/${username}/${emptyFed}`)
+		agent.post(`/teamspaces/${username}/models/${emptyFed}`)
 		.send({ 
 			desc, 
 			type, 
@@ -179,7 +179,7 @@ describe('Federated Model', function () {
 
 			async.series([
 				done => {
-					agent.get(`/${username}/${emptyFedId}.json`)
+					agent.get(`/teamspaces/${username}/models/${emptyFedId}.json`)
 					.expect(200, function(err, res){
 						expect(res.body.desc).to.equal(desc);
 						expect(res.body.type).to.equal(type);
@@ -187,7 +187,7 @@ describe('Federated Model', function () {
 					})
 				},
 				done => {
-					agent.get(`/${username}.json`)
+					agent.get(`/teamspaces/${username}.json`)
 					.expect(200, function(err, res){
 						let account = res.body.accounts.find(a => a.account === username);
 						let fed = account.fedModels.find(p => p.model === emptyFedId);
@@ -205,7 +205,7 @@ describe('Federated Model', function () {
 
 	it('should fail if create federation using existing model name (fed or model)', function(done){
 
-		agent.post(`/${username}/${subModels[0]}`)
+		agent.post(`/teamspaces/${username}/models/${subModels[0]}`)
 		.send({ 
 			desc, 
 			type, 
@@ -226,7 +226,7 @@ describe('Federated Model', function () {
 	it('should fail if create federation using invalid model name', function(done){
 
 
-		agent.post(`/${username}/a%20c`)
+		agent.post(`/teamspaces/${username}/models/a%20c`)
 		.send({ 
 			desc, 
 			type, 
@@ -247,7 +247,7 @@ describe('Federated Model', function () {
 
 	it('should fail if create federation from models in a different database', function(done){
 
-		agent.post(`/${username}/badfed`)
+		agent.post(`/teamspaces/${username}/models/badfed`)
 		.send({ 
 			desc, 
 			type, 
@@ -317,7 +317,7 @@ describe('Federated Model', function () {
 		q.channel.assertQueue(q.workerQName, { durable: true }).then(() => {
 			return q.channel.purgeQueue(q.workerQName);
 		}).then(() => {
-			agent.post(`/${username}/dupfed`)
+			agent.post(`/teamspaces/${username}/models/dupfed`)
 			.send({ 
 				desc, 
 				type, 
@@ -340,7 +340,7 @@ describe('Federated Model', function () {
 
 
 	it('should fail if create fed of fed', function(done){
-		agent.post(`/${username}/fedfed`)
+		agent.post(`/teamspaces/${username}/models/fedfed`)
 		.send({ 
 			desc, 
 			type, 
@@ -360,7 +360,7 @@ describe('Federated Model', function () {
 
 	it('update should fail if model is not a fed', function(done){
 
-		agent.put(`/${username}/${subModels[0]}`)
+		agent.put(`/teamspaces/${username}/models/${subModels[0]}`)
 		.send({ 
 			desc, 
 			type, 
@@ -379,7 +379,7 @@ describe('Federated Model', function () {
 	});
 
 	it('update should fail if model does not exist', function(done){
-		agent.put(`/${username}/nonexistmodel`)
+		agent.put(`/teamspaces/${username}/models/nonexistmodel`)
 		.send({ 
 			desc, 
 			type, 
@@ -429,7 +429,7 @@ describe('Federated Model', function () {
 
 		}, 1000);
 
-		agent.put(`/${username}/${fedModelId}`)
+		agent.put(`/teamspaces/${username}/models/${fedModelId}`)
 		.send({ 
 			desc, 
 			type, 

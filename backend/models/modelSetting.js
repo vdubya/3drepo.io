@@ -24,6 +24,7 @@ var _ = require('lodash');
 var schema = mongoose.Schema({
 	_id : String,
 	name: String, // model name
+	project: String, // redundant field to speed up url lookup by /project/modelName instead of modelId
 	owner: String,
 	users: [String],
 	desc: String,
@@ -56,12 +57,7 @@ var schema = mongoose.Schema({
 			label: String
 		}]
 
-	},
-	//redundant field to speed up listing collaborators
-	collaborators: [{
-		user: String,
-		role: {type: String}
-	}],
+	}
 
 });
 

@@ -107,7 +107,7 @@ describe('Issues', function () {
 
 			async.series([
 				function(done){
-					agent.post(`/${username}/${model}/issues.json`)
+					agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 					.send(issue)
 					.expect(200 , function(err, res){
 						
@@ -136,7 +136,7 @@ describe('Issues', function () {
 				},
 
 				function(done){
-					agent.get(`/${username}/${model}/issues/${issueId}.json`).expect(200, function(err , res){
+					agent.get(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`).expect(200, function(err , res){
 
 						expect(res.body.name).to.equal(issue.name);
 						expect(res.body.scale).to.equal(issue.scale);
@@ -174,7 +174,7 @@ describe('Issues', function () {
 
 			async.series([
 				function(done){
-					agent.post(`/${username}/${model}/issues.json`)
+					agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 					.send(issue)
 					.expect(200 , function(err, res){
 						
@@ -184,9 +184,9 @@ describe('Issues', function () {
 				},
 
 				function(done){
-					agent.get(`/${username}/${model}/issues/${issueId}.json`).expect(200, function(err , res){
+					agent.get(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`).expect(200, function(err , res){
 
-						expect(res.body.viewpoint.screenshot).to.equal(`${username}/${model}/issues/${issueId}/viewpoints/${res.body.viewpoint.guid}/screenshot.png`);
+						expect(res.body.viewpoint.screenshot).to.equal(`teamspaces/${username}/models/${model}/issues/${issueId}/viewpoints/${res.body.viewpoint.guid}/screenshot.png`);
 						return done(err);
 
 					});
@@ -198,7 +198,7 @@ describe('Issues', function () {
 
 			let issue = baseIssue;
 
-			agent.post(`/${username}/${model}/issues.json`)
+			agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 			.send(issue)
 			.expect(400 , function(err, res){
 				expect(res.body.value).to.equal(responseCodes.ISSUE_NO_NAME.value);
@@ -210,7 +210,7 @@ describe('Issues', function () {
 
 			let issue = Object.assign({}, baseIssue, {"name":"Issue test", "priority":"abc"});
 
-			agent.post(`/${username}/${model}/issues.json`)
+			agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 			.send(issue)
 			.expect(400 , function(err, res){
 				expect(res.body.value).to.equal(responseCodes.ISSUE_INVALID_PRIORITY.value);
@@ -222,7 +222,7 @@ describe('Issues', function () {
 
 			let issue = Object.assign({}, baseIssue, {"name":"Issue test", "status":"abc"});
 
-			agent.post(`/${username}/${model}/issues.json`)
+			agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 			.send(issue)
 			.expect(400 , function(err, res){
 				expect(res.body.value).to.equal(responseCodes.ISSUE_INVALID_STATUS.value);
@@ -242,7 +242,7 @@ describe('Issues', function () {
 
 			async.series([
 				function(done){
-					agent.post(`/${username}/${model}/issues.json`)
+					agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 					.send(issue)
 					.expect(200 , function(err, res){
 						issueId = res.body._id;
@@ -253,7 +253,7 @@ describe('Issues', function () {
 					});
 				},
 				function(done){
-					agent.get(`/${username}/${model}/issues/${issueId}.json`).expect(200, function(err , res){
+					agent.get(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`).expect(200, function(err , res){
 
 						expect(res.body.norm).to.deep.equal(issue.norm);
 						expect(res.body.position).to.deep.equal(issue.position);
@@ -272,7 +272,7 @@ describe('Issues', function () {
 			let status = { status: 'in progress'};
 			async.series([
 				function(done){
-					agent.post(`/${username}/${model}/issues.json`)
+					agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 					.send(issue)
 					.expect(200 , function(err, res){
 						issueId = res.body._id;
@@ -281,12 +281,12 @@ describe('Issues', function () {
 					});
 				},
 				function(done){
-					agent.put(`/${username}/${model}/issues/${issueId}.json`)
+					agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 					.send(status)
 					.expect(200, done);
 				},
 				function(done){
-					agent.get(`/${username}/${model}/issues/${issueId}.json`)
+					agent.get(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 					.expect(200, function(err, res){
 						expect(res.body.status === status.status);
 						done(err);
@@ -303,7 +303,7 @@ describe('Issues', function () {
 			let status = { status: '999'};
 			async.series([
 				function(done){
-					agent.post(`/${username}/${model}/issues.json`)
+					agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 					.send(issue)
 					.expect(200 , function(err, res){
 						issueId = res.body._id;
@@ -312,7 +312,7 @@ describe('Issues', function () {
 					});
 				},
 				function(done){
-					agent.put(`/${username}/${model}/issues/${issueId}.json`)
+					agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 					.send(status)
 					.expect(400, function(err, res){
 						expect(res.body.value === responseCodes.ISSUE_INVALID_STATUS.value);
@@ -329,7 +329,7 @@ describe('Issues', function () {
 			let priority = { priority: 'high'};
 			async.series([
 				function(done){
-					agent.post(`/${username}/${model}/issues.json`)
+					agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 					.send(issue)
 					.expect(200 , function(err, res){
 						issueId = res.body._id;
@@ -338,12 +338,12 @@ describe('Issues', function () {
 					});
 				},
 				function(done){
-					agent.put(`/${username}/${model}/issues/${issueId}.json`)
+					agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 					.send(priority)
 					.expect(200, done);
 				},
 				function(done){
-					agent.get(`/${username}/${model}/issues/${issueId}.json`)
+					agent.get(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 					.expect(200, function(err, res){
 						expect(res.body.priority === priority.priority);
 						done(err);
@@ -359,7 +359,7 @@ describe('Issues', function () {
 			let priority = { priority: 'xxx'};
 			async.series([
 				function(done){
-					agent.post(`/${username}/${model}/issues.json`)
+					agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 					.send(issue)
 					.expect(200 , function(err, res){
 						issueId = res.body._id;
@@ -368,7 +368,7 @@ describe('Issues', function () {
 					});
 				},
 				function(done){
-					agent.put(`/${username}/${model}/issues/${issueId}.json`)
+					agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 					.send(priority)
 					.expect(400, function(err, res){
 						expect(res.body.value === responseCodes.ISSUE_INVALID_PRIORITY.value);
@@ -386,7 +386,7 @@ describe('Issues', function () {
 			let topic_type = { topic_type: 'for abcdef'};
 			async.series([
 				function(done){
-					agent.post(`/${username}/${model}/issues.json`)
+					agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 					.send(issue)
 					.expect(200 , function(err, res){
 						issueId = res.body._id;
@@ -395,12 +395,12 @@ describe('Issues', function () {
 					});
 				},
 				function(done){
-					agent.put(`/${username}/${model}/issues/${issueId}.json`)
+					agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 					.send(topic_type)
 					.expect(200, done);
 				},
 				function(done){
-					agent.get(`/${username}/${model}/issues/${issueId}.json`)
+					agent.get(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 					.expect(200, function(err, res){
 						expect(res.body.topic_type === topic_type.topic_type);
 						done(err);
@@ -417,7 +417,7 @@ describe('Issues', function () {
 			let status = { status: 'in progress'};
 			async.series([
 				function(done){
-					agent.post(`/${username}/${model}/issues.json`)
+					agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 					.send(issue)
 					.expect(200 , function(err, res){
 						issueId = res.body._id;
@@ -426,12 +426,12 @@ describe('Issues', function () {
 					});
 				},
 				function(done){
-					agent.put(`/${username}/${model}/issues/${issueId}.json`)
+					agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 					.send(status)
 					.expect(200, done);
 				},
 				function(done){
-					agent.get(`/${username}/${model}/issues/${issueId}.json`)
+					agent.get(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 					.expect(200, function(err, res){
 						expect(res.body.status === status.status);
 						expect(res.body.comments[0].action).to.deep.equal({
@@ -454,7 +454,7 @@ describe('Issues', function () {
 			let data = { topic_type: 'abc123'};
 			async.series([
 				function(done){
-					agent.post(`/${username}/${model}/issues.json`)
+					agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 					.send(issue)
 					.expect(200 , function(err, res){
 						issueId = res.body._id;
@@ -463,12 +463,12 @@ describe('Issues', function () {
 					});
 				},
 				function(done){
-					agent.put(`/${username}/${model}/issues/${issueId}.json`)
+					agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 					.send(data)
 					.expect(200, done);
 				},
 				function(done){
-					agent.get(`/${username}/${model}/issues/${issueId}.json`)
+					agent.get(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 					.expect(200, function(err, res){
 						expect(res.body.topic_type === data.topic_type);
 						expect(res.body.comments[0].action).to.deep.equal({
@@ -493,7 +493,7 @@ describe('Issues', function () {
 			let data = { assigned_roles: ["jobB"]};
 			async.series([
 				function(done){
-					agent.post(`/${username}/${model}/issues.json`)
+					agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 					.send(issue)
 					.expect(200 , function(err, res){
 						issueId = res.body._id;
@@ -502,12 +502,12 @@ describe('Issues', function () {
 					});
 				},
 				function(done){
-					agent.put(`/${username}/${model}/issues/${issueId}.json`)
+					agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 					.send(data)
 					.expect(200, done);
 				},
 				function(done){
-					agent.get(`/${username}/${model}/issues/${issueId}.json`)
+					agent.get(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 					.expect(200, function(err, res){
 						expect(res.body.assigned_roles).to.deep.equal(data.assigned_roles);
 						expect(res.body.comments[0].action).to.deep.equal({
@@ -531,7 +531,7 @@ describe('Issues', function () {
 			let data = { topic_type: 'abc123'};
 			async.series([
 				function(done){
-					agent.post(`/${username}/${model}/issues.json`)
+					agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 					.send(issue)
 					.expect(200 , function(err, res){
 						issueId = res.body._id;
@@ -540,17 +540,17 @@ describe('Issues', function () {
 					});
 				},
 				function(done){
-					agent.put(`/${username}/${model}/issues/${issueId}.json`)
+					agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 					.send({ comment : 'hello world'})
 					.expect(200 , done);
 				},
 				function(done){
-					agent.put(`/${username}/${model}/issues/${issueId}.json`)
+					agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 					.send(data)
 					.expect(200, done);
 				},
 				function(done){
-					agent.get(`/${username}/${model}/issues/${issueId}.json`)
+					agent.get(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 					.expect(200, function(err, res){
 						expect(res.body.comments[0].sealed).to.equal(true);
 						done(err);
@@ -573,7 +573,7 @@ describe('Issues', function () {
 
 			async.series([
 				function(done){
-					agent.post(`/${username}/${model}/issues.json`)
+					agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 					.send(issue)
 					.expect(200 , function(err, res){
 						issueId = res.body._id;
@@ -582,12 +582,12 @@ describe('Issues', function () {
 					});
 				},
 				function(done){
-					agent.put(`/${username}/${model}/issues/${issueId}.json`)
+					agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 					.send(updateData)
 					.expect(200, done);
 				},
 				function(done){
-					agent.get(`/${username}/${model}/issues/${issueId}.json`)
+					agent.get(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 					.expect(200, function(err, res){
 						expect(res.body.topic_type).to.equal(updateData.topic_type);
 						expect(res.body.status).to.equal(updateData.status);
@@ -615,7 +615,7 @@ describe('Issues', function () {
 
 			async.series([
 				function(done){
-					agent.post(`/${username}/${model}/issues.json`)
+					agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 					.send(issue)
 					.expect(200 , function(err, res){
 						issueId = res.body._id;
@@ -625,12 +625,12 @@ describe('Issues', function () {
 					});
 				},
 				function(done){
-					agent.put(`/${username}/${model}/issues/${issueId}.json`)
+					agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 					.send(updateData)
 					.expect(200, done);
 				},
 				function(done){
-					agent.get(`/${username}/${model}/issues/${issueId}.json`)
+					agent.get(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 					.expect(200, function(err, res){
 						expect(res.body.status).to.equal(updateData.status);
 						expect(res.body.assigned_roles).to.deep.equal([issue.creator_role]);
@@ -659,7 +659,7 @@ describe('Issues', function () {
 
 			async.series([
 				function(done){
-					agent.post(`/${username}/${model}/issues.json`)
+					agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 					.send(issue)
 					.expect(200 , function(err, res){
 						//console.log(res.body);
@@ -669,12 +669,12 @@ describe('Issues', function () {
 					});
 				},
 				function(done){
-					agent.put(`/${username}/${model}/issues/${issueId}.json`)
+					agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 					.send(updateData)
 					.expect(200, done);
 				},
 				function(done){
-					agent.get(`/${username}/${model}/issues/${issueId}.json`)
+					agent.get(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 					.expect(200, function(err, res){
 						expect(res.body.status).to.equal('in progress');
 						expect(res.body.assigned_roles).to.deep.equal(updateData.assigned_roles);
@@ -692,7 +692,7 @@ describe('Issues', function () {
 			let desc = { desc: 'for abcdef'};
 			async.series([
 				function(done){
-					agent.post(`/${username}/${model}/issues.json`)
+					agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 					.send(issue)
 					.expect(200 , function(err, res){
 						issueId = res.body._id;
@@ -701,12 +701,12 @@ describe('Issues', function () {
 					});
 				},
 				function(done){
-					agent.put(`/${username}/${model}/issues/${issueId}.json`)
+					agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 					.send(desc)
 					.expect(200, done);
 				},
 				function(done){
-					agent.get(`/${username}/${model}/issues/${issueId}.json`)
+					agent.get(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 					.expect(200, function(err, res){
 						expect(res.body.desc === desc.desc);
 						done(err);
@@ -736,7 +736,7 @@ describe('Issues', function () {
 						.expect(200, done);
 					},
 					function(done){
-						agent.post(`/${username}/${model}/issues.json`)
+						agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 						.send(issue)
 						.expect(200 , function(err, res){
 							issueId = res.body._id;
@@ -761,7 +761,7 @@ describe('Issues', function () {
 
 				async.series([
 					function(done){
-						agent.put(`/${username}/${model}/issues/${issueId}.json`)
+						agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 						.send(close)
 						.expect(200, done);
 					},
@@ -781,7 +781,7 @@ describe('Issues', function () {
 			before(function(done){
 				async.series([
 					function(done){
-						agent.post(`/${username}/${model}/issues.json`)
+						agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 						.send(issue)
 						.expect(200 , function(err, res){
 							issueId = res.body._id;
@@ -821,7 +821,7 @@ describe('Issues', function () {
 
 				async.series([
 					function(done){
-						agent.put(`/${username}/${model}/issues/${issueId}.json`)
+						agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 						.send(close)
 						.expect(400, function(err, res){
 
@@ -842,7 +842,7 @@ describe('Issues', function () {
 
 		// 	async.series([
 		// 		function(done){
-		// 			agent.post(`/${username}/${model}/issues.json`)
+		// 			agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 		// 			.send(issue)
 		// 			.expect(200 , function(err, res){
 		// 				issueId = res.body._id;
@@ -851,7 +851,7 @@ describe('Issues', function () {
 		// 			});
 		// 		},
 		// 		function(done){
-		// 			agent.put(`/${username}/${model}/issues/${issueId}.json`)
+		// 			agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 		// 			.send({ desc: 'desc'})
 		// 			.expect(400, function(err, res){
 		// 				expect(res.body.value).to.equal(responseCodes.ISSUE_CLOSED_ALREADY.value);
@@ -859,7 +859,7 @@ describe('Issues', function () {
 		// 			});
 		// 		},
 		// 		function(done){
-		// 			agent.put(`/${username}/${model}/issues/${issueId}.json`)
+		// 			agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 		// 			.send({ topic_type: 'desc'})
 		// 			.expect(400, function(err, res){
 		// 				expect(res.body.value).to.equal(responseCodes.ISSUE_CLOSED_ALREADY.value);
@@ -867,7 +867,7 @@ describe('Issues', function () {
 		// 			});
 		// 		},
 		// 		function(done){
-		// 			agent.put(`/${username}/${model}/issues/${issueId}.json`)
+		// 			agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 		// 			.send({ priority: 'high'})
 		// 			.expect(400, function(err, res){
 		// 				expect(res.body.value).to.equal(responseCodes.ISSUE_CLOSED_ALREADY.value);
@@ -887,7 +887,7 @@ describe('Issues', function () {
 
 				async.series([
 					function(done){
-						agent.post(`/${username}/${model}/issues.json`)
+						agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 						.send(issue)
 						.expect(200 , function(err, res){
 							issueId = res.body._id;
@@ -913,7 +913,7 @@ describe('Issues', function () {
 							},
 						};
 
-						agent.put(`/${username}/${model}/issues/${issueId}.json`)
+						agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 						.send(comment)
 						.expect(200 , done);
 
@@ -923,7 +923,7 @@ describe('Issues', function () {
 			});
 
 			it('should succee', function(done){
-				agent.put(`/${username}/${model}/issues/${issueId}.json`)
+				agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 				.send({sealed: true, commentIndex: 0})
 				.expect(200, function(err, res){
 					done(err);
@@ -932,7 +932,7 @@ describe('Issues', function () {
 
 
 			it('should fail if editing a sealed comment', function(done){
-				agent.put(`/${username}/${model}/issues/${issueId}.json`)
+				agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 				.send({comment: 'abcd', commentIndex: 0, edit: true})
 				.expect(400, function(err, res){
 					expect(res.body.value).to.equal(responseCodes.ISSUE_COMMENT_SEALED.value);
@@ -950,7 +950,7 @@ describe('Issues', function () {
 
 				let issue = Object.assign({"name":"Issue test"}, baseIssue);
 
-				agent.post(`/${username}/${model}/issues.json`)
+				agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 				.send(issue)
 				.expect(200 , function(err, res){
 					issueId = res.body._id;
@@ -980,13 +980,13 @@ describe('Issues', function () {
 
 				async.series([
 					function(done){
-						agent.put(`/${username}/${model}/issues/${issueId}.json`)
+						agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 						.send(comment)
 						.expect(200 , done);
 					},
 
 					function(done){
-						agent.get(`/${username}/${model}/issues/${issueId}.json`).expect(200, function(err , res){
+						agent.get(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`).expect(200, function(err , res){
 
 							expect(res.body.comments.length).to.equal(1);
 							expect(res.body.comments[0].comment).to.equal(comment.comment);
@@ -1017,13 +1017,13 @@ describe('Issues', function () {
 
 				async.series([
 					function(done){
-						agent.put(`/${username}/${model}/issues/${issueId}.json`)
+						agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 						.send(comment)
 						.expect(200 , done);
 					},
 
 					function(done){
-						agent.get(`/${username}/${model}/issues/${issueId}.json`).expect(200, function(err , res){
+						agent.get(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`).expect(200, function(err , res){
 
 							expect(res.body.comments.length).to.equal(1);
 							expect(res.body.comments[0].comment).to.equal(comment.comment);
@@ -1042,7 +1042,7 @@ describe('Issues', function () {
 
 				let comment = { comment: '' };
 
-				agent.put(`/${username}/${model}/issues/${issueId}.json`)
+				agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 				.send({comment})
 				.expect(400 , function(err, res){
 					expect(res.body.value).to.equal(responseCodes.MONGOOSE_VALIDATION_ERROR({}).value);
@@ -1055,7 +1055,7 @@ describe('Issues', function () {
 
 				let comment = { commentIndex: 0, delete: true };
 
-				agent.put(`/${username}/${model}/issues/${issueId}.json`)
+				agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 				.send(comment)
 				.expect(200 , function(err, res){
 					done(err);
@@ -1067,7 +1067,7 @@ describe('Issues', function () {
 				let invalidId = '00000000-0000-0000-0000-000000000000';
 				let comment = { comment: 'hello world' };
 
-				agent.put(`/${username}/${model}/issues/${invalidId}.json`)
+				agent.put(`/teamspaces/${username}/models/${model}/issues/${invalidId}.json`)
 				.send(comment)
 				.expect(404 , function(err, res){
 					done(err);
@@ -1084,7 +1084,7 @@ describe('Issues', function () {
 
 				let issue = Object.assign({"name":"Issue test"}, baseIssue);
 
-				agent.post(`/${username}/${model}/issues.json`)
+				agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 				.send(issue)
 				.expect(200 , function(err, res){
 
@@ -1097,7 +1097,7 @@ describe('Issues', function () {
 					//add an comment
 					let comment = { comment: 'hello world' };
 
-					agent.put(`/${username}/${model}/issues/${issueId}.json`)
+					agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 					.send(comment)
 					.expect(200 , function(err, res){
 						done(err);
@@ -1110,7 +1110,7 @@ describe('Issues', function () {
 
 				let close = { status: 'closed' };
 
-				agent.put(`/${username}/${model}/issues/${issueId}.json`)
+				agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 				.send(close)
 				.expect(200 , function(err, res){
 
@@ -1122,7 +1122,7 @@ describe('Issues', function () {
 			// it('should fail if adding a comment', function(done){
 			// 	let comment = { comment: 'hello world' };
 
-			// 	agent.put(`/${username}/${model}/issues/${issueId}.json`)
+			// 	agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 			// 	.send(comment)
 			// 	.expect(400 , function(err, res){
 
@@ -1135,7 +1135,7 @@ describe('Issues', function () {
 			// it('should fail if removing a comment', function(done){
 			// 	let comment = { commentIndex: 0, delete: true };
 
-			// 	agent.put(`/${username}/${model}/issues/${issueId}.json`)
+			// 	agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 			// 	.send(comment)
 			// 	.expect(400 , function(err, res){
 
@@ -1148,7 +1148,7 @@ describe('Issues', function () {
 			// it('should fail if editing a comment', function(done){
 			// 	let comment = { comment: 'hello world 2', commentIndex: 0, edit: true };
 
-			// 	agent.put(`/${username}/${model}/issues/${issueId}.json`)
+			// 	agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 			// 	.send(comment)
 			// 	.expect(400 , function(err, res){
 
@@ -1163,7 +1163,7 @@ describe('Issues', function () {
 
 				let open = {  status: 'open' };
 
-				agent.put(`/${username}/${model}/issues/${issueId}.json`)
+				agent.put(`/teamspaces/${username}/models/${model}/issues/${issueId}.json`)
 				.send(open)
 				.expect(200 , function(err, res){
 					done(err)
@@ -1176,7 +1176,7 @@ describe('Issues', function () {
 				let invalidId = '00000000-0000-0000-0000-000000000000';
 				let close = { status: 'closed' };
 
-				agent.put(`/${username}/${model}/issues/${invalidId}.json`)
+				agent.put(`/teamspaces/${username}/models/${model}/issues/${invalidId}.json`)
 				.send(close )
 				.expect(404 , function(err, res){
 					done(err);
@@ -1214,7 +1214,7 @@ describe('Issues', function () {
 
 				async.series([
 					function(done){
-						agent.post(`/${bcfusername}/${bcfmodel}/issues.bcfzip`)
+						agent.post(`/teamspaces/${bcfusername}/models/${bcfmodel}/issues.bcfzip`)
 						.attach('file', __dirname + bcf.path)
 						.expect(200, function(err, res){
 							done(err);
@@ -1222,7 +1222,7 @@ describe('Issues', function () {
 					},
 
 					function(done){
-						agent.get(`/${bcfusername}/${bcfmodel}/issues.json`)
+						agent.get(`/teamspaces/${bcfusername}/models/${bcfmodel}/issues.json`)
 						.expect(200, function(err, res){
 
 							//issues in bcf file should be imported
@@ -1236,7 +1236,7 @@ describe('Issues', function () {
 					},
 
 					function(done){
-						agent.get(`/${bcfusername}/${bcfmodel}/issues/${bcf.issue1}.json`)
+						agent.get(`/teamspaces/${bcfusername}/models/${bcfmodel}/issues/${bcf.issue1}.json`)
 						.expect(200, function(err, res){
 
 							let issue1 = res.body;
@@ -1269,7 +1269,7 @@ describe('Issues', function () {
 
 		describe('Exporting a bcf file', function(){
 			it('should succee', function(done){
-				agent.get(`/${bcfusername}/${bcfmodel}/issues.bcfzip`)
+				agent.get(`/teamspaces/${bcfusername}/models/${bcfmodel}/issues.bcfzip`)
 				.expect(200, function(err, res){
 					done(err);
 				});

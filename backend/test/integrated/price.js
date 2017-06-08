@@ -88,7 +88,7 @@ describe('Billing agreement price from PayPal', function () {
 			}
 		};
 
-		agent.post(`/${username}/subscriptions`)
+		agent.post(`/teamspaces/${username}/subscriptions`)
 		.send(plans)
 		.expect(200, function(err, res){
 			expect(res.body).to.have.property('url');

@@ -72,7 +72,7 @@ describe('Revision', function () {
 
 
 	it('list revisions should sccuess', function(done){
-		agent.get(`/${username}/${model}/revisions.json`)
+		agent.get(`/teamspaces/${username}/models/${model}/revisions.json`)
 		.expect(200, function(err, res){
 			expect(res.body.length).to.equal(3);
 			expect(res.body[0]).to.have._id;
@@ -85,7 +85,7 @@ describe('Revision', function () {
 
 
 	it('get x3d mp by revision id should success', function(done){
-		agent.get(`/${username}/${model}/revision/${revisions[0]._id}.x3d.mp`)
+		agent.get(`/teamspaces/${username}/models/${model}/revision/${revisions[0]._id}.x3d.mp`)
 		.expect(200, function(err, res){
 			done(err);
 		});
@@ -94,7 +94,7 @@ describe('Revision', function () {
 	it('get x3d mp by revision tag should success', function(done){
 
 		let revWithTag = revisions.find(rev => rev.tag);
-		agent.get(`/${username}/${model}/revision/${revWithTag.tag}.x3d.mp`)
+		agent.get(`/teamspaces/${username}/models/${model}/revision/${revWithTag.tag}.x3d.mp`)
 		.expect(200, function(err, res){
 			done(err);
 		});
@@ -103,14 +103,14 @@ describe('Revision', function () {
 	it('get non existing rev should fail', function(done){
 
 		let revWithTag = revisions.find(rev => rev.tag);
-		agent.get(`/${username}/${model}/revision/invalidtag.x3d.mp`)
+		agent.get(`/teamspaces/${username}/models/${model}/revision/invalidtag.x3d.mp`)
 		.expect(404, function(err, res){
 			done(err);
 		});
 	});
 
 	it('get issues by revision id should success', function(done){
-		agent.get(`/${username}/${model}/revision/${revisions[0]._id}/issues.json`)
+		agent.get(`/teamspaces/${username}/models/${model}/revision/${revisions[0]._id}/issues.json`)
 		.expect(200, function(err, res){
 			done(err);
 		});
@@ -118,7 +118,7 @@ describe('Revision', function () {
 
 	it('get issues by revision tag should success', function(done){
 		let revWithTag = revisions.find(rev => rev.tag);
-		agent.get(`/${username}/${model}/revision/${revWithTag.tag}/issues.json`)
+		agent.get(`/teamspaces/${username}/models/${model}/revision/${revWithTag.tag}/issues.json`)
 		.expect(200, function(err, res){
 			done(err);
 		});
@@ -126,7 +126,7 @@ describe('Revision', function () {
 
 
 	it('get tree by revision tag should success', function(done){
-		agent.get(`/${username}/${model}/revision/original/fulltree.json`)
+		agent.get(`/teamspaces/${username}/models/${model}/revision/original/fulltree.json`)
 		.expect(200, function(err, res){
 			expect(JSON.parse(res.body.mainTree).nodes.name).to.equal('suzanne-flat.obj');
 			done(err);
@@ -135,7 +135,7 @@ describe('Revision', function () {
 
 
 	it('get tree by revision id should success', function(done){
-		agent.get(`/${username}/${model}/revision/6c558faa-8236-4255-a48a-a4ce99465182/fulltree.json`)
+		agent.get(`/teamspaces/${username}/models/${model}/revision/6c558faa-8236-4255-a48a-a4ce99465182/fulltree.json`)
 		.expect(200, function(err, res){
 			expect(JSON.parse(res.body.mainTree).nodes.name).to.equal('suzanne-flat.obj');
 			done(err);
@@ -143,7 +143,7 @@ describe('Revision', function () {
 	});
 
 	it('get tree by non existing revision should fail', function(done){
-		agent.get(`/${username}/${model}/revision/000/fulltree.json`)
+		agent.get(`/teamspaces/${username}/models/${model}/revision/000/fulltree.json`)
 		.expect(404, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.TREE_NOT_FOUND.value);
 			done(err);
@@ -153,7 +153,7 @@ describe('Revision', function () {
 
 
 	it('get tree of head of master should success', function(done){
-		agent.get(`/${username}/${model}/revision/master/head/fulltree.json`)
+		agent.get(`/teamspaces/${username}/models/${model}/revision/master/head/fulltree.json`)
 		.expect(200, function(err, res){
 			expect(JSON.parse(res.body.mainTree).nodes.name).to.equal('3DrepoBIM.obj');
 			done(err);
@@ -163,7 +163,7 @@ describe('Revision', function () {
 	it('upload with exisitng tag name should fail', function(done){
 
 		let revWithTag = revisions.find(rev => rev.tag);
-		agent.post(`/${username}/${model}/upload`)
+		agent.post(`/teamspaces/${username}/models/${model}/upload`)
 		.field('tag', revWithTag.tag)
 		.attach('file', __dirname + '/../../statics/3dmodels/8000cubes.obj')
 		.expect(400, function(err, res){
@@ -175,7 +175,7 @@ describe('Revision', function () {
 
 	it('upload with invalid tag name should fail', function(done){
 
-		agent.post(`/${username}/${model}/upload`)
+		agent.post(`/teamspaces/${username}/models/${model}/upload`)
 		.field('tag', 'a!b')
 		.attach('file', __dirname + '/../../statics/3dmodels/8000cubes.obj')
 		.expect(400, function(err, res){

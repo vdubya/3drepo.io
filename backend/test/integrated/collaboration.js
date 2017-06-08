@@ -138,7 +138,7 @@ describe('Sharing/Unsharing a model', function () {
 			async.series([
 				function share(done){
 
-					agent.post(`/${username}/${model}/permissions`)
+					agent.post(`/teamspaces/${username}/models/${model}/permissions`)
 					.send(permissions)
 					.expect(200, function(err, res){
 						done(err);
@@ -164,7 +164,7 @@ describe('Sharing/Unsharing a model', function () {
 				},
 				function checkSharedModelInList(done){
 
-					agent.get(`/${username_viewer}.json`)
+					agent.get(`/teamspaces/${username_viewer}.json`)
 					.expect(200, function(err, res){
 
 						expect(res.body).to.have.property('accounts').that.is.an('array');
@@ -179,7 +179,7 @@ describe('Sharing/Unsharing a model', function () {
 				},
 				function ableToViewModel(done){
 
-					agent.get(`/${username}/${model}/revision/master/head.x3d.mp`)
+					agent.get(`/teamspaces/${username}/models/${model}/revision/master/head.x3d.mp`)
 					.expect(200, function(err ,res){
 						done(err);
 					});
@@ -190,7 +190,7 @@ describe('Sharing/Unsharing a model', function () {
 		});
 
 		it('model info api shows correct permissions', function(done){
-			agent.get(`/${username}/${model}.json`).
+			agent.get(`/teamspaces/${username}/models/${model}.json`).
 			expect(200, function(err, res){
 				expect(res.body.permissions).to.deep.equal(C.VIEWER_TEMPLATE_PERMISSIONS);
 				done(err);
@@ -198,28 +198,28 @@ describe('Sharing/Unsharing a model', function () {
 		});
 
 		it('and the viewer should be able to see list of issues', function(done){
-			agent.get(`/${username}/${model}/issues.json`)
+			agent.get(`/teamspaces/${username}/models/${model}/issues.json`)
 			.expect(200, done);
 		});
 
 		it('and the viewer should not be able to download the model', function(done){
-			agent.get(`/${username}/${model}/download/latest`).expect(401, done);
+			agent.get(`/teamspaces/${username}/models/${model}/download/latest`).expect(401, done);
 		});
 
 		it('and the viewer should NOT be able to upload model', function(done){
-			agent.post(`/${username}/${model}/upload`)
+			agent.post(`/teamspaces/${username}/models/${model}/upload`)
 			.attach('file', __dirname + '/../../statics/3dmodels/8000cubes.obj')
 			.expect(401, done);
 		});
 
 		it('and the viewer should NOT be able to see raise issue', function(done){
-			agent.post(`/${username}/${model}/issues.json`)
+			agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 			.send({})
 			.expect(401 , done);
 		});
 
 		it('and the viewer should NOT be able to delete the model', function(done){
-			agent.delete(`/${username}/${model}`)
+			agent.delete(`/teamspaces/${username}/models/${model}`)
 			.send({})
 			.expect(401 , done);
 		});
@@ -236,7 +236,7 @@ describe('Sharing/Unsharing a model', function () {
 
 			};
 			
-			agent.put(`/${username}/${model}/settings`)
+			agent.put(`/teamspaces/${username}/models/${model}/settings`)
 			.send(body).expect(401 , done);
 		});
 
@@ -272,7 +272,7 @@ describe('Sharing/Unsharing a model', function () {
 				async.waterfall([
 					function remove(done){
 
-						agent.post(`/${username}/${model}/permissions`)
+						agent.post(`/teamspaces/${username}/models/${model}/permissions`)
 						.send(permissions)
 						.expect(200, function(err, res){
 							done(err);
@@ -298,7 +298,7 @@ describe('Sharing/Unsharing a model', function () {
 					},
 					function checkSharedModelInList(done){
 
-						agent.get(`/${username_viewer}.json`)
+						agent.get(`/teamspaces/${username_viewer}.json`)
 						.expect(200, function(err, res){
 
 							expect(res.body).to.have.property('accounts').that.is.an('array');
@@ -310,7 +310,7 @@ describe('Sharing/Unsharing a model', function () {
 					},
 					function notAbleToViewModel(done){
 
-						agent.get(`/${username}/${model}/revision/master/head.x3d.mp`)
+						agent.get(`/teamspaces/${username}/models/${model}/revision/master/head.x3d.mp`)
 						.expect(401, function(err ,res){
 							done(err);
 						});
@@ -320,7 +320,7 @@ describe('Sharing/Unsharing a model', function () {
 			});
 
 			it('and the viewer should NOT be able to see raise issue', function(done){
-				agent.post(`/${username}/${model}/issues.json`)
+				agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 				.send({})
 				.expect(401 , done);
 			});
@@ -357,7 +357,7 @@ describe('Sharing/Unsharing a model', function () {
 			async.series([
 				function share(done){
 
-					agent.post(`/${username}/${model}/permissions`)
+					agent.post(`/teamspaces/${username}/models/${model}/permissions`)
 					.send(permissions)
 					.expect(200, function(err, res){
 						done(err);
@@ -383,7 +383,7 @@ describe('Sharing/Unsharing a model', function () {
 				},
 				function checkSharedModelInList(done){
 
-					agent.get(`/${username_commenter}.json`)
+					agent.get(`/teamspaces/${username_commenter}.json`)
 					.expect(200, function(err, res){
 
 						expect(res.body).to.have.property('accounts').that.is.an('array');
@@ -398,7 +398,7 @@ describe('Sharing/Unsharing a model', function () {
 				},
 				function ableToViewModel(done){
 
-					agent.get(`/${username}/${model}/revision/master/head.x3d.mp`)
+					agent.get(`/teamspaces/${username}/models/${model}/revision/master/head.x3d.mp`)
 					.expect(200, function(err ,res){
 						done(err);
 					});
@@ -409,7 +409,7 @@ describe('Sharing/Unsharing a model', function () {
 		});
 
 		it('model info api shows correct permissions', function(done){
-			agent.get(`/${username}/${model}.json`).
+			agent.get(`/teamspaces/${username}/models/${model}.json`).
 			expect(200, function(err, res){
 				expect(res.body.permissions).to.deep.equal(C.COMMENTER_TEMPLATE_PERMISSIONS);
 				done(err);
@@ -417,12 +417,12 @@ describe('Sharing/Unsharing a model', function () {
 		});
 
 		it('and the commenter should be able to see list of issues', function(done){
-			agent.get(`/${username}/${model}/issues.json`)
+			agent.get(`/teamspaces/${username}/models/${model}/issues.json`)
 			.expect(200, done);
 		});
 
 		it('and the commenter should not be able to download the model', function(done){
-			agent.get(`/${username}/${model}/download/latest`).expect(401, done);
+			agent.get(`/teamspaces/${username}/models/${model}/download/latest`).expect(401, done);
 		});
 
 		it('and the commenter should be able to see raise issue', function(done){
@@ -449,19 +449,19 @@ describe('Sharing/Unsharing a model', function () {
 				"assigned_roles":["testproject.collaborator"],
 			};
 
-			agent.post(`/${username}/${model}/issues.json`)
+			agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 			.send(issue)
 			.expect(200 , done);
 		});
 
 		it('and the commenter should NOT be able to upload model', function(done){
-			agent.post(`/${username}/${model}/upload`)
+			agent.post(`/teamspaces/${username}/models/${model}/upload`)
 			.attach('file', __dirname + '/../../statics/3dmodels/8000cubes.obj')
 			.expect(401, done);
 		});
 
 		it('and the commenter should NOT be able to delete the model', function(done){
-			agent.delete(`/${username}/${model}`)
+			agent.delete(`/teamspaces/${username}/models/${model}`)
 			.send({})
 			.expect(401 , done);
 		});
@@ -478,7 +478,7 @@ describe('Sharing/Unsharing a model', function () {
 
 			};
 			
-			agent.put(`/${username}/${model}/settings`)
+			agent.put(`/teamspaces/${username}/models/${model}/settings`)
 			.send(body).expect(401 , done);
 		});
 
@@ -513,7 +513,7 @@ describe('Sharing/Unsharing a model', function () {
 				async.waterfall([
 					function remove(done){
 
-						agent.post(`/${username}/${model}/permissions`)
+						agent.post(`/teamspaces/${username}/models/${model}/permissions`)
 						.send(permissions)
 						.expect(200, function(err, res){
 							done(err);
@@ -539,7 +539,7 @@ describe('Sharing/Unsharing a model', function () {
 					},
 					function checkSharedModelInList(done){
 
-						agent.get(`/${username_commenter}.json`)
+						agent.get(`/teamspaces/${username_commenter}.json`)
 						.expect(200, function(err, res){
 
 							expect(res.body).to.have.property('accounts').that.is.an('array');
@@ -551,7 +551,7 @@ describe('Sharing/Unsharing a model', function () {
 					},
 					function notAbleToViewModel(done){
 
-						agent.get(`/${username}/${model}/revision/master/head.x3d.mp`)
+						agent.get(`/teamspaces/${username}/models/${model}/revision/master/head.x3d.mp`)
 						.expect(401, function(err ,res){
 							done(err);
 						});
@@ -561,7 +561,7 @@ describe('Sharing/Unsharing a model', function () {
 			});
 
 			it('and the commenter should NOT be able to see raise issue', function(done){
-				agent.post(`/${username}/${model}/issues.json`)
+				agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 				.send({ })
 				.expect(401 , done);
 			});
@@ -597,7 +597,7 @@ describe('Sharing/Unsharing a model', function () {
 			async.series([
 				function share(done){
 
-					agent.post(`/${username}/${model}/permissions`)
+					agent.post(`/teamspaces/${username}/models/${model}/permissions`)
 					.send(permissions)
 					.expect(200, function(err, res){
 						done(err);
@@ -623,7 +623,7 @@ describe('Sharing/Unsharing a model', function () {
 				},
 				function checkSharedModelInList(done){
 
-					agent.get(`/${username_editor}.json`)
+					agent.get(`/teamspaces/${username_editor}.json`)
 					.expect(200, function(err, res){
 
 						expect(res.body).to.have.property('accounts').that.is.an('array');
@@ -638,7 +638,7 @@ describe('Sharing/Unsharing a model', function () {
 				},
 				function ableToViewModel(done){
 
-					agent.get(`/${username}/${model}/revision/master/head.x3d.mp`)
+					agent.get(`/teamspaces/${username}/models/${model}/revision/master/head.x3d.mp`)
 					.expect(200, function(err ,res){
 						done(err);
 					});
@@ -649,7 +649,7 @@ describe('Sharing/Unsharing a model', function () {
 		});
 
 		it('model info api shows correct permissions', function(done){
-			agent.get(`/${username}/${model}.json`).
+			agent.get(`/teamspaces/${username}/models/${model}.json`).
 			expect(200, function(err, res){
 				expect(res.body.permissions).to.deep.equal(C.COLLABORATOR_TEMPLATE_PERMISSIONS);
 				done(err);
@@ -658,7 +658,7 @@ describe('Sharing/Unsharing a model', function () {
 		
 
 		it('and the editor should be able to see list of issues', function(done){
-			agent.get(`/${username}/${model}/issues.json`)
+			agent.get(`/teamspaces/${username}/models/${model}/issues.json`)
 			.expect(200, done);
 		});
 
@@ -686,24 +686,24 @@ describe('Sharing/Unsharing a model', function () {
 				"assigned_roles":["testproject.collaborator"],
 			};
 
-			agent.post(`/${username}/${model}/issues.json`)
+			agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 			.send(issue)
 			.expect(200 , done);
 		});
 
 		it('and the collaborator should be able to upload model', function(done){
-			agent.post(`/${username}/${model}/upload`)
+			agent.post(`/teamspaces/${username}/models/${model}/upload`)
 			.attach('file', __dirname + '/../../statics/3dmodels/8000cubes.obj')
 			.expect(200, done);
 		});
 
 
 		it('and the collaborator should be able to download the model', function(done){
-			agent.get(`/${username}/${model}/download/latest`).expect(200, done);
+			agent.get(`/teamspaces/${username}/models/${model}/download/latest`).expect(200, done);
 		});
 
 		it('and the collaborator should NOT be able to delete the model', function(done){
-			agent.delete(`/${username}/${model}`)
+			agent.delete(`/teamspaces/${username}/models/${model}`)
 			.send({})
 			.expect(401 , done);
 		});
@@ -720,7 +720,7 @@ describe('Sharing/Unsharing a model', function () {
 
 			};
 			
-			agent.put(`/${username}/${model}/settings`)
+			agent.put(`/teamspaces/${username}/models/${model}/settings`)
 			.send(body).expect(401 , done);
 		});
 
@@ -755,7 +755,7 @@ describe('Sharing/Unsharing a model', function () {
 				async.waterfall([
 					function remove(done){
 
-						agent.post(`/${username}/${model}/permissions`)
+						agent.post(`/teamspaces/${username}/models/${model}/permissions`)
 						.send(permissions)
 						.expect(200, function(err, res){
 							done(err);
@@ -781,7 +781,7 @@ describe('Sharing/Unsharing a model', function () {
 					},
 					function checkSharedModelInList(done){
 
-						agent.get(`/${username_editor}.json`)
+						agent.get(`/teamspaces/${username_editor}.json`)
 						.expect(200, function(err, res){
 
 							expect(res.body).to.have.property('accounts').that.is.an('array');
@@ -793,7 +793,7 @@ describe('Sharing/Unsharing a model', function () {
 					},
 					function notAbleToViewModel(done){
 
-						agent.get(`/${username}/${model}/revision/master/head.x3d.mp`)
+						agent.get(`/teamspaces/${username}/models/${model}/revision/master/head.x3d.mp`)
 						.expect(401, function(err ,res){
 							done(err);
 						});
@@ -803,7 +803,7 @@ describe('Sharing/Unsharing a model', function () {
 			});
 
 			it('and the editor should NOT be able to raise issue', function(done){
-				agent.post(`/${username}/${model}/issues.json`)
+				agent.post(`/teamspaces/${username}/models/${model}/issues.json`)
 				.send({})
 				.expect(401 , done);
 			});
@@ -860,7 +860,7 @@ describe('Sharing/Unsharing a model', function () {
 
 			const permissions = [{ user: username_viewer + '99', permission: 'collaborator'}];
 
-			agent.post(`/${username}/${model}/permissions`)
+			agent.post(`/teamspaces/${username}/models/${model}/permissions`)
 			.send(permissions)
 			.expect(404, function(err, res){
 				expect(res.body.value).to.equal(responseCodes.USER_NOT_FOUND.value);
@@ -963,14 +963,14 @@ describe('Sharing/Unsharing a model', function () {
 
 			async.series([
 				done => {
-					agent.post(`/${username}/${model}/permissions`)
+					agent.post(`/teamspaces/${username}/models/${model}/permissions`)
 					.send(permissions)
 					.expect(200, function(err, res){
 						done(err);
 					});
 				},
 				done => {
-					agent.get(`/${username}/${model}/permissions`)
+					agent.get(`/teamspaces/${username}/models/${model}/permissions`)
 					.expect(200, function(err, res){
 						expect(res.body).to.deep.equal([{ user: username_viewer, permission: 'viewer'}]);
 						done(err);

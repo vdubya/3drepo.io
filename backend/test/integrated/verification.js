@@ -70,7 +70,7 @@ describe('Verify', function () {
 		}, 200000).then(emailVerifyToken => {
 
 			request(server)
-			.post(`/${username}/verify`)
+			.post(`/teamspaces/${username}/verify`)
 			.send({ token: emailVerifyToken.token })
 			.expect(200, function(err, res){
 				
@@ -102,7 +102,7 @@ describe('Verify', function () {
 	// 			});
 	// 		},
 	// 		function(done){
-	// 			agent.get(`/${username}/sample_project.json`)
+	// 			agent.get(`/teamspaces/${username}/sample_project.json`)
 	// 			.expect(200, function(err, res){
 	// 				expect(res.body.status).to.equal('ok');
 	// 				done(err);
@@ -119,7 +119,7 @@ describe('Verify', function () {
 		}, 200000).then(emailVerifyToken => {
 
 			request(server)
-			.post(`/${username_double_verified}/verify`)
+			.post(`/teamspaces/${username_double_verified}/verify`)
 			.send({ token: emailVerifyToken.token })
 			.expect(200, function(err, res){
 
@@ -128,7 +128,7 @@ describe('Verify', function () {
 				} else {
 					//double verify
 					request(server)
-					.post(`/${username_double_verified}/verify`)
+					.post(`/teamspaces/${username_double_verified}/verify`)
 					.send({ token: emailVerifyToken.token })
 					.expect(400, function(err, res){
 						expect(res.body.value).to.equal(responseCodes.ALREADY_VERIFIED.value);
@@ -158,7 +158,7 @@ describe('Verify', function () {
 
 		it('if token provided is invalid', function(done){
 			request(server)
-			.post(`/${username_not_verified}/verify`)
+			.post(`/teamspaces/${username_not_verified}/verify`)
 			.send({ token: token + '123'})
 			.expect(400, function(err, res){
 				expect(res.body.value).to.equal(responseCodes.TOKEN_INVALID.value);
@@ -168,7 +168,7 @@ describe('Verify', function () {
 
 		it('if no token is provided', function(done){
 			request(server)
-			.post(`/${username_not_verified}/verify`)
+			.post(`/teamspaces/${username_not_verified}/verify`)
 			.send({})
 			.expect(400, function(err, res){
 				expect(res.body.value).to.equal(responseCodes.TOKEN_INVALID.value);
@@ -178,7 +178,7 @@ describe('Verify', function () {
 
 		it('if username provided is invalid', function(done){
 			request(server)
-			.post(`/${username_not_verified}123/verify`)
+			.post(`/teamspaces/${username_not_verified}123/verify`)
 			.send({ token: token})
 			.expect(400, function(err, res){
 				expect(res.body.value).to.equal(responseCodes.TOKEN_INVALID.value);
@@ -195,7 +195,7 @@ describe('Verify', function () {
 			}, expiryTime).then(emailVerifyToken => {
 
 				request(server)
-				.post(`/${username_expired_token}/verify`)
+				.post(`/teamspaces/${username_expired_token}/verify`)
 				.send({ token: emailVerifyToken.token })
 				.expect(400, function(err, res){
 					expect(res.body.value).to.equal(responseCodes.TOKEN_INVALID.value);

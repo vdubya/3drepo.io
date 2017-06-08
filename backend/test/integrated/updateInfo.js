@@ -69,13 +69,13 @@ describe('Updating user info', function () {
 		let lastName = 'def';
 		async.series([
 			function update(done){
-				agent.put(`/${username}`)
+				agent.put(`/teamspaces/${username}`)
 				.send({ firstName, lastName, email })
 				.expect(200, done);
 			},
 
 			function check(done){
-				agent.get(`/${username}.json`)
+				agent.get(`/teamspaces/${username}.json`)
 				.expect(200, function(err, res){
 					expect(res.body.firstName).to.equal(firstName);
 					expect(res.body.lastName).to.equal(lastName);
@@ -93,13 +93,13 @@ describe('Updating user info', function () {
 		let lastName = 'def';
 		async.series([
 			function update(done){
-				agent.put(`/${username}`)
+				agent.put(`/teamspaces/${username}`)
 				.send({ firstName, lastName, email: newEmail})
 				.expect(200, done);
 			},
 
 			function check(done){
-				agent.get(`/${username}.json`)
+				agent.get(`/teamspaces/${username}.json`)
 				.expect(200, function(err, res){
 					expect(res.body.firstName).to.equal(firstName);
 					expect(res.body.lastName).to.equal(lastName);
@@ -117,7 +117,7 @@ describe('Updating user info', function () {
 		let lastName = 'def';
 
 
-		agent.put(`/${username}`)
+		agent.put(`/teamspaces/${username}`)
 		.send({ firstName, lastName, email: takenEmail })
 		.expect(400, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.EMAIL_EXISTS.value);

@@ -63,7 +63,7 @@ describe('Download', function () {
 
 	it('should succee', function(done){
 
-		agent.get(`/${username}/${model}/download/latest`)
+		agent.get(`/teamspaces/${username}/models/${model}/download/latest`)
 		.expect(200, function(err, res){
 			done(err);
 		});

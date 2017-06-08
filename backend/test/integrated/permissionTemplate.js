@@ -64,7 +64,7 @@ describe('Permission templates', function () {
 
 	it('should able to create new template', function(done){
 
-		agent.post(`/${username}/permission-templates`)
+		agent.post(`/teamspaces/${username}/permission-templates`)
 		.send(permission)
 		.expect(200, function(err, res){
 			done(err);
@@ -74,7 +74,7 @@ describe('Permission templates', function () {
 
 	it('should fail to create duplicated template', function(done){
 
-		agent.post(`/${username}/permission-templates`)
+		agent.post(`/teamspaces/${username}/permission-templates`)
 		.send(permission)
 		.expect(400, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.DUP_PERM_TEMPLATE.value);
@@ -86,7 +86,7 @@ describe('Permission templates', function () {
 
 	it('should able to create another template', function(done){
 
-		agent.post(`/${username}/permission-templates`)
+		agent.post(`/teamspaces/${username}/permission-templates`)
 		.send(permission1)
 		.expect(200, function(err, res){
 			done(err);
@@ -96,7 +96,7 @@ describe('Permission templates', function () {
 
 	it('should fail to create template with invalid permission', function(done){
 
-		agent.post(`/${username}/permission-templates`)
+		agent.post(`/teamspaces/${username}/permission-templates`)
 		.send( { _id: 'customC', permissions: ['nonsense']})
 		.expect(400, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.INVALID_PERM.value);
@@ -108,7 +108,7 @@ describe('Permission templates', function () {
 
 	it('should able to remove template', function(done){
 
-		agent.delete(`/${username}/permission-templates/${permission._id}`)
+		agent.delete(`/teamspaces/${username}/permission-templates/${permission._id}`)
 		.expect(200, function(err, res){
 			done(err);
 		});
@@ -117,7 +117,7 @@ describe('Permission templates', function () {
 
 	it('should fail to remove template that doesnt exist', function(done){
 
-		agent.delete(`/${username}/permission-templates/nonsense`)
+		agent.delete(`/teamspaces/${username}/permission-templates/nonsense`)
 		.expect(404, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.PERM_NOT_FOUND.value);
 			done(err);
@@ -137,7 +137,7 @@ describe('Permission templates', function () {
 		async.series([
 			callback => {
 			
-				agent.post(`/${username}/${model}/permissions`)
+				agent.post(`/teamspaces/${username}/models/${model}/permissions`)
 				.send(permissions)
 				.expect(200, function(err, res){
 					callback(err);
@@ -146,7 +146,7 @@ describe('Permission templates', function () {
 			}, 
 			callback => {
 
-				agent.get(`/${username}/${model}/permissions`)
+				agent.get(`/teamspaces/${username}/models/${model}/permissions`)
 				.expect(200, function(err, res){
 
 					permissions.forEach(permission => {
@@ -160,7 +160,7 @@ describe('Permission templates', function () {
 				agent2.post('/login').send({username: 'testing', password: 'testing'}).expect(200, callback);
 			},
 			callback => {
-				agent2.get(`/testing.json`)
+				agent2.get(`/teamspaces/testing.json`)
 				.expect(200, function(err, res){
 					const account = res.body.accounts.find(account => account.account === username);
 					expect(account).to.exist;
@@ -178,7 +178,7 @@ describe('Permission templates', function () {
 
 	it('should fail to assign a non existing permission to user', function(done){
 
-		agent.post(`/${username}/${model}/permissions`)
+		agent.post(`/teamspaces/${username}/models/${model}/permissions`)
 		.send([{ user: 'testing', permission: 'nonsense'}])
 		.expect(404, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.PERM_NOT_FOUND.value);
@@ -189,7 +189,7 @@ describe('Permission templates', function () {
 
 	it('should fail to assign a permission to a non existing user', function(done){
 
-		agent.post(`/${username}/${model}/permissions`)
+		agent.post(`/teamspaces/${username}/models/${model}/permissions`)
 		.send([{ user: 'nonses', permission: 'customB'}])
 		.expect(404, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.USER_NOT_FOUND.value);
@@ -207,7 +207,7 @@ describe('Permission templates', function () {
 		async.series([
 			callback => {
 			
-				agent.post(`/${username}/model2/permissions`)
+				agent.post(`/teamspaces/${username}/models/model2/permissions`)
 				.send(permissions)
 				.expect(200, function(err, res){
 					callback(err);
@@ -216,7 +216,7 @@ describe('Permission templates', function () {
 			}, 
 			callback => {
 
-				agent.get(`/${username}/model2/permissions`)
+				agent.get(`/teamspaces/${username}/models/model2/permissions`)
 				.expect(200, function(err, res){
 
 					expect(res.body).to.deep.equal(permissions);
@@ -228,7 +228,7 @@ describe('Permission templates', function () {
 				agent2.post('/login').send({username: 'testing', password: 'testing'}).expect(200, callback);
 			},
 			callback => {
-				agent2.get(`/testing.json`)
+				agent2.get(`/teamspaces/testing.json`)
 				.expect(200, function(err, res){
 
 					const account = res.body.accounts.find(account => account.account === username);

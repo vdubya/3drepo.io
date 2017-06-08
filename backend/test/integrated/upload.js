@@ -60,7 +60,7 @@ describe('Uploading a model', function () {
 				},
 				function(done){
 					//create a model
-					agent.post(`/${username}/${model}`)
+					agent.post(`/teamspaces/${username}/models/${model}`)
 					.send({ type, desc, unit })
 					.expect(200, function(err, res){
 						modelId = res.body.model;
@@ -88,7 +88,7 @@ describe('Uploading a model', function () {
 	describe('without quota', function(){
 
 		it('should return error (no subscriptions)', function(done){
-			agent.post(`/${username}/${modelId}/upload`)
+			agent.post(`/teamspaces/${username}/models/${modelId}/upload`)
 			.attach('file', __dirname + '/../../statics/3dmodels/8000cubes.obj')
 			.expect(400, function(err, res){
 				expect(res.body.value).to.equal(responseCodes.SIZE_LIMIT_PAY.value);
@@ -110,7 +110,7 @@ describe('Uploading a model', function () {
 
 				//create a model
 				let myModel = 'testproject';
-				agent2.post(`/testing/${myModel}/upload`)
+				agent2.post(`/teamspaces/testing/models/${myModel}/upload`)
 				.attach('file', __dirname + '/../../statics/3dmodels/8000cubes.obj')
 				.expect(400, function(err, res){
 					expect(res.body.value).to.equal(responseCodes.SIZE_LIMIT_PAY.value);
@@ -132,7 +132,7 @@ describe('Uploading a model', function () {
 		});
 
 		it('should succee', function(done){
-			agent.post(`/${username}/${modelId}/upload`)
+			agent.post(`/teamspaces/${username}/models/${modelId}/upload`)
 			.attach('file', __dirname + '/../../statics/3dmodels/8000cubes.obj')
 			.expect(200, function(err, res){
 				done(err);
@@ -162,7 +162,7 @@ describe('Uploading a model', function () {
 		});
 
 		it('should succee (uppercase extension)', function(done){
-			agent.post(`/${username}/${modelId}/upload`)
+			agent.post(`/teamspaces/${username}/models/${modelId}/upload`)
 			.attach('file', __dirname + '/../../statics/3dmodels/upper.OBJ')
 			.expect(200, function(err, res){
 				done(err);
@@ -171,7 +171,7 @@ describe('Uploading a model', function () {
 		
 		it('but empty file size should fail', function(done){
 
-			agent.post(`/${username}/${modelId}/upload`)
+			agent.post(`/teamspaces/${username}/models/${modelId}/upload`)
 			.attach('file', __dirname + '/../../statics/3dmodels/empty.ifc')
 			.expect(400, function(err, res){
 				expect(res.body.value).to.equal(responseCodes.FILE_FORMAT_NOT_SUPPORTED.value);
@@ -182,7 +182,7 @@ describe('Uploading a model', function () {
 
 		it('but unaccepted extension should failed', function(done){
 
-			agent.post(`/${username}/${modelId}/upload`)
+			agent.post(`/teamspaces/${username}/models/${modelId}/upload`)
 			.attach('file', __dirname + '/../../statics/3dmodels/toy.abc')
 			.expect(400, function(err, res){
 				expect(res.body.value).to.equal(responseCodes.FILE_FORMAT_NOT_SUPPORTED.value);
@@ -193,7 +193,7 @@ describe('Uploading a model', function () {
 
 		it('but no extension should failed', function(done){
 
-			agent.post(`/${username}/${modelId}/upload`)
+			agent.post(`/teamspaces/${username}/models/${modelId}/upload`)
 			.attach('file', __dirname + '/../../statics/3dmodels/toy')
 			.expect(400, function(err, res){
 				expect(res.body.value).to.equal(responseCodes.FILE_NO_EXT.value);
@@ -204,7 +204,7 @@ describe('Uploading a model', function () {
 
 		it('but file size exceeded fixed single file size limit should fail', function(done){
 
-			agent.post(`/${username}/${modelId}/upload`)
+			agent.post(`/teamspaces/${username}/models/${modelId}/upload`)
 			.attach('file', __dirname + '/../../statics/3dmodels/toy.ifc')
 			.expect(400, function(err, res){
 				expect(res.body.value).to.equal(responseCodes.SIZE_LIMIT.value);
