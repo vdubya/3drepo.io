@@ -123,7 +123,7 @@ describe('Model', function () {
 
 	});
 
-	it('model added to a project should be listed on top level models array', function(done){
+	it('model added to a project should not be listed on top level models array', function(done){
 
 		agent.get(`/teamspaces/${username}.json`)
 		.expect(200, function(err, res){
@@ -131,10 +131,10 @@ describe('Model', function () {
 			const account = res.body.accounts.find(account => account.account === username);
 			expect(account).to.exist;
 
-			let myModel = account.models.find(_model => _model.model === model);
+			let myModel = account.models.find(_model => _model.model === modelId);
 			expect(myModel).to.not.exist;
 
-			myModel = account.fedModels.find(_model => _model.model === model);
+			myModel = account.fedModels.find(_model => _model.model === modelId);
 			expect(myModel).to.not.exist;
 
 			done(err);

@@ -507,7 +507,8 @@ function _fillInModelDetails(accountName, setting, permissions){
 		permissions: permissions,
 		model: setting._id,
 		name: setting.name,
-		status: setting.status
+		status: setting.status,
+		project: setting.project
 	};
 
 	return History.findByBranch({account: accountName, model: model.model}, C.MASTER_BRANCH_NAME).then(history => {
@@ -565,7 +566,7 @@ function _getAllModels(accountName, permissions){
 	});
 }
 
-// find model groups and put models into project
+// find projects and put models into project
 function _addProjects(account){
 	'use strict';
 
@@ -574,24 +575,21 @@ function _addProjects(account){
 		projects.forEach((project, i) => {
 		
 			project = project.toObject();
+			project.models = [];
 
 			projects[i] = project;
 
-			const findModel = model => (m, i, models) => {
-				if (m.model === model){
-					models.splice(i, 1);
-					return true;
+			const findModel = (x, currModel, index, models) => {
+				if(currModel.project === project.name){
+					project.models.push(currModel);
+					models.splice(index, 1);
 				}
 			};
 
-			project.models.forEach((model, i) => {
+			account.models.reduceRight(findModel, 0);
+			account.fedModels.reduceRight(findModel, 0);
 
-				let fullModel = account.models.find(findModel(model)) || account.fedModels.find(findModel(model));
-				project.models[i] = fullModel;
-
-			});
-
-			project.models = _.compact(project.models);
+			//project.models = _.compact(project.models);
 
 		});
 

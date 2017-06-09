@@ -165,18 +165,11 @@ function createAndAssignRole(modelName, account, username, data) {
 
 		setting.properties.topicTypes = ModelSetting.defaultTopicTypes;
 
-		return setting.save();
-
-	}).then(setting => {
-
-
 		if(project){
-			project.models.push(model);
-			return project.save().then(() => setting);
+			setting.project = project.name;
 		}
 
-		return setting;
-		
+		return setting.save();
 
 	}).then(setting => {
 
@@ -920,10 +913,10 @@ function removeModel(account, model){
 		});
 
 		return Promise.all(promises);
-	}).then(() => {
+	// }).then(() => {
 
-		//remove model from all project
-		return Project.removeModel(account, model);
+	// 	//remove model from all project
+	// 	return Project.removeModel(account, model);
 	}).then(() => {
 
 		//remove model from collaborator.customData.models

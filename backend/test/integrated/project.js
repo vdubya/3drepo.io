@@ -34,6 +34,7 @@ describe('Projects', function () {
 	let agent;
 	let username = 'projectuser';
 	let password = 'projectuser';
+	let modelIdInProject = 'd41ef76c-ccec-403e-aeee-1c292fee0e4e';
 
 	before(function(done){
 		server = app.listen(8080, function () {
@@ -235,6 +236,10 @@ describe('Projects', function () {
 					const account = res.body.accounts.find(account => account.account === username);
 					expect(account).to.exist;
 
+					const model = account.models.find(model => model.model === modelIdInProject);
+					expect(model).to.exist;
+					expect(model.project).to.not.exist;
+					
 					const pg = account.projects.find(pg => pg.name === project.name);
 					expect(pg).to.not.exist;
 

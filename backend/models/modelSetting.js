@@ -198,6 +198,19 @@ schema.methods.findPermissionByUser = function(username){
 	return this.permissions.find(perm => perm.user === username);
 };
 
+
+schema.statics.removeProjectFromAllModels = function(account, project){
+	'use strict';
+
+	return ModelSetting.update( {account}, {
+		project: project
+	}, {
+		$unset: { 
+			'project' : ''
+		} 
+	}, {'multi': true});
+};
+
 var ModelSetting = ModelFactory.createClass(
 	'ModelSetting',
 	schema,

@@ -104,7 +104,7 @@ describe('Logout', function () {
 					if(err){
 						done(err);
 					} else {
-						agent.get(`/${username}.json`)
+						agent.get(`/teamspaces/${username}.json`)
 						.expect(401, function(err, res){
 							done(err);
 						})

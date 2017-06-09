@@ -22,12 +22,13 @@
 	const C = require("../constants");
 	const responseCodes = require("../response_codes.js");
 	const ModelFactory = require("./factory/modelFactory");
+	const ModelSetting = require("./modelSetting");
 	const utils = require("../utils");
 	const _ = require('lodash');
 
 	const schema = mongoose.Schema({
 		name: { type: String, unique: true},
-		models: [String],
+		//models: [String],
 		permissions: [{
 			_id: false,
 			user: String,
@@ -78,7 +79,9 @@
 
 	schema.statics.delete = function(account, name){
 
-		return Project.findOneAndRemove({account}, {name}).then(project => {
+		return ModelSetting.removeProjectFromAllModels(account, name).then(() => {
+			return Project.findOneAndRemove({account}, {name});
+		}).then(project => {
 			if(!project){
 				return Promise.reject(responseCodes.PROJECT_NOT_FOUND);
 			} else {
@@ -87,9 +90,9 @@
 		});
 	};
 
-	schema.statics.removeModel = function(account, model){
-		return Project.update({account}, { models: model }, { '$pull' : { 'models': model}}, {'multi': true});
-	};
+	// schema.statics.removeModel = function(account, model){
+	// 	return Project.update({account}, { models: model }, { '$pull' : { 'models': model}}, {'multi': true});
+	// };
 
 	schema.methods.updateAttrs = function(data){
 		
