@@ -30,6 +30,7 @@ module.exports = {
 		"algorithm": "HS256",
 		"expiresIn": "2h", //https://github.com/zeit/ms
 	},
+	originWhitelists: [ "http://example.org" ],
 	servers: [
 		{
 			service: "api",

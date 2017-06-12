@@ -37,6 +37,7 @@
 		const bodyParser = require("body-parser");
 		const utils = require("../utils");
 		const middlewares = require("../routes/middlewares");
+		const config = require("../config.js");
 
 		// Express app
 		let app = express();
@@ -49,11 +50,21 @@
 
 		// Configure various middleware
 		//app.use(sharedSession);
-		app.use(cors({ origin: true, credentials: true }));
-
 
 		// put logger in req object
 		app.use(log_iface.startRequest);
+
+		app.use(cors(function(req, callback){
+			const opts = { origin: false, credentials: false };
+			
+			if(config.originWhitelists && config.originWhitelists.indexOf(req.header('Origin')) !== -1){
+				opts.origin = true;
+				opts.credentials = true;
+			}
+
+			callback(null, opts);
+		}));
+
 		app.use(middlewares.verifyJWT);
 
 		// init the singleton db connection for modelFactory
@@ -84,16 +95,6 @@
 		// 	sharedSession(req, res, next);
 		// });
 		app.use(compress());
-
-		app.use(function (req, res, next) {
-			// intercept OPTIONS method
-			if ("OPTIONS" === req.method) {
-				res.sendStatus(200);
-			} else {
-				next();
-			}
-		});
-
 
 
 		app.use("/", require("../routes/plan"));
