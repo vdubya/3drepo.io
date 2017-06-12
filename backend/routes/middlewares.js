@@ -185,6 +185,22 @@
 		);
 	}
 
+	function translateToModelId(req, res, next){
+
+		if(req.params.project && req.params.model){
+			return ModelSetting.findByProjectAndModelName(req.params.account, req.params.project, req.params.model).then(setting => {
+				if(setting){
+
+					req.params.model = setting._id;
+				}
+
+				next();
+			});
+		}
+
+		next();
+	}
+
 	var middlewares = {
 
 
@@ -206,6 +222,7 @@
 		hasCollaboratorQuota: [loggedIn, hasCollaboratorQuota],
 		connectQueue,
 		loggedIn,
+		translateToModelId,
 
 		// Helpers
 		checkPermissions,

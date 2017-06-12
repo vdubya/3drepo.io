@@ -36,6 +36,8 @@
 		const cors = require("cors");
 		const bodyParser = require("body-parser");
 		const utils = require("../utils");
+		const middlewares = require("../routes/middlewares");
+
 		// Express app
 		let app = express();
 
@@ -119,31 +121,31 @@
 
 		//metadata handler
 		app.use("/teamspaces/:account/models/:model", require("../routes/meta"));
-		app.use("/teamspaces/:account/projects/:project/models/:model", require("../routes/meta"));
+		app.use("/teamspaces/:account/projects/:project/models/:model", middlewares.translateToModelId, require("../routes/meta"));
 
 		//groups handler
 		app.use("/teamspaces/:account/models/:model/groups", require("../routes/group"));
-		app.use("/teamspaces/:account/projects/:project/models/:model/groups", require("../routes/group"));
+		app.use("/teamspaces/:account/projects/:project/models/:model/groups", middlewares.translateToModelId, require("../routes/group"));
 		
 		//issues handler
 		app.use("/teamspaces/:account/models/:model", require("../routes/issueAnalytic"));
-		app.use("/teamspaces/:account/projects/:project/models/:model", require("../routes/issueAnalytic"));
+		app.use("/teamspaces/:account/projects/:project/models/:model", middlewares.translateToModelId, require("../routes/issueAnalytic"));
 
 		app.use("/teamspaces/:account/models/:model", require("../routes/issue"));
-		app.use("/teamspaces/:account/projects/:project/models/:model", require("../routes/issue"));
+		app.use("/teamspaces/:account/projects/:project/models/:model", middlewares.translateToModelId, require("../routes/issue"));
 
 
 		//mesh handler
 		app.use("/teamspaces/:account/models/:model", require("../routes/mesh"));
-		app.use("/teamspaces/:account/projects/:project/models/:model", require("../routes/mesh"));
+		app.use("/teamspaces/:account/projects/:project/models/:model", middlewares.translateToModelId, require("../routes/mesh"));
 
 		//texture handler
 		app.use("/teamspaces/:account/models/:model", require("../routes/texture"));
-		app.use("/teamspaces/:account/projects/:project/models/:model", require("../routes/texture"));
+		app.use("/teamspaces/:account/projects/:project/models/:model", middlewares.translateToModelId, require("../routes/texture"));
 
 		//history handler
 		app.use("/teamspaces/:account/models/:model", require("../routes/history"));
-		app.use("/teamspaces/:account/projects/:project/models/:model", require("../routes/history"));
+		app.use("/teamspaces/:account/projects/:project/models/:model", middlewares.translateToModelId, require("../routes/history"));
 
 		//app.use("/", routes.router);
 

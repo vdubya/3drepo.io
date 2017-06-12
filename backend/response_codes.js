@@ -361,7 +361,7 @@
 			length = JSON.stringify(responseObject)
 				.length;
 			req[C.REQ_REPO].logger.logError(JSON.stringify(responseObject), { httpCode: resCode.status, contentLength: length });
-
+			
 			res.status(resCode.status)
 				.send(responseObject);
 

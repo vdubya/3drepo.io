@@ -38,7 +38,7 @@
 
 	schema.pre('save', function checkInvalidName(next){
 
-		if(C.PROJECT_DEFAULT_ID === this.name){
+		if(C.PROJECT_DEFAULT_ID === this.name || !this.name){
 			return next(utils.makeError(responseCodes.INVALID_PROJECT_NAME));
 		}
 

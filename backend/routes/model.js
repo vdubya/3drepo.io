@@ -34,43 +34,43 @@ var getDbColOptions = function(req){
 
 
 // Get model info
-router.get('/:model.json', middlewares.hasReadAccessToModel, getModelSetting);
+router.get('/:model.json', middlewares.translateToModelId, middlewares.hasReadAccessToModel, getModelSetting);
 
-router.put('/:model/settings', middlewares.hasWriteAccessToModelSettings, updateSettings);
+router.put('/:model/settings', middlewares.translateToModelId, middlewares.hasWriteAccessToModelSettings, updateSettings);
 
 router.post('/:modelName', middlewares.connectQueue, middlewares.checkPermissions([C.PERM_CREATE_MODEL]), createModel);
 
 //update federated model
-router.put('/:model', middlewares.connectQueue, middlewares.hasEditAccessToFedModel, updateModel);
+router.put('/:model', middlewares.translateToModelId, middlewares.connectQueue, middlewares.hasEditAccessToFedModel, updateModel);
 
 //model permission
-router.post('/:model/permissions', middlewares.checkPermissions([C.PERM_MANAGE_MODEL_PERMISSION]), updatePermissions);
+router.post('/:model/permissions', middlewares.translateToModelId, middlewares.checkPermissions([C.PERM_MANAGE_MODEL_PERMISSION]), updatePermissions);
 
 //model permission
-router.get('/:model/permissions',  middlewares.checkPermissions([C.PERM_MANAGE_MODEL_PERMISSION]), getPermissions);
+router.get('/:model/permissions',  middlewares.translateToModelId, middlewares.checkPermissions([C.PERM_MANAGE_MODEL_PERMISSION]), getPermissions);
 
-router.get('/:model/jobs.json', middlewares.hasReadAccessToModel, getJobs);
-router.get('/:model/userJobForModel.json', middlewares.hasReadAccessToModel, getUserJobForModel);
+router.get('/:model/jobs.json', middlewares.translateToModelId, middlewares.hasReadAccessToModel, getJobs);
+router.get('/:model/userJobForModel.json', middlewares.translateToModelId, middlewares.hasReadAccessToModel, getUserJobForModel);
 
 //master tree
-router.get('/:model/revision/master/head/fulltree.json', middlewares.hasReadAccessToModel, getModelTree);
+router.get('/:model/revision/master/head/fulltree.json', middlewares.translateToModelId, middlewares.hasReadAccessToModel, getModelTree);
 
-router.get('/:model/revision/master/head/modelProperties.json', middlewares.hasReadAccessToModel, getModelProperties);
+router.get('/:model/revision/master/head/modelProperties.json', middlewares.translateToModelId, middlewares.hasReadAccessToModel, getModelProperties);
 
-router.get('/:model/revision/:rev/fulltree.json', middlewares.hasReadAccessToModel, getModelTree);
+router.get('/:model/revision/:rev/fulltree.json', middlewares.translateToModelId, middlewares.hasReadAccessToModel, getModelTree);
 
-router.get('/:model/revision/:rev/modelProperties.json', middlewares.hasReadAccessToModel, getModelProperties);
+router.get('/:model/revision/:rev/modelProperties.json', middlewares.translateToModelId, middlewares.hasReadAccessToModel, getModelProperties);
 
 //search master tree
-router.get('/:model/revision/master/head/searchtree.json', middlewares.hasReadAccessToModel, searchModelTree);
+router.get('/:model/revision/master/head/searchtree.json', middlewares.translateToModelId, middlewares.hasReadAccessToModel, searchModelTree);
 
-router.get('/:model/revision/:rev/searchtree.json', middlewares.hasReadAccessToModel, searchModelTree);
+router.get('/:model/revision/:rev/searchtree.json', middlewares.translateToModelId, middlewares.hasReadAccessToModel, searchModelTree);
 
-router.delete('/:model', middlewares.hasDeleteAccessToModel, deleteModel);
+router.delete('/:model', middlewares.translateToModelId, middlewares.hasDeleteAccessToModel, deleteModel);
 
-router.post('/:model/upload', middlewares.hasUploadAccessToModel, middlewares.connectQueue, uploadModel);
+router.post('/:model/upload', middlewares.translateToModelId, middlewares.hasUploadAccessToModel, middlewares.connectQueue, uploadModel);
 
-router.get('/:model/download/latest', middlewares.hasDownloadAccessToModel, downloadLatest);
+router.get('/:model/download/latest', middlewares.translateToModelId, middlewares.hasDownloadAccessToModel, downloadLatest);
 
 function updateSettings(req, res, next){
 	'use strict';

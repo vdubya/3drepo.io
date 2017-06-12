@@ -211,6 +211,11 @@ schema.statics.removeProjectFromAllModels = function(account, project){
 	}, {'multi': true});
 };
 
+schema.statics.findByProjectAndModelName = function(account, project, name){
+	'use strict';
+	return ModelSetting.findOne({account}, { project, name});
+}
+
 var ModelSetting = ModelFactory.createClass(
 	'ModelSetting',
 	schema,
