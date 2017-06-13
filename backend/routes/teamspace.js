@@ -37,7 +37,7 @@
 	router.get("/:account/avatar", middlewares.isAccountAdmin, getAvatar);
 	router.post("/:account/avatar", middlewares.isAccountAdmin, uploadAvatar);
 	
-	router.post('/:account', signUp);
+	router.post('/', signUp);
 
 	router.post('/:account/verify', verify);
 	router.post('/:account/forgot-password', forgotPassword);
@@ -97,7 +97,7 @@
 		checkCaptcha.then(resBody => {
 
 			if(resBody.success){
-				return User.createUser(req[C.REQ_REPO].logger, req.params.account, req.body.password, {
+				return User.createUser(req[C.REQ_REPO].logger, req.body.name, req.body.password, {
 
 					email: req.body.email,
 					firstName: req.body.firstName,
@@ -136,7 +136,7 @@
 			return Mailer.sendVerifyUserEmail(req.body.email, {
 				token : data.token,
 				email: req.body.email,
-				username: req.params.account,
+				username: req.body.name,
 				pay: req.body.pay
 
 			}).catch( err => {
@@ -151,7 +151,7 @@
 		}).then(emailRes => {
 
 			req[C.REQ_REPO].logger.logInfo('Email info - ' + JSON.stringify(emailRes));
-			responseCodes.respond(responsePlace, req, res, next, responseCodes.OK, { account: req.params[C.REPO_REST_API_ACCOUNT] });
+			responseCodes.respond(responsePlace, req, res, next, responseCodes.OK, { teamspace: req.body.name });
 		}).catch(err => {
 			responseCodes.respond(responsePlace, req, res, next, err.resCode ? err.resCode: err, err.resCode ? err.resCode: err);
 		});
@@ -271,7 +271,7 @@
 		let responsePlace = utils.APIInfo(req);
 
 		User.updatePassword(req[C.REQ_REPO].logger, req.params[C.REPO_REST_API_ACCOUNT], null, req.body.token, req.body.newPassword).then(() => {
-			responseCodes.respond(responsePlace, req, res, next, responseCodes.OK, { account: req.params[C.REPO_REST_API_ACCOUNT] });
+			responseCodes.respond(responsePlace, req, res, next, responseCodes.OK, { teamspace: req.params[C.REPO_REST_API_ACCOUNT] });
 		}).catch(err => {
 			responseCodes.respond(responsePlace, req, res, next, err.resCode ? err.resCode: err, err.resCode ? err.resCode: err);
 		});
@@ -291,12 +291,12 @@
 			user = _user;
 			return user.listAccounts();
 
-		}).then(databases => {
+		}).then(teamspaces => {
 
 			let customData = user.customData.toObject();
 
 			responseCodes.respond(responsePlace, req, res, next, responseCodes.OK, {
-				accounts: databases,
+				teamspaces: teamspaces,
 				firstName: customData.firstName,
 				lastName: customData.lastName,
 				email: customData.email,

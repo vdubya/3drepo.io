@@ -79,10 +79,9 @@ describe('Model', function () {
 		async.series([
 			callback => {
 
-				agent.post(`/teamspaces/${username}/models/${model}`)
-				.send({ desc, type, unit, code, project })
+				agent.post(`/teamspaces/${username}/models`)
+				.send({ name:model, desc, type, unit, code, project })
 				.expect(200, function(err ,res) {
-					console.log(res.body);
 					expect(res.body.name).to.equal(model);
 					modelId = res.body.model;
 					callback(err);
@@ -104,10 +103,8 @@ describe('Model', function () {
 				agent.get(`/teamspaces/${username}.json`)
 				.expect(200, function(err, res){
 
-					const account = res.body.accounts.find(account => account.account === username);
+					const account = res.body.teamspaces.find(account => account.teamspace === username);
 					expect(account).to.exist;
-
-					console.log(account);
 
 					const pg = account.projects.find(pg => pg.name === project);
 					expect(pg).to.exist;
@@ -128,7 +125,7 @@ describe('Model', function () {
 		agent.get(`/teamspaces/${username}.json`)
 		.expect(200, function(err, res){
 
-			const account = res.body.accounts.find(account => account.account === username);
+			const account = res.body.teamspaces.find(account => account.teamspace === username);
 			expect(account).to.exist;
 
 			let myModel = account.models.find(_model => _model.model === modelId);
@@ -143,8 +140,8 @@ describe('Model', function () {
 
 	it('should fail if project supplied is not found', function(done){
 
-		agent.post(`/teamspaces/${username}/models/model2`)
-		.send({ desc, type, unit, code, project: 'noexist' })
+		agent.post(`/teamspaces/${username}/models`)
+		.send({ name: 'model2', desc, type, unit, code, project: 'noexist' })
 		.expect(404, function(err ,res) {
 			expect(res.body.value).to.equal(responseCodes.PROJECT_NOT_FOUND.value);
 			done(err);
@@ -154,8 +151,8 @@ describe('Model', function () {
 
 	it('should fail if no unit specified', function(done){
 
-		agent.post(`/teamspaces/${username}/models/model3`)
-		.send({ desc, type })
+		agent.post(`/teamspaces/${username}/models`)
+		.send({ name: 'model3', desc, type })
 		.expect(400, function(err ,res) {
 
 			expect(res.body.value).to.equal(responseCodes.MODEL_NO_UNIT.value);
@@ -265,8 +262,8 @@ describe('Model', function () {
 
 		let model = 'project7';
 		
-		agent.post(`/teamspaces/${username}/models/${model}`)
-		.send({ desc, type, unit })
+		agent.post(`/teamspaces/${username}/models`)
+		.send({ name: model, desc, type, unit })
 		.expect(400, function(err ,res) {
 			expect(res.body.value).to.equal(responseCodes.MODEL_EXIST.value);
 			done(err);
@@ -290,8 +287,8 @@ describe('Model', function () {
 				return done();
 			}
 
-			agent.post(`/teamspaces/${username}/models/${modelName}`)
-			.send({ desc, type, unit })
+			agent.post(`/teamspaces/${username}/models`)
+			.send({ name: modelName, desc, type, unit })
 			.expect(400, function(err ,res) {
 				expect(res.body.value).to.equal(responseCodes.BLACKLISTED_MODEL_NAME.value);
 				done(err);
@@ -304,8 +301,8 @@ describe('Model', function () {
 
 	it('should return error message if model name contains spaces', function(done){
 
-		agent.post('/teamspaces/' + username + '/models/you%20are%20genius')
-		.send({ desc, type, unit })
+		agent.post('/teamspaces/' + username + '/models')
+		.send({ name: 'you are genius', desc, type, unit })
 		.expect(400, function(err ,res) {
 			expect(res.body.value).to.equal(responseCodes.INVALID_MODEL_NAME.value);
 			done(err);
@@ -315,8 +312,8 @@ describe('Model', function () {
 
 	it('should return error if creating a model in a database that doesn\'t exists or not authorized for', function(done){
 
-		agent.post(`/teamspaces/${username}_someonelese/models/${model}`)
-		.send({ desc, type, unit })
+		agent.post(`/teamspaces/${username}_someonelese/models`)
+		.send({ name: model, desc, type, unit })
 		.expect(401, function(err ,res) {
 			done(err);
 		});
@@ -420,7 +417,7 @@ describe('Model', function () {
 				callback => {
 					agent2.get(`/teamspaces/testing.json`).expect(200, function(err, res){
 						
-						const account = res.body.accounts.find(account => account.account === username);
+						const account = res.body.teamspaces.find(account => account.teamspace === username);
 						expect(account).to.not.exist;
 
 						// const mm = account.models.find(m => m.model === model);
@@ -437,7 +434,7 @@ describe('Model', function () {
 		it('should be removed from model group', function(done){
 			agent.get(`/teamspaces/${username}.json`).expect(200, function(err, res){
 				
-				const account = res.body.accounts.find(account => account.account === username);
+				const account = res.body.teamspaces.find(account => account.teamspace === username);
 				expect(account).to.exist;
 
 				const pg = account.projects.find(pg => pg.name === 'project1');

@@ -65,7 +65,7 @@ describe('Default permission assignment', function () {
 		agent.get(`/teamspaces/${username}.json`)
 		.expect(200, function(err, res){
 			
-			const account = res.body.accounts.find(account => account.account === username);
+			const account = res.body.teamspaces.find(account => account.teamspace === username);
 			expect(account).to.exist;
 			expect(account.permissions).include('teamspace_admin');
 			done(err);
@@ -86,8 +86,8 @@ describe('Default permission assignment', function () {
 
 	it('user should be able to create model', function(done){
 
-		agent.post(`/teamspaces/${username}/models/model1`)
-		.send({unit: 'm'})
+		agent.post(`/teamspaces/${username}/models`)
+		.send({name: 'model1', unit: 'm'})
 		.expect(200, function(err, res){
 			modelId = res.body.model;
 			done(err);
@@ -98,7 +98,7 @@ describe('Default permission assignment', function () {
 		agent.get(`/teamspaces/${username}.json`)
 		.expect(200, function(err, res){
 			
-			const account = res.body.accounts.find(account => account.account === username);
+			const account = res.body.teamspaces.find(account => account.teamspace === username);
 			expect(account).to.exist;
 			
 			const model = account.models.find(model => model.model === modelId);

@@ -570,7 +570,7 @@ function _getAllModels(accountName, permissions){
 function _addProjects(account){
 	'use strict';
 
-	return Project.find({account: account.account}, {}).then(projects => {
+	return Project.find({account: account.teamspace}, {}).then(projects => {
 
 		projects.forEach((project, i) => {
 		
@@ -674,9 +674,9 @@ function _sortAccountsAndModels(accounts){
 	});
 
 	accounts.sort((a, b) => {
-		if (a.account.toLowerCase() < b.account.toLowerCase()){
+		if (a.teamspace.toLowerCase() < b.teamspace.toLowerCase()){
 			return -1;
-		} else if (a.account.toLowerCase() > b.account.toLowerCase()) {
+		} else if (a.teamspace.toLowerCase() > b.teamspace.toLowerCase()) {
 			return 1;
 		} else {
 			return 0;
@@ -697,7 +697,7 @@ schema.methods.listAccounts = function(){
 		dbUsers.forEach(user => {
 			
 			let account = {
-				account: user.user,
+				teamspace: user.user,
 				models: [],
 				fedModels: [],
 				isAdmin: true,
@@ -708,7 +708,7 @@ schema.methods.listAccounts = function(){
 
 			addAccountPromises.push(
 				// list all models under this account as they have full access
-				_getAllModels(account.account, C.MODEL_PERM_LIST).then(data => {
+				_getAllModels(account.teamspace, C.MODEL_PERM_LIST).then(data => {
 					account.models = data.models;
 					account.fedModels = data.fedModels;
 				}),
@@ -737,10 +737,10 @@ schema.methods.listAccounts = function(){
 			//add project to list if not covered previously
 			if(!findModel){
 
-				let account = accounts.find(account => account.account === model.account);
+				let account = accounts.find(account => account.teamspace === model.account);
 				
 				if(!account){
-					account = {account: model.account, models: [], fedModels: []};
+					account = {teamspace: model.account, models: [], fedModels: []};
 					accounts.push(account);
 				}
 
@@ -749,7 +749,7 @@ schema.methods.listAccounts = function(){
 						account: model.account, model: model.model 
 					}).then(data => {
 						//console.log('data', JSON.stringify(data, null ,2))
-						return _fillInModelDetails(account.account, data.setting, data.permissions);
+						return _fillInModelDetails(account.teamspace, data.setting, data.permissions);
 					}).then(_model => {
 						//push result to account object
 						_model.federate ? account.fedModels.push(_model) : account.models.push(_model);

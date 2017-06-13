@@ -79,7 +79,7 @@ describe('Projects', function () {
 				agent.get(`/teamspaces/${username}.json`)
 				.expect(200, function(err, res){
 
-					const account = res.body.accounts.find(account => account.account === username);
+					const account = res.body.teamspaces.find(account => account.teamspace === username);
 					expect(account).to.exist;
 
 					const pg = account.projects.find(pg => pg.name === project.name);
@@ -144,7 +144,7 @@ describe('Projects', function () {
 				.expect(200, function(err, res){
 
 
-					const account = res.body.accounts.find(account => account.account === username);
+					const account = res.body.teamspaces.find(account => account.teamspace === username);
 					expect(account).to.exist;
 
 					const pg = account.projects.find(pg => pg.name === project.name);
@@ -181,7 +181,7 @@ describe('Projects', function () {
 				.expect(200, function(err, res){
 
 
-					const account = res.body.accounts.find(account => account.account === username);
+					const account = res.body.teamspaces.find(account => account.teamspace === username);
 					expect(account).to.exist;
 
 					const pg = account.projects.find(pg => pg.name === project.name);
@@ -233,7 +233,7 @@ describe('Projects', function () {
 				agent.get(`/teamspaces/${username}.json`)
 				.expect(200, function(err, res){
 
-					const account = res.body.accounts.find(account => account.account === username);
+					const account = res.body.teamspaces.find(account => account.teamspace === username);
 					expect(account).to.exist;
 
 					const model = account.models.find(model => model.model === modelIdInProject);

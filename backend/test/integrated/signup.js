@@ -60,9 +60,9 @@ describe('Sign up', function(){
 	it('with available username should return success', function(done){
 
 		request(server)
-		.post(`/teamspaces/${username}`)
+		.post(`/teamspaces`)
 		.send({
-
+			"name": username,
 			"email": email,
 			"password": password,
 			"firstName": firstName,
@@ -73,8 +73,8 @@ describe('Sign up', function(){
 			"company": company
 
 		}).expect(200, function(err, res){
-
-			expect(res.body.account).to.equal(username);
+			console.log(res.body);
+			expect(res.body.teamspace).to.equal(username);
 			done(err);
 		});
 
@@ -98,9 +98,9 @@ describe('Sign up', function(){
 	it('with username that already exists should fail', function(done){
 
 		request(server)
-		.post(`/teamspaces/${username}`)
+		.post(`/teamspaces`)
 		.send({
-
+			"name": username,
 			"email": email,
 			"password": password
 
@@ -121,9 +121,9 @@ describe('Sign up', function(){
 			}
 			
 			request(server)
-			.post(`/teamspaces/${username}`)
+			.post(`/teamspaces`)
 			.send({
-
+				"name": username,
 				"email": email,
 				"password": password
 
@@ -136,9 +136,9 @@ describe('Sign up', function(){
 
 	it('with invalid email address - abc@b should fail', function(done){
 			request(server)
-			.post('/teamspaces/signup_somebaduser')
+			.post('/teamspaces')
 			.send({
-
+				"name": "signup_somebaduser",
 				"email": "abc@b",
 				"password": password
 
@@ -151,9 +151,9 @@ describe('Sign up', function(){
 
 	it('with invalid email address - abc should fail', function(done){
 			request(server)
-			.post('/teamspaces/signup_somebaduser')
+			.post('/teamspaces')
 			.send({
-
+				"name": "signup_somebaduser",
 				"email": "abc",
 				"password": password
 
@@ -166,9 +166,9 @@ describe('Sign up', function(){
 
 	it('without email should fail', function(done){
 			request(server)
-			.post('/teamspaces/signup_somebaduser')
+			.post('/teamspaces')
 			.send({
-
+				"name": "signup_somebaduser",
 				"email": "",
 				"password": password
 
@@ -181,9 +181,9 @@ describe('Sign up', function(){
 
 	it('without password should fail', function(done){
 			request(server)
-			.post('/teamspaces/signup_somebaduser')
+			.post('/teamspaces')
 			.send({
-
+				"name": "signup_somebaduser",
 				"email": email,
 				"password": ''
 

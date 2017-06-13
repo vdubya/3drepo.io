@@ -167,8 +167,8 @@ describe('Sharing/Unsharing a model', function () {
 					agent.get(`/teamspaces/${username_viewer}.json`)
 					.expect(200, function(err, res){
 
-						expect(res.body).to.have.property('accounts').that.is.an('array');
-						const account = res.body.accounts.find( a => a.account === username);
+						expect(res.body).to.have.property('teamspaces').that.is.an('array');
+						const account = res.body.teamspaces.find( a => a.teamspace === username);
 						expect(account).to.have.property('models').that.is.an('array');
 						const modelObj = account.models.find( _model => _model.model === model);
 						expect(modelObj).to.have.property('model', model);
@@ -301,8 +301,8 @@ describe('Sharing/Unsharing a model', function () {
 						agent.get(`/teamspaces/${username_viewer}.json`)
 						.expect(200, function(err, res){
 
-							expect(res.body).to.have.property('accounts').that.is.an('array');
-							let account = res.body.accounts.find( a => a.account === username);
+							expect(res.body).to.have.property('teamspaces').that.is.an('array');
+							let account = res.body.teamspaces.find( a => a.teamspace === username);
 							expect(account).to.be.undefined;
 
 							done(err);
@@ -386,8 +386,8 @@ describe('Sharing/Unsharing a model', function () {
 					agent.get(`/teamspaces/${username_commenter}.json`)
 					.expect(200, function(err, res){
 
-						expect(res.body).to.have.property('accounts').that.is.an('array');
-						let account = res.body.accounts.find( a => a.account === username);
+						expect(res.body).to.have.property('teamspaces').that.is.an('array');
+						let account = res.body.teamspaces.find( a => a.teamspace === username);
 						expect(account).to.have.property('models').that.is.an('array');
 						let modelObj = account.models.find( _model => _model.model === model);
 						expect(modelObj).to.have.property('model', model);
@@ -542,8 +542,8 @@ describe('Sharing/Unsharing a model', function () {
 						agent.get(`/teamspaces/${username_commenter}.json`)
 						.expect(200, function(err, res){
 
-							expect(res.body).to.have.property('accounts').that.is.an('array');
-							let account = res.body.accounts.find( a => a.account === username);
+							expect(res.body).to.have.property('teamspaces').that.is.an('array');
+							let account = res.body.teamspaces.find( a => a.teamspace === username);
 							expect(account).to.be.undefined;
 
 							done(err);
@@ -626,8 +626,8 @@ describe('Sharing/Unsharing a model', function () {
 					agent.get(`/teamspaces/${username_editor}.json`)
 					.expect(200, function(err, res){
 
-						expect(res.body).to.have.property('accounts').that.is.an('array');
-						let account = res.body.accounts.find( a => a.account === username);
+						expect(res.body).to.have.property('teamspaces').that.is.an('array');
+						let account = res.body.teamspaces.find( a => a.teamspace === username);
 						expect(account).to.have.property('models').that.is.an('array');
 						let modelObj = account.models.find( _model => _model.model === model);
 						expect(modelObj).to.have.property('model', model);
@@ -784,8 +784,8 @@ describe('Sharing/Unsharing a model', function () {
 						agent.get(`/teamspaces/${username_editor}.json`)
 						.expect(200, function(err, res){
 
-							expect(res.body).to.have.property('accounts').that.is.an('array');
-							let account = res.body.accounts.find( a => a.account === username);
+							expect(res.body).to.have.property('teamspaces').that.is.an('array');
+							let account = res.body.teamspaces.find( a => a.teamspace === username);
 							expect(account).to.be.undefined;
 
 							done(err);

@@ -110,8 +110,9 @@ describe('Federated Model', function () {
 
 		}, 1000);
 
-		agent.post(`/teamspaces/${username}/models/${fedModelName}`)
-		.send({ 
+		agent.post(`/teamspaces/${username}/models`)
+		.send({
+			name: fedModelName,
 			desc, 
 			type,
 			unit,
@@ -141,7 +142,7 @@ describe('Federated Model', function () {
 				done => {
 					agent.get(`/teamspaces/${username}.json`)
 					.expect(200, function(err, res){
-						let account = res.body.accounts.find(a => a.account === username);
+						let account = res.body.teamspaces.find(a => a.teamspace === username);
 						let fed = account.fedModels.find(m => m.model === fedModelId);
 						expect(fed.federate).to.equal(true);
 						done(err);
@@ -160,8 +161,9 @@ describe('Federated Model', function () {
 		let emptyFed = 'emptyFed';
 		let emptyFedId;
 
-		agent.post(`/teamspaces/${username}/models/${emptyFed}`)
-		.send({ 
+		agent.post(`/teamspaces/${username}/models`)
+		.send({
+			name: emptyFed,
 			desc, 
 			type, 
 			unit,
@@ -189,7 +191,7 @@ describe('Federated Model', function () {
 				done => {
 					agent.get(`/teamspaces/${username}.json`)
 					.expect(200, function(err, res){
-						let account = res.body.accounts.find(a => a.account === username);
+						let account = res.body.teamspaces.find(a => a.teamspace === username);
 						let fed = account.fedModels.find(p => p.model === emptyFedId);
 						expect(fed.federate).to.equal(true);
 						done(err);
@@ -205,8 +207,9 @@ describe('Federated Model', function () {
 
 	it('should fail if create federation using existing model name (fed or model)', function(done){
 
-		agent.post(`/teamspaces/${username}/models/${subModels[0]}`)
+		agent.post(`/teamspaces/${username}/models`)
 		.send({ 
+			name: subModels[0],
 			desc, 
 			type, 
 			unit,
@@ -226,8 +229,9 @@ describe('Federated Model', function () {
 	it('should fail if create federation using invalid model name', function(done){
 
 
-		agent.post(`/teamspaces/${username}/models/a%20c`)
+		agent.post(`/teamspaces/${username}/models`)
 		.send({ 
+			name: 'a c',
 			desc, 
 			type, 
 			subModels:[{
@@ -247,8 +251,9 @@ describe('Federated Model', function () {
 
 	it('should fail if create federation from models in a different database', function(done){
 
-		agent.post(`/teamspaces/${username}/models/badfed`)
-		.send({ 
+		agent.post(`/teamspaces/${username}/models`)
+		.send({
+			name: 'badfed',
 			desc, 
 			type, 
 			unit,
@@ -317,8 +322,9 @@ describe('Federated Model', function () {
 		q.channel.assertQueue(q.workerQName, { durable: true }).then(() => {
 			return q.channel.purgeQueue(q.workerQName);
 		}).then(() => {
-			agent.post(`/teamspaces/${username}/models/dupfed`)
+			agent.post(`/teamspaces/${username}/models`)
 			.send({ 
+				name: 'dupfed',
 				desc, 
 				type, 
 				unit,
@@ -340,8 +346,9 @@ describe('Federated Model', function () {
 
 
 	it('should fail if create fed of fed', function(done){
-		agent.post(`/teamspaces/${username}/models/fedfed`)
+		agent.post(`/teamspaces/${username}/models`)
 		.send({ 
+			name: 'fedfed',
 			desc, 
 			type, 
 			unit,

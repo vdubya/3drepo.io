@@ -74,8 +74,8 @@ function signUpAndLoginAndCreateModel(params){
 			}
 
 			//create a model
-			agent.post(`/teamspaces/${username}/${model}`)
-			.send({ type, desc, unit })
+			agent.post(`/teamspaces/${username}`)
+			.send({ name: model, type, desc, unit })
 			.expect(200, function(err, res){
 				done(err, agent);
 			});

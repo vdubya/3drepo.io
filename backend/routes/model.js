@@ -38,7 +38,7 @@ router.get('/:model.json', middlewares.translateToModelId, middlewares.hasReadAc
 
 router.put('/:model/settings', middlewares.translateToModelId, middlewares.hasWriteAccessToModelSettings, updateSettings);
 
-router.post('/:modelName', middlewares.connectQueue, middlewares.checkPermissions([C.PERM_CREATE_MODEL]), createModel);
+router.post('/', middlewares.connectQueue, middlewares.checkPermissions([C.PERM_CREATE_MODEL]), createModel);
 
 //update federated model
 router.put('/:model', middlewares.translateToModelId, middlewares.connectQueue, middlewares.hasEditAccessToFedModel, updateModel);
@@ -176,7 +176,6 @@ function createModel(req, res, next){
 	'use strict';
 
 	let responsePlace = utils.APIInfo(req);
-	let modelName = req.params.modelName;
 	let account = req.params.account;
 	let username = req.session.user.username;
 
@@ -197,7 +196,7 @@ function createModel(req, res, next){
 
 	data.sessionId = req.headers[C.HEADER_SOCKET_ID];
 
-	createAndAssignRole(modelName, account, username, data).then(data => {
+	createAndAssignRole(req.body.name, account, username, data).then(data => {
 		responseCodes.respond(responsePlace, req, res, next, responseCodes.OK, data.model);
 	}).catch( err => {
 		responseCodes.respond(responsePlace, req, res, next, err.resCode || utils.mongoErrorToResCode(err), err.resCode ? {} : err);
