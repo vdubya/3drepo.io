@@ -16,7 +16,7 @@ permissions | list of [model level permissions](#model-level)
 > Example request
 
 ```http
-GET /repoman/permission-templates HTTP/1.1
+GET /teamspaces/repoman/permission-templates HTTP/1.1
 ```
 
 > Example response
@@ -34,16 +34,16 @@ GET /repoman/permission-templates HTTP/1.1
 ]
 ```
 
-### GET /{accountName}/permission-templates
+### GET /teamspaces/{teamspace}/permission-templates
 
-Get a list of [permission templates](#template-object) belongs to this account.
+Get a list of [permission templates](#template-object) belongs to this teamspace.
 
 ## Create a template
 
 > Example request
 
 ```http
-POST /repoman/permission-templates HTTP/1.1
+POST /teamspaces/repoman/permission-templates HTTP/1.1
 ```
 ```json
 {
@@ -61,7 +61,7 @@ POST /repoman/permission-templates HTTP/1.1
 }
 ```
 
-### GET /{accountName}/permission-templates
+### GET /teamspaces/{teamspace}/permission-templates
 
 Create a permission template.
 
@@ -74,7 +74,7 @@ Request body
 > Example request
 
 ```http
-DELETE /repoman/permission-templates/template1 HTTP/1.1
+DELETE /teamspaces/repoman/permission-templates/template1 HTTP/1.1
 ```
 
 > Example response
@@ -83,7 +83,7 @@ DELETE /repoman/permission-templates/template1 HTTP/1.1
 {}
 ```
 
-### DELETE /{accountName}/permission-templates/{templateId}
+### DELETE /teamspaces/{teamspace}/permission-templates/{templateId}
 
 Delete a permission template
 

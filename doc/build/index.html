@@ -318,15 +318,16 @@ don&rsquo;t need to take care of the authenication process after calling to /log
 
 <p>Invalidate the token.</p>
 
-          <h1 id="account">Account</h1>
+          <h1 id="teamspace">Teamspace</h1>
 
 <h2 id="sign-up">Sign up</h2>
 
 <blockquote>
 <p>Example Request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/repoman</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/teamspaces</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+    </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"repoman"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"repo-man@3drepo.org"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"password"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1984fantasy"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"firstName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Otto"</span><span class="p">,</span><span class="w">
@@ -344,28 +345,12 @@ don&rsquo;t need to take care of the authenication process after calling to /log
 <p>Example Responses</p>
 </blockquote>
 <pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
-    </span><span class="s2">"username"</span><span class="p">:</span><span class="w"> </span><span class="s2">"repoman"</span><span class="w">
+    </span><span class="s2">"teamspace"</span><span class="p">:</span><span class="w"> </span><span class="s2">"repoman"</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<h3 id="post-accountname">POST /{accountName}</h3>
+<h3 id="post-teamspaces">POST /teamspaces</h3>
 
 <p>Sign up a new account.</p>
-
-<h3 id="url-parameters">URL parameters</h3>
-
-<table><thead>
-<tr>
-<th>Parameter</th>
-<th>Required</th>
-<th>Format</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>accountName</td>
-<td>Yes</td>
-<td>only alphabets and numbers and starts with an alphabet, less than 20 characters</td>
-</tr>
-</tbody></table>
 
 <h3 id="request-body">Request body</h3>
 
@@ -376,6 +361,11 @@ don&rsquo;t need to take care of the authenication process after calling to /log
 <th>Format</th>
 </tr>
 </thead><tbody>
+<tr>
+<td>name</td>
+<td>Yes</td>
+<td>only alphabets and numbers and starts with an alphabet, less than 20 characters</td>
+</tr>
 <tr>
 <td>password</td>
 <td>Yes</td>
@@ -425,15 +415,15 @@ don&rsquo;t need to take care of the authenication process after calling to /log
 <blockquote>
 <p>Example Request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/repoman/verify</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/teamspaces/repoman/verify</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w"> </span><span class="s2">"token"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1234567890"</span><span class="w"> </span><span class="p">}</span><span class="w">
 </span></code></pre>
 <blockquote>
 <p>Example Response</p>
 </blockquote>
-<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w"> </span><span class="s2">"account"</span><span class="p">:</span><span class="w"> </span><span class="s2">"repoman"</span><span class="w"> </span><span class="p">}</span><span class="w">
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w"> </span><span class="s2">"teamspace"</span><span class="p">:</span><span class="w"> </span><span class="s2">"repoman"</span><span class="w"> </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<h3 id="post-accountname-verify">POST /{accountName}/verify</h3>
+<h3 id="post-teamspaces-teamspace-verify">POST /teamspaces/{teamspace}/verify</h3>
 
 <p>Verify an account after signing up</p>
 
@@ -454,15 +444,15 @@ don&rsquo;t need to take care of the authenication process after calling to /log
 <blockquote>
 <p>Example Request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/repoman.json</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/teamspaces/repoman.json</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre>
 <blockquote>
 <p>Example Response</p>
 </blockquote>
 <pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
-    </span><span class="s2">"accounts"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="s2">"teamspaces"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
         </span><span class="p">{</span><span class="w">
-            </span><span class="s2">"account"</span><span class="p">:</span><span class="w"> </span><span class="s2">"repoman"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"teamspace"</span><span class="p">:</span><span class="w"> </span><span class="s2">"repoman"</span><span class="p">,</span><span class="w">
             </span><span class="s2">"models"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
                 </span><span class="p">{</span><span class="w">
                     </span><span class="s2">"permissions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
@@ -497,7 +487,7 @@ don&rsquo;t need to take care of the authenication process after calling to /log
             </span><span class="s2">"projects"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w">
         </span><span class="p">},</span><span class="w">
         </span><span class="p">{</span><span class="w">
-            </span><span class="s2">"account"</span><span class="p">:</span><span class="w"> </span><span class="s2">"breakingbad"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"teamspace"</span><span class="p">:</span><span class="w"> </span><span class="s2">"breakingbad"</span><span class="p">,</span><span class="w">
             </span><span class="s2">"models"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
                 </span><span class="p">{</span><span class="w">
                     </span><span class="s2">"permissions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
@@ -596,9 +586,9 @@ don&rsquo;t need to take care of the authenication process after calling to /log
     </span><span class="p">]</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<h3 id="get-accountname-json">GET /{accountName}.json</h3>
+<h3 id="get-teamspaces-teamspace-json">GET /teamspaces/{teamspace}.json</h3>
 
-<p>Return account information and list of projects and models grouped by teamspace (account) this account have access to.</p>
+<p>Return teamspace information and list of projects and models grouped by teamspace this user have access to.</p>
 
 <h3 id="return-body">Return body</h3>
 
@@ -610,9 +600,9 @@ don&rsquo;t need to take care of the authenication process after calling to /log
 </tr>
 </thead><tbody>
 <tr>
-<td>accounts</td>
+<td>teamspaces</td>
 <td></td>
-<td>list of account object</td>
+<td>list of teamspace object</td>
 </tr>
 <tr>
 <td>email</td>
@@ -627,7 +617,7 @@ don&rsquo;t need to take care of the authenication process after calling to /log
 <tr>
 <td>hasAvatar</td>
 <td>boolean</td>
-<td>whether the account has an avatar</td>
+<td>whether the teamspace has an avatar</td>
 </tr>
 <tr>
 <td>jobs</td>
@@ -636,7 +626,7 @@ don&rsquo;t need to take care of the authenication process after calling to /log
 </tr>
 </tbody></table>
 
-<h3 id="account-object">Account object</h3>
+<h3 id="teamspace-object">Teamspace object</h3>
 
 <table><thead>
 <tr>
@@ -646,9 +636,9 @@ don&rsquo;t need to take care of the authenication process after calling to /log
 </tr>
 </thead><tbody>
 <tr>
-<td>account</td>
+<td>teamspace</td>
 <td></td>
-<td>account name</td>
+<td>teamspace name</td>
 </tr>
 <tr>
 <td>models</td>
@@ -663,17 +653,17 @@ don&rsquo;t need to take care of the authenication process after calling to /log
 <tr>
 <td>projects</td>
 <td></td>
-<td>list of <a href="#project-object-in-account-info">projects (folders) objects</a></td>
+<td>list of <a href="#project-object-in-teamspace-info">projects (folders) objects</a></td>
 </tr>
 <tr>
 <td>isAdmin <code class="prettyprint">deprecated</code></td>
 <td></td>
-<td>is user an account admin of this account</td>
+<td>is user an teamspace admin of this teamspace</td>
 </tr>
 <tr>
 <td>permissions</td>
-<td>list of <a href="#account-level">account level permission</a></td>
-<td>list of permissions user has on this account</td>
+<td>list of <a href="#teamspace-level">teamspace level permission</a></td>
+<td>list of permissions user has in this teamspace</td>
 </tr>
 <tr>
 <td>firstName</td>
@@ -703,22 +693,22 @@ don&rsquo;t need to take care of the authenication process after calling to /log
 </thead><tbody>
 <tr>
 <td>spaceLimit</td>
-<td>account space limit</td>
+<td>teamspace space limit</td>
 <td>integer, size in byte</td>
 </tr>
 <tr>
 <td>collaboratorLimit</td>
-<td>account collaborator limit</td>
+<td>teamspace collaborator limit</td>
 <td>integer, size in byte</td>
 </tr>
 <tr>
 <td>spaceUsed</td>
-<td>account space limit</td>
+<td>teamspace space limit</td>
 <td>integer, size in byte</td>
 </tr>
 </tbody></table>
 
-<h3 id="project-object-in-account-info">Project Object (in account info)</h3>
+<h3 id="project-object-in-teamspace-info">Project Object (in teamspace info)</h3>
 
 <table><thead>
 <tr>
@@ -802,7 +792,7 @@ don&rsquo;t need to take care of the authenication process after calling to /log
 </blockquote>
 <pre class="highlight plaintext tab-plaintext"><code>&lt;binary image&gt;
 </code></pre>
-<h3 id="get-accountname-avatar">GET /{accountName}/avatar</h3>
+<h3 id="get-teamspaces-teamspace-avatar">GET /teamspaces/{teamspace}/avatar</h3>
 
 <p>Return avatar if user has one.</p>
 
@@ -811,7 +801,7 @@ don&rsquo;t need to take care of the authenication process after calling to /log
 <blockquote>
 <p>Example Request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/repoman/avatar</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/teamspaces/repoman/avatar</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">multipart/form-data; boundary=----WebKitFormBoundaryN8dwXAkcO1frCHLf</span>
 
 ------WebKitFormBoundaryN8dwXAkcO1frCHLf
@@ -829,7 +819,7 @@ Content-Type: image/png
     </span><span class="s2">"status"</span><span class="p">:</span><span class="s2">"success"</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<h3 id="post-accountname-avatar">POST /{accountName}/avatar</h3>
+<h3 id="post-teamspaces-teamspace-avatar">POST /teamspaces/{teamspace}/avatar</h3>
 
 <p>Upload an image. Only multipart form data content type will be accepted.</p>
 
@@ -847,12 +837,12 @@ Content-Type: image/png
 </tr>
 </tbody></table>
 
-<h2 id="update-account-info">Update account info</h2>
+<h2 id="update-teamspace-info">Update teamspace info</h2>
 
 <blockquote>
 <p>Example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">PUT</span> <span class="nn">/repoman</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">PUT</span> <span class="nn">/teamspaces/repoman</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"firstName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Heisenberg"</span><span class="w">
     </span><span class="s2">"lastName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"White"</span><span class="w">
@@ -863,12 +853,12 @@ Content-Type: image/png
 <p>Example Response</p>
 </blockquote>
 <pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
-    </span><span class="s2">"account"</span><span class="p">:</span><span class="s2">"repoman"</span><span class="w">
+    </span><span class="s2">"teamspace"</span><span class="p">:</span><span class="s2">"repoman"</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<h3 id="put-accountname">PUT /{accountName}</h3>
+<h3 id="put-teamspace-teamspace">PUT /teamspace/{teamspace}</h3>
 
-<p>Update account information.</p>
+<p>Update teamspace information.</p>
 
 <h3 id="request-body">Request body</h3>
 
@@ -901,7 +891,7 @@ Content-Type: image/png
 <blockquote>
 <p>Example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">PUT</span> <span class="nn">/repoman</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">PUT</span> <span class="nn">/teamspaces/repoman</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"oldPassword"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1984fantasy"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"newPassword"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ElPaso"</span><span class="w">
@@ -911,10 +901,10 @@ Content-Type: image/png
 <p>Example Response</p>
 </blockquote>
 <pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
-    </span><span class="s2">"account"</span><span class="p">:</span><span class="s2">"repoman"</span><span class="w">
+    </span><span class="s2">"teamspace"</span><span class="p">:</span><span class="s2">"repoman"</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<h3 id="put-accountname">PUT /{accountName}</h3>
+<h3 id="put-teamspaces-teamspace">PUT /teamspaces/{teamspace}</h3>
 
 <p>Reset password. New password must be different.</p>
 
@@ -936,7 +926,7 @@ Content-Type: image/png
 </tr>
 </tbody></table>
 
-<h3 id="put-accountname-password">PUT /{accountName}/password</h3>
+<h3 id="put-teamspaces-teamspace-password">PUT /teamspaces/{teamspace}/password</h3>
 
 <p>Reset password by token.</p>
 
@@ -961,7 +951,7 @@ Content-Type: image/png
 <blockquote>
 <p>Example Request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/repoman/forgot-password</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/teamspaces/repoman/forgot-password</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre><pre class="highlight json tab-json"><code><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="s2">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"repoman@3drepo.org"</span><span class="p">}</span><span class="w">
 </span></code></pre>
 <blockquote>
@@ -969,11 +959,11 @@ Content-Type: image/png
 </blockquote>
 <pre class="highlight json tab-json"><code><span class="p">{}</span><span class="w">
 </span></code></pre>
-<h3 id="post-accountname-forgot-password">POST /{accountName}/forgot-password</h3>
+<h3 id="post-teamspaces-teamspace-forgot-password">POST /teamspaces/{teamspace}/forgot-password</h3>
 
 <h3 id="request-body">Request body</h3>
 
-<p>Send a reset password link to account&rsquo;s email.</p>
+<p>Send a reset password link to user&rsquo;s email.</p>
 
 <table><thead>
 <tr>
@@ -987,9 +977,9 @@ Content-Type: image/png
 </tr>
 </tbody></table>
 
-          <h1 id="account-permission">Account permission</h1>
+          <h1 id="teamspace-permission">Teamspace permission</h1>
 
-<h2 id="account-permission-object">Account permission object</h2>
+<h2 id="teamspace-permission-object">Teamspace permission object</h2>
 
 <table><thead>
 <tr>
@@ -1003,7 +993,7 @@ Content-Type: image/png
 </tr>
 <tr>
 <td>permissions</td>
-<td>list of <a href="#account-level">account level permissions</a></td>
+<td>list of <a href="#teamspace-level">teamspace level permissions</a></td>
 </tr>
 </tbody></table>
 
@@ -1012,7 +1002,7 @@ Content-Type: image/png
 <blockquote>
 <p>Example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/repoman/permissions</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/teamspaces/repoman/permissions</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre>
 <blockquote>
 <p>Example response</p>
@@ -1024,16 +1014,16 @@ Content-Type: image/png
     </span><span class="p">}</span><span class="w">
 </span><span class="p">]</span><span class="w">
 </span></code></pre>
-<h3 id="get-acconutname-permissions">GET /{acconutName}/permissions</h3>
+<h3 id="get-teamspaces-teamspace-permissions">GET /teamspaces/{teamspace}/permissions</h3>
 
-<p>Get a list of <a href="#account-permission-object">account permission objects</a> on this account.</p>
+<p>Get a list of <a href="#teamspace-permission-object">teamspace permission objects</a> on this teamspace.</p>
 
 <h2 id="assign-permissions">Assign permissions</h2>
 
 <blockquote>
 <p>Example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/repoman/permissions</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/teamspaces/repoman/permissions</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"user"</span><span class="p">:</span><span class="w"> </span><span class="s2">"breakingbad"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"permissions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"create_project"</span><span class="p">]</span><span class="w">
@@ -1047,20 +1037,20 @@ Content-Type: image/png
     </span><span class="s2">"permissions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"create_project"</span><span class="p">]</span><span class="w">
 </span><span class="p">}]</span><span class="w">
 </span></code></pre>
-<h3 id="post-accountname-permissions">POST /{accountName}/permissions</h3>
+<h3 id="post-teamspaces-teamspace-permissions">POST /teamspaces/{teamspace}/permissions</h3>
 
-<p>Assign account level permission to a user.</p>
+<p>Assign teamspace level permission to a user.</p>
 
 <h3 id="request-body">Request body</h3>
 
-<p><a href="#account-permission-object">account permission object</a></p>
+<p><a href="#teamspace-permission-object">teamspace permission object</a></p>
 
 <h2 id="update-permissions">Update permissions</h2>
 
 <blockquote>
 <p>Example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">PUT</span> <span class="nn">/repoman/permissions/breakingbad</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">PUT</span> <span class="nn">/teamspaces/epoman/permissions/breakingbad</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w"> </span><span class="s2">"permissions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"teamspace_admin"</span><span class="p">]</span><span class="w"> </span><span class="p">}</span><span class="w">
 </span></code></pre>
 <blockquote>
@@ -1068,7 +1058,7 @@ Content-Type: image/png
 </blockquote>
 <pre class="highlight json tab-json"><code><span class="p">{</span><span class="w"> </span><span class="s2">"permissions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"teamspace_admin"</span><span class="p">]</span><span class="w"> </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<h3 id="put-accountname-permissions-user">PUT /{accountName}/permissions/{user}</h3>
+<h3 id="put-teamspaces-teamspace-permissions-user">PUT /teamspaces/{teamspace}/permissions/{user}</h3>
 
 <p>Update permission assigment on a user</p>
 
@@ -1082,7 +1072,7 @@ Content-Type: image/png
 </thead><tbody>
 <tr>
 <td>permissions</td>
-<td>list of <a href="#account-level">account level permissions</a></td>
+<td>list of <a href="#teamspace-level">teamspace level permissions</a></td>
 </tr>
 </tbody></table>
 
@@ -1091,14 +1081,14 @@ Content-Type: image/png
 <blockquote>
 <p>Example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">DELETE</span> <span class="nn">/repoman/permissions/breakingbad</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">DELETE</span> <span class="nn">/teamspaces/repoman/permissions/breakingbad</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre>
 <blockquote>
 <p>Example response</p>
 </blockquote>
 <pre class="highlight json tab-json"><code><span class="p">{}</span><span class="w">
 </span></code></pre>
-<h3 id="delete-accountname-permissions-user">DELETE /{accountName}/permissions/{user}</h3>
+<h3 id="delete-teamspaces-teamspace-permissions-user">DELETE /teamspaces/{teamspace}/permissions/{user}</h3>
 
 <p>Revoke all permissions from a user.</p>
 
@@ -1131,7 +1121,7 @@ Content-Type: image/png
 <blockquote>
 <p>Example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/repoman/permission-templates</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/teamspaces/repoman/permission-templates</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre>
 <blockquote>
 <p>Example response</p>
@@ -1147,16 +1137,16 @@ Content-Type: image/png
     </span><span class="p">}</span><span class="w">
 </span><span class="p">]</span><span class="w">
 </span></code></pre>
-<h3 id="get-accountname-permission-templates">GET /{accountName}/permission-templates</h3>
+<h3 id="get-teamspaces-teamspace-permission-templates">GET /teamspaces/{teamspace}/permission-templates</h3>
 
-<p>Get a list of <a href="#template-object">permission templates</a> belongs to this account.</p>
+<p>Get a list of <a href="#template-object">permission templates</a> belongs to this teamspace.</p>
 
 <h2 id="create-a-template">Create a template</h2>
 
 <blockquote>
 <p>Example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/repoman/permission-templates</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/teamspaces/repoman/permission-templates</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"template1"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"permissions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"view_model"</span><span class="p">]</span><span class="w">
@@ -1170,7 +1160,7 @@ Content-Type: image/png
     </span><span class="s2">"permissions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"view_model"</span><span class="p">]</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<h3 id="get-accountname-permission-templates">GET /{accountName}/permission-templates</h3>
+<h3 id="get-teamspaces-teamspace-permission-templates">GET /teamspaces/{teamspace}/permission-templates</h3>
 
 <p>Create a permission template.</p>
 
@@ -1183,14 +1173,14 @@ Content-Type: image/png
 <blockquote>
 <p>Example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">DELETE</span> <span class="nn">/repoman/permission-templates/template1</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">DELETE</span> <span class="nn">/teamspaces/repoman/permission-templates/template1</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre>
 <blockquote>
 <p>Example response</p>
 </blockquote>
 <pre class="highlight json tab-json"><code><span class="p">{}</span><span class="w">
 </span></code></pre>
-<h3 id="delete-accountname-permission-templates-templateid">DELETE /{accountName}/permission-templates/{templateId}</h3>
+<h3 id="delete-teamspaces-teamspace-permission-templates-templateid">DELETE /teamspaces/{teamspace}/permission-templates/{templateId}</h3>
 
 <p>Delete a permission template</p>
 
@@ -1235,7 +1225,7 @@ Content-Type: image/png
 <blockquote>
 <p>Example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/repoman/jobs</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/teamspaces/repoman/jobs</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre>
 <blockquote>
 <p>Example response</p>
@@ -1251,16 +1241,16 @@ Content-Type: image/png
     </span><span class="p">}</span><span class="w">
 </span><span class="p">]</span><span class="w">
 </span></code></pre>
-<h3 id="get-accountname-jobs">GET /{accountName}/jobs</h3>
+<h3 id="get-teamspaces-teamspace-jobs">GET /teamspaces/{teamspace}/jobs</h3>
 
-<p>Get a list of <a href="#job-object">job objects</a> belongs to this account.</p>
+<p>Get a list of <a href="#job-object">job objects</a> belongs to this teamspace.</p>
 
 <h2 id="create-a-job">Create a job</h2>
 
 <blockquote>
 <p>Example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/repoman/jobs</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/teamspaces/repoman/jobs</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"driver"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"color"</span><span class="p">:</span><span class="w"> </span><span class="s2">"#111111"</span><span class="w">
@@ -1276,9 +1266,9 @@ Content-Type: image/png
     </span><span class="p">}</span><span class="w">
 </span><span class="p">]</span><span class="w">
 </span></code></pre>
-<h3 id="post-accountname-jobs">POST /{accountName}/jobs</h3>
+<h3 id="post-teamspaces-teamspace-jobs">POST /teamspaces/{teamspace}/jobs</h3>
 
-<p>Create a job for this account</p>
+<p>Create a job for this teamspace</p>
 
 <p>Request body
 <a href="#job-object">Job object</a></p>
@@ -1288,16 +1278,16 @@ Content-Type: image/png
 <blockquote>
 <p>Example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">DELETE</span> <span class="nn">/repoman/jobs/driver</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">DELETE</span> <span class="nn">/teamspaces/repoman/jobs/driver</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre>
 <blockquote>
 <p>Example response</p>
 </blockquote>
 <pre class="highlight json tab-json"><code><span class="p">{}</span><span class="w">
 </span></code></pre>
-<h3 id="delete-accountname-jobs-jobid">DELETE /{accountName}/jobs/{jobId}</h3>
+<h3 id="delete-teamspaces-teamspace-jobs-jobid">DELETE /teamspaces/{teamspace}/jobs/{jobId}</h3>
 
-<p>Delete a job from an account</p>
+<p>Delete a job from a teamspace</p>
 
 <h3 id="url-parameters">URL parameters</h3>
 
@@ -1370,7 +1360,7 @@ Content-Type: image/png
 <blockquote>
 <p>Example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/repoman/projects</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/teamspaces/repoman/projects</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"project1"</span><span class="w">
 </span><span class="p">}</span><span class="w">
@@ -1385,7 +1375,7 @@ Content-Type: image/png
     </span><span class="s2">"permissions"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<h3 id="post-accountname-projects">POST /{accountName}/projects</h3>
+<h3 id="post-teamspaces-teamspace-projects">POST /teamspaces/{teamspace}/projects</h3>
 
 <p>Create a project</p>
 
@@ -1406,7 +1396,7 @@ Content-Type: image/png
 </tbody></table>
 
 <h2 id="update-a-project">Update a project</h2>
-<pre class="highlight http tab-http"><code><span class="nf">PUT</span> <span class="nn">/repoman/projects/project1</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">PUT</span> <span class="nn">/teamspaces/repoman/projects/project1</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"project2"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"permissions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
@@ -1432,7 +1422,7 @@ Content-Type: image/png
     </span><span class="p">]</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<h3 id="put-accountname-projects-projectname">PUT /{accountName}/projects/{projectName}</h3>
+<h3 id="put-teamspaces-teamspace-projects-projectname">PUT /teamspaces/{teamspace}/projects/{projectName}</h3>
 
 <p>Update a project.</p>
 
@@ -1462,14 +1452,14 @@ Content-Type: image/png
 <blockquote>
 <p>Example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">DELETE</span> <span class="nn">/repoman/projects/project1</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">DELETE</span> <span class="nn">/teamspaces/repoman/projects/project1</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre>
 <blockquote>
 <p>Example response</p>
 </blockquote>
 <pre class="highlight json tab-json"><code><span class="p">{}</span><span class="w">
 </span></code></pre>
-<h3 id="delete-accountname-projects-projectname">DELETE /{accountName}/projects/{projectName}</h3>
+<h3 id="delete-teamspaces-teamspace-projects-projectname">DELETE /teamspaces/{teamspace}/projects/{projectName}</h3>
 
 <p>Delete a project</p>
 
@@ -1496,7 +1486,7 @@ Content-Type: image/png
 <blockquote>
 <p>Example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/repoman/00000000-0000-0000-0000-000000000000.json</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/teamspaces/repoman/models/00000000-0000-0000-0000-000000000000.json</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre>
 <blockquote>
 <p>Example response</p>
@@ -1533,7 +1523,9 @@ Content-Type: image/png
     </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<h3 id="get-accountname-modelid-json">GET /{accountName}/{modelId}.json</h3>
+<h3 id="get-teamspaces-teamspace-models-modelid-json">GET /teamspaces/{teamspace}/models/{modelId}.json</h3>
+
+<h3 id="get-teamspaces-teamspace-projects-project-models-modelname-json">GET /teamspaces/{teamspace}/projects/{project}/models/{modelName}.json</h3>
 
 <p>Get model information</p>
 
@@ -1682,7 +1674,7 @@ Content-Type: image/png
 <blockquote>
 <p>Example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">PUT</span> <span class="nn">/repoman/00000000-0000-0000-0000-000000000000/settings</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">PUT</span> <span class="nn">/teamspaces/repoman/models/00000000-0000-0000-0000-000000000000/settings</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"012"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"topicTypes"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"Type 1"</span><span class="p">,</span><span class="w"> </span><span class="s2">"Type 2"</span><span class="p">],</span><span class="w">
@@ -1723,7 +1715,9 @@ Content-Type: image/png
     </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<h3 id="put-accountname-modelid-settings">PUT /{accountName}/{modelId}/settings</h3>
+<h3 id="put-teamspaces-teamspace-models-modelid-settings">PUT /teamspaces/{teamspace}/models/{modelId}/settings</h3>
+
+<h3 id="put-teamspaces-teamspace-projects-project-models-modelname-settings">PUT /teamspaces/{teamspace}/projects/{project}/models/{modelName}/settings</h3>
 
 <p>Update model settings.</p>
 
@@ -1735,8 +1729,9 @@ Content-Type: image/png
 <blockquote>
 <p>Example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/repoman/model1</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/teamspaces/repoman/models</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+    </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"model1"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"desc"</span><span class="p">:</span><span class="w"> </span><span class="s2">"this is a model"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Structural"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"00123"</span><span class="p">,</span><span class="w">
@@ -1753,7 +1748,7 @@ Content-Type: image/png
 <p>Example response</p>
 </blockquote>
 <pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
-    </span><span class="s2">"account"</span><span class="p">:</span><span class="s2">"repoman"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"teamspace"</span><span class="p">:</span><span class="s2">"repoman"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"model"</span><span class="p">:</span><span class="s2">"00000000-0000-0000-0000-000000000000"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"model1"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"permissions"</span><span class="p">:[</span><span class="w">
@@ -1771,25 +1766,9 @@ Content-Type: image/png
     </span><span class="p">]</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<h3 id="post-accountname-modelname">POST /{accountName}/{modelName}</h3>
+<h3 id="post-teamspaces-teamspace-models">POST /teamspaces/{teamspace}/models</h3>
 
 <p>Create a new model.</p>
-
-<p>URL parameters</p>
-
-<table><thead>
-<tr>
-<th>Parameter</th>
-<th>Required</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>modelName</td>
-<td>Yes</td>
-<td>the new model name</td>
-</tr>
-</tbody></table>
 
 <p>Request body</p>
 
@@ -1800,6 +1779,11 @@ Content-Type: image/png
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td>name</td>
+<td>Yes</td>
+<td>model name</td>
+</tr>
 <tr>
 <td>desc</td>
 <td>No</td>
@@ -1837,7 +1821,7 @@ Content-Type: image/png
 <blockquote>
 <p>Example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">PUT</span> <span class="nn">/repoman/00000000-0000-0000-0000-000000000000</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">PUT</span> <span class="nn">/teamspaces/repoman/models/00000000-0000-0000-0000-000000000000</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w"> </span><span class="s2">"subModels"</span><span class="w"> </span><span class="p">:</span><span class="w"> 
     </span><span class="p">[</span><span class="w">
         </span><span class="p">{</span><span class="w">
@@ -1851,11 +1835,13 @@ Content-Type: image/png
 <p>Example response</p>
 </blockquote>
 <pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
-    </span><span class="s2">"account"</span><span class="p">:</span><span class="w"> </span><span class="s2">"repoman"</span><span class="w">
+    </span><span class="s2">"teamspace"</span><span class="p">:</span><span class="w"> </span><span class="s2">"repoman"</span><span class="w">
     </span><span class="s2">"model"</span><span class="p">:</span><span class="w"> </span><span class="s2">"00000000-0000-0000-0000-000000000000"</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<h3 id="put-accountname-modelid">PUT /{accountName}/{modelID}</h3>
+<h3 id="put-teamspaces-teamspace-models-modelid">PUT /teamspaces/{teamspace}/models/{modelID}</h3>
+
+<h3 id="put-teamspaces-teamspace-projects-project-models-modelname">PUT /teamspaces/{teamspace}/projects/{project}/models/{modelName}</h3>
 
 <p>Update a model. This API is used to update sub models in a federated model only.</p>
 
@@ -1887,7 +1873,7 @@ Content-Type: image/png
 </thead><tbody>
 <tr>
 <td>database</td>
-<td>account name the model belongs to</td>
+<td>teamspace name the model belongs to</td>
 </tr>
 <tr>
 <td>model</td>
@@ -1900,7 +1886,7 @@ Content-Type: image/png
 <blockquote>
 <p>Example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/repoman/00000000-0000-0000-0000-000000000000/upload</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/teamspaces/repoman/models/00000000-0000-0000-0000-000000000000/upload</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">multipart/form-data; boundary=----WebKitFormBoundarySos0xligf1T8Sy8I</span>
 
 ------WebKitFormBoundarySos0xligf1T8Sy8I
@@ -1923,7 +1909,9 @@ el paso
 </blockquote>
 <pre class="highlight json tab-json"><code><span class="p">{</span><span class="s2">"status"</span><span class="p">:</span><span class="s2">"uploaded"</span><span class="p">}</span><span class="w">
 </span></code></pre>
-<h3 id="post-accountname-modelid-upload">POST /{accountName}/{modelID}/upload</h3>
+<h3 id="post-teamspaces-teamspace-models-modelid-upload">POST /teamspaces/{teamspace}/models/{modelID}/upload</h3>
+
+<h3 id="post-teamspaces-teamspace-projects-project-models-modelname-upload">POST /teamspaces/{teamspace}/projects/{project}/models/{modelName}/upload</h3>
 
 <p>Upload a model. Only multipart/form-data content type will be accepted.</p>
 
@@ -1958,7 +1946,7 @@ el paso
 <blockquote>
 <p>Example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/repoman/00000000-0000-0000-0000-000000000000/download/latest</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/teamspaces/repoman/models/00000000-0000-0000-0000-000000000000/download/latest</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre>
 <blockquote>
 <p>Example response</p>
@@ -1970,7 +1958,9 @@ el paso
 
 &lt;binary content&gt;
 </code></pre>
-<h3 id="get-accountname-modelid-download-latest">GET /{accountName/{modelID}/download/latest</h3>
+<h3 id="get-teamspaces-teamspace-models-modelid-download-latest">GET /teamspaces/{teamspace}/models/{modelID}/download/latest</h3>
+
+<h3 id="get-teamspaces-teamspace-projects-project-models-modelname-download-latest">GET /teamspaces/{teamspace}/projects/{project}/models/{modelName}/download/latest</h3>
 
 <p>Download model of latest revision</p>
 
@@ -1979,18 +1969,20 @@ el paso
 <blockquote>
 <p>Example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">DELETE</span> <span class="nn">/repoman/00000000-0000-0000-0000-000000000000</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">DELETE</span> <span class="nn">/teamspaces/repoman/models/00000000-0000-0000-0000-000000000000</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre>
 <blockquote>
 <p>Example response</p>
 </blockquote>
 <pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
-    </span><span class="s2">"account"</span><span class="p">:</span><span class="w"> </span><span class="s2">"repoman"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"teamspace"</span><span class="p">:</span><span class="w"> </span><span class="s2">"repoman"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"model"</span><span class="p">:</span><span class="w"> </span><span class="s2">"00000000-0000-0000-0000-000000000000"</span><span class="w">
 </span><span class="p">}</span><span class="w">
 
 </span></code></pre>
-<h3 id="delete-accountname-modelid">DELETE /{accountName}/{modelID}</h3>
+<h3 id="delete-teamspaces-teamspace-models-modelid">DELETE /teamspaces/{teamspace}/models/{modelID}</h3>
+
+<h3 id="delete-teamspaces-teamspace-projects-project-models-modelname">DELETE /teamspaces/{teamspace}/projects/{project}/models/{modelName}</h3>
 
 <p>Delete a model.</p>
 
@@ -1999,7 +1991,7 @@ el paso
 <blockquote>
 <p>Example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/repoman/00000000-0000-0000-0000-000000000000/permissions</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/teamspaces/repoman/models/00000000-0000-0000-0000-000000000000/permissions</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre>
 <blockquote>
 <p>Example response</p>
@@ -2011,7 +2003,9 @@ el paso
     </span><span class="p">}</span><span class="w">
 </span><span class="p">]</span><span class="w">
 </span></code></pre>
-<h3 id="get-accountname-modelid-permissions">GET /{accountName}/{modelID}/permissions</h3>
+<h3 id="get-teamspaces-teamspace-models-modelid-permissions">GET /teamspaces/{teamspace}/models/{modelID}/permissions</h3>
+
+<h3 id="get-teamspaces-teamspace-projects-project-models-modelname-permissions">GET /teamspaces/{teamspace}/projects/{project}/models/{modelName}/permissions</h3>
 
 <p>Get list of permissions of this model assigned to users.</p>
 
@@ -2042,7 +2036,7 @@ el paso
 <blockquote>
 <p>Example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/repoman/00000000-0000-0000-0000-000000000000/permissions</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/teamspaces/repoman/models/00000000-0000-0000-0000-000000000000/permissions</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre><pre class="highlight json tab-json"><code><span class="p">[</span><span class="w">
     </span><span class="p">{</span><span class="w">
         </span><span class="s2">"user"</span><span class="p">:</span><span class="w"> </span><span class="s2">"breakingbad"</span><span class="p">,</span><span class="w">
@@ -2068,7 +2062,9 @@ el paso
     </span><span class="p">}</span><span class="w">
 </span><span class="p">]</span><span class="w">
 </span></code></pre>
-<h3 id="post-accountname-modelid-permissions">POST /{accountName}/{modelID}/permissions</h3>
+<h3 id="post-teamspaces-teamspace-models-modelid-permissions">POST /teamspaces/{teamspace}/models/{modelID}/permissions</h3>
+
+<h3 id="post-teamspaces-teamspace-projects-project-models-modelname-permissions">POST /teamspaces/{teamspace}/projects/{project}/models/{modelName}/permissions</h3>
 
 <p>Update permissions assigned users for this model.</p>
 
@@ -2084,26 +2080,30 @@ that particular model permission object.
 
 <h2 id="get-all-jobs">Get all jobs</h2>
 
-<h3 id="get-accountname-modelid-jobs-json">GET /{accountName}/{modelID}/jobs.json</h3>
+<h3 id="get-teamspaces-teamspace-models-modelid-jobs-json">GET /teamspaces/{teamspace}/models/{modelID}/jobs.json</h3>
 
-<p>Same as <a href="#get-all-jobs">Get all jobs</a> for an account.</p>
+<h3 id="get-teamspaces-teamspace-projects-project-models-modelname-jobs-json">GET /teamspaces/{teamspace}/projects/{project}/models/{modelName}/jobs.json</h3>
+
+<p>Same as <a href="#get-all-jobs">Get all jobs</a> for a teamspace.</p>
 
 <p>This API is created to get around the problem that some users may not
-have access to the <a href="#get-all-jobs">Get all jobs</a> for an account API.</p>
+have access to the <a href="#get-all-jobs">Get all jobs</a> for a teamspace API.</p>
 
 <h2 id="get-user-job">Get user job</h2>
 
 <blockquote>
 <p>Example request </p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/repoman/00000000-0000-0000-0000-000000000000/userJobForModel</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/teamspaces/repoman/models/00000000-0000-0000-0000-000000000000/userJobForModel</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 </code></pre>
 <blockquote>
 <p>Example response</p>
 </blockquote>
 <pre class="highlight json tab-json"><code><span class="p">{</span><span class="s2">"_id"</span><span class="p">:</span><span class="s2">"Actor"</span><span class="p">,</span><span class="w"> </span><span class="s2">"color"</span><span class="p">:</span><span class="w"> </span><span class="s2">"#000000"</span><span class="p">}</span><span class="w">
 </span></code></pre>
-<h3 id="get-accountname-modelid-userjobformodel-json">GET /{accountName}/{modelID}/userJobForModel.json</h3>
+<h3 id="get-teamspaces-teamspace-models-modelid-userjobformodel-json">GET /teamspaces/{teamspace}/models/{modelID}/userJobForModel.json</h3>
+
+<h3 id="get-teamspaces-teamspace-projects-project-models-modelname-userjobformodel-json">GET /teamspaces/{teamspace}/projects/{project}/models/{modelName}/userJobForModel.json</h3>
 
 <p>Get the job assigned to user for this team space</p>
 
@@ -2116,12 +2116,12 @@ have access to the <a href="#get-all-jobs">Get all jobs</a> for an account API.<
 <p>There are three levels of permissions</p>
 
 <ul>
-<li>Account (team space) level permissions</li>
+<li>Teamspace level permissions</li>
 <li>project level permissions</li>
 <li>model level permissions</li>
 </ul>
 
-<h2 id="account-level">Account level</h2>
+<h2 id="teamspace-level">Teamspace level</h2>
 
 <table><thead>
 <tr>

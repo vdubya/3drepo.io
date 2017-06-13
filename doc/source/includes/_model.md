@@ -5,7 +5,7 @@
 > Example request
 
 ```http
-GET /repoman/00000000-0000-0000-0000-000000000000.json HTTP/1.1
+GET /teamspaces/repoman/models/00000000-0000-0000-0000-000000000000.json HTTP/1.1
 ```
 
 > Example response
@@ -44,7 +44,8 @@ GET /repoman/00000000-0000-0000-0000-000000000000.json HTTP/1.1
 }
 ```
 
-### GET /{accountName}/{modelId}.json
+### GET /teamspaces/{teamspace}/models/{modelId}.json
+### GET /teamspaces/{teamspace}/projects/{project}/models/{modelName}.json
 
 Get model information
 
@@ -95,7 +96,7 @@ label |
 > Example request
 
 ```http
-PUT /repoman/00000000-0000-0000-0000-000000000000/settings HTTP/1.1
+PUT /teamspaces/repoman/models/00000000-0000-0000-0000-000000000000/settings HTTP/1.1
 ```
 ```json
 {
@@ -140,7 +141,8 @@ PUT /repoman/00000000-0000-0000-0000-000000000000/settings HTTP/1.1
 }
 ```
 
-### PUT /{accountName}/{modelId}/settings
+### PUT /teamspaces/{teamspace}/models/{modelId}/settings
+### PUT /teamspaces/{teamspace}/projects/{project}/models/{modelName}/settings
 
 Update model settings.
 
@@ -152,10 +154,11 @@ Request body
 > Example request
 
 ```http
-POST /repoman/model1 HTTP/1.1
+POST /teamspaces/repoman/models HTTP/1.1
 ```
 ```json
 {
+	"name": "model1",
 	"desc": "this is a model",
 	"type": "Structural",
 	"code": "00123",
@@ -173,7 +176,7 @@ POST /repoman/model1 HTTP/1.1
 
 ```json
 {
-    "account":"repoman",
+    "teamspace":"repoman",
     "model":"00000000-0000-0000-0000-000000000000",
     "name": "model1",
     "permissions":[
@@ -192,20 +195,15 @@ POST /repoman/model1 HTTP/1.1
 }
 ```
 
-### POST /{accountName}/{modelName} 
+### POST /teamspaces/{teamspace}/models
 
 Create a new model.
-
-URL parameters
-
-Parameter | Required | Description
---------- | ------- | -------
-modelName | Yes | the new model name
 
 Request body
 
 Attribute       | Required | Description
 --------------- | ---------| ----------------------------------------------------
+name | Yes | model name
 desc | No | description
 type | No | model type
 subModels | No | list of sub models, empty for non-federated model
@@ -219,7 +217,7 @@ project |  No | project this model belongs to
 > Example request
 
 ```http
-PUT /repoman/00000000-0000-0000-0000-000000000000 HTTP/1.1
+PUT /teamspaces/repoman/models/00000000-0000-0000-0000-000000000000 HTTP/1.1
 ```
 ```json
 { "subModels" : 
@@ -236,12 +234,13 @@ PUT /repoman/00000000-0000-0000-0000-000000000000 HTTP/1.1
 
 ```json
 {
-	"account": "repoman"
+	"teamspace": "repoman"
 	"model": "00000000-0000-0000-0000-000000000000"
 }
 ```
 
-### PUT /{accountName}/{modelID}
+### PUT /teamspaces/{teamspace}/models/{modelID}
+### PUT /teamspaces/{teamspace}/projects/{project}/models/{modelName}
 
 Update a model. This API is used to update sub models in a federated model only.
 
@@ -256,7 +255,7 @@ subModels | Yes | list of [sub model objects](#sub-model-object)
 ### Sub model object
 Attribute       | Description
 --------------- | --------------------------------------------------------
-database  | account name the model belongs to
+database  | teamspace name the model belongs to
 model   | model name
 
 ## Upload a model
@@ -264,7 +263,7 @@ model   | model name
 > Example request
 
 ```http
-POST /repoman/00000000-0000-0000-0000-000000000000/upload HTTP/1.1
+POST /teamspaces/repoman/models/00000000-0000-0000-0000-000000000000/upload HTTP/1.1
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundarySos0xligf1T8Sy8I
 
 ------WebKitFormBoundarySos0xligf1T8Sy8I
@@ -289,7 +288,8 @@ el paso
 {"status":"uploaded"}
 ```
 
-### POST /{accountName}/{modelID}/upload
+### POST /teamspaces/{teamspace}/models/{modelID}/upload
+### POST /teamspaces/{teamspace}/projects/{project}/models/{modelName}/upload
 
 Upload a model. Only multipart/form-data content type will be accepted.
 
@@ -307,7 +307,7 @@ desc | No | revision description
 > Example request
 
 ```http
-GET /repoman/00000000-0000-0000-0000-000000000000/download/latest HTTP/1.1
+GET /teamspaces/repoman/models/00000000-0000-0000-0000-000000000000/download/latest HTTP/1.1
 ```
 
 > Example response
@@ -321,7 +321,8 @@ Content-Type: binary/octet-stream
 <binary content>
 ```
 
-### GET /{accountName/{modelID}/download/latest
+### GET /teamspaces/{teamspace}/models/{modelID}/download/latest
+### GET /teamspaces/{teamspace}/projects/{project}/models/{modelName}/download/latest
 
 Download model of latest revision
 
@@ -330,20 +331,21 @@ Download model of latest revision
 > Example request
 
 ```http
-DELETE /repoman/00000000-0000-0000-0000-000000000000 HTTP/1.1
+DELETE /teamspaces/repoman/models/00000000-0000-0000-0000-000000000000 HTTP/1.1
 ```
 
 > Example response
 
 ```json
 {
-	"account": "repoman",
+	"teamspace": "repoman",
 	"model": "00000000-0000-0000-0000-000000000000"
 }
 
 ```
 
-### DELETE /{accountName}/{modelID}
+### DELETE /teamspaces/{teamspace}/models/{modelID}
+### DELETE /teamspaces/{teamspace}/projects/{project}/models/{modelName}
 
 Delete a model.
 
@@ -352,7 +354,7 @@ Delete a model.
 > Example request
 
 ```http
-GET /repoman/00000000-0000-0000-0000-000000000000/permissions HTTP/1.1
+GET /teamspaces/repoman/models/00000000-0000-0000-0000-000000000000/permissions HTTP/1.1
 ```
 
 > Example response
@@ -366,7 +368,8 @@ GET /repoman/00000000-0000-0000-0000-000000000000/permissions HTTP/1.1
 ]
 ```
 
-### GET /{accountName}/{modelID}/permissions
+### GET /teamspaces/{teamspace}/models/{modelID}/permissions
+### GET /teamspaces/{teamspace}/projects/{project}/models/{modelName}/permissions
 
 Get list of permissions of this model assigned to users.
 
@@ -385,7 +388,7 @@ permission      | ID of [a permission template](#permission-template)
 > Example request
 
 ```http
-POST /repoman/00000000-0000-0000-0000-000000000000/permissions HTTP/1.1
+POST /teamspaces/repoman/models/00000000-0000-0000-0000-000000000000/permissions HTTP/1.1
 ```
 ```json
 [
@@ -415,7 +418,8 @@ POST /repoman/00000000-0000-0000-0000-000000000000/permissions HTTP/1.1
 ]
 ```
 
-### POST /{accountName}/{modelID}/permissions
+### POST /teamspaces/{teamspace}/models/{modelID}/permissions
+### POST /teamspaces/{teamspace}/projects/{project}/models/{modelName}/permissions
 
 Update permissions assigned users for this model.
 
@@ -432,19 +436,20 @@ that particular model permission object.
 
 ## Get all jobs
 
-### GET /{accountName}/{modelID}/jobs.json
+### GET /teamspaces/{teamspace}/models/{modelID}/jobs.json
+### GET /teamspaces/{teamspace}/projects/{project}/models/{modelName}/jobs.json
 
-Same as [Get all jobs](#get-all-jobs) for an account.
+Same as [Get all jobs](#get-all-jobs) for a teamspace.
 
 This API is created to get around the problem that some users may not
-have access to the [Get all jobs](#get-all-jobs) for an account API.
+have access to the [Get all jobs](#get-all-jobs) for a teamspace API.
 
 ## Get user job
 
 > Example request 
 
 ```http
-GET /repoman/00000000-0000-0000-0000-000000000000/userJobForModel HTTP/1.1
+GET /teamspaces/repoman/models/00000000-0000-0000-0000-000000000000/userJobForModel HTTP/1.1
 ```
 
 >Example response
@@ -452,7 +457,8 @@ GET /repoman/00000000-0000-0000-0000-000000000000/userJobForModel HTTP/1.1
 ```json
 {"_id":"Actor", "color": "#000000"}
 ```
-### GET /{accountName}/{modelID}/userJobForModel.json
+### GET /teamspaces/{teamspace}/models/{modelID}/userJobForModel.json
+### GET /teamspaces/{teamspace}/projects/{project}/models/{modelName}/userJobForModel.json
 
 Get the job assigned to user for this team space
 

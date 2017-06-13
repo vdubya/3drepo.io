@@ -1,17 +1,17 @@
-# Account permission
+# Teamspace permission
 
-## Account permission object
+## Teamspace permission object
 Attribute          | Description
 ------------------ | ------- 
 user               | 
-permissions        | list of [account level permissions](#account-level)
+permissions        | list of [teamspace level permissions](#teamspace-level)
 
 ## Get permission
 
 > Example request
 
 ```http
-GET /repoman/permissions HTTP/1.1
+GET /teamspaces/repoman/permissions HTTP/1.1
 ```
 
 > Example response
@@ -25,9 +25,9 @@ GET /repoman/permissions HTTP/1.1
 ]
 ```
 
-### GET /{acconutName}/permissions
+### GET /teamspaces/{teamspace}/permissions
 
-Get a list of [account permission objects](#account-permission-object) on this account.
+Get a list of [teamspace permission objects](#teamspace-permission-object) on this teamspace.
 
 
 ## Assign permissions
@@ -35,7 +35,7 @@ Get a list of [account permission objects](#account-permission-object) on this a
 > Example request
 
 ```http
-POST /repoman/permissions HTTP/1.1
+POST /teamspaces/repoman/permissions HTTP/1.1
 ```
 
 
@@ -55,12 +55,12 @@ POST /repoman/permissions HTTP/1.1
 }]
 ```
 
-### POST /{accountName}/permissions
+### POST /teamspaces/{teamspace}/permissions
 
-Assign account level permission to a user.
+Assign teamspace level permission to a user.
 
 ### Request body
-[account permission object](#account-permission-object)
+[teamspace permission object](#teamspace-permission-object)
 
 
 ## Update permissions
@@ -68,7 +68,7 @@ Assign account level permission to a user.
 > Example request
 
 ```http
-PUT /repoman/permissions/breakingbad HTTP/1.1
+PUT /teamspaces/epoman/permissions/breakingbad HTTP/1.1
 ```
 ```json
 { "permissions": ["teamspace_admin"] }
@@ -80,7 +80,7 @@ PUT /repoman/permissions/breakingbad HTTP/1.1
 { "permissions": ["teamspace_admin"] }
 ```
 
-### PUT /{accountName}/permissions/{user}
+### PUT /teamspaces/{teamspace}/permissions/{user}
 
 Update permission assigment on a user
 
@@ -88,14 +88,14 @@ Request body
 
 Attribute          | Description
 ------------------ | ------- 
-permissions        | list of [account level permissions](#account-level)
+permissions        | list of [teamspace level permissions](#teamspace-level)
 
 ## Revoke permissions
 
 > Example request
 
 ```http
-DELETE /repoman/permissions/breakingbad HTTP/1.1
+DELETE /teamspaces/repoman/permissions/breakingbad HTTP/1.1
 ```
 
 > Example response
@@ -104,7 +104,7 @@ DELETE /repoman/permissions/breakingbad HTTP/1.1
 {}
 ```
 
-### DELETE /{accountName}/permissions/{user}
+### DELETE /teamspaces/{teamspace}/permissions/{user}
 
 Revoke all permissions from a user.
 

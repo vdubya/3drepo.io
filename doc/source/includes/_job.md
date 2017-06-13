@@ -12,7 +12,7 @@ color     | job color, RGB hex values
 > Example request
 
 ```http
-GET /repoman/jobs HTTP/1.1
+GET /teamspaces/repoman/jobs HTTP/1.1
 ```
 
 > Example response
@@ -30,16 +30,16 @@ GET /repoman/jobs HTTP/1.1
 ]
 ```
 
-### GET /{accountName}/jobs
+### GET /teamspaces/{teamspace}/jobs
 
-Get a list of [job objects](#job-object) belongs to this account.
+Get a list of [job objects](#job-object) belongs to this teamspace.
 
 ## Create a job
 
 > Example request
 
 ```http
-POST /repoman/jobs HTTP/1.1
+POST /teamspaces/repoman/jobs HTTP/1.1
 ```
 ```json
 {
@@ -59,9 +59,9 @@ POST /repoman/jobs HTTP/1.1
 ]
 ```
 
-### POST /{accountName}/jobs
+### POST /teamspaces/{teamspace}/jobs
 
-Create a job for this account
+Create a job for this teamspace
 
 Request body
 [Job object](#job-object)
@@ -71,7 +71,7 @@ Request body
 > Example request
 
 ```http
-DELETE /repoman/jobs/driver HTTP/1.1
+DELETE /teamspaces/repoman/jobs/driver HTTP/1.1
 ```
 > Example response
 
@@ -79,9 +79,9 @@ DELETE /repoman/jobs/driver HTTP/1.1
 {}
 ```
 
-### DELETE /{accountName}/jobs/{jobId}
+### DELETE /teamspaces/{teamspace}/jobs/{jobId}
 
-Delete a job from an account
+Delete a job from a teamspace
 
 ### URL parameters
 

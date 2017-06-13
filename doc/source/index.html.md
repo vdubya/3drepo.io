@@ -8,8 +8,8 @@ toc_footers:
 
 includes:
   - auth
-  - account
-  - accountPermission
+  - teamspace
+  - teamspacePermission
   - permissionTemplate
   - job
   - project

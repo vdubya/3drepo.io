@@ -2,11 +2,11 @@
 
 There are three levels of permissions
 
-* Account (team space) level permissions
+* Teamspace level permissions
 * project level permissions
 * model level permissions
 
-## Account level
+## Teamspace level
 
 Permission       | meaning
 -----------------|--------------- 

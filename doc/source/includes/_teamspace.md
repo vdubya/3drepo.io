@@ -1,15 +1,16 @@
-# Account
+# Teamspace
 
 ## Sign up
 > Example Request
 
 ```http
-POST /repoman HTTP/1.1
+POST /teamspaces HTTP/1.1
 ```
 
 
 ```json
 {
+	"name": "repoman",
 	"email": "repo-man@3drepo.org",
 	"password": "1984fantasy",
 	"firstName": "Otto",
@@ -27,25 +28,21 @@ POST /repoman HTTP/1.1
 
 ```json
 {
-	"username": "repoman"
+	"teamspace": "repoman"
 }
 ```
 
 
-### POST /{accountName}
+### POST /teamspaces
 
 Sign up a new account.
 
-### URL parameters
-
-Parameter | Required | Format
---------- | ------- | -------
-accountName | Yes | only alphabets and numbers and starts with an alphabet, less than 20 characters
 
 ### Request body
 
 Attribute | Required | Format
 --------- | ------- | -------
+name | Yes | only alphabets and numbers and starts with an alphabet, less than 20 characters
 password | Yes | 
 email | Yes | valid email address
 firstName | No
@@ -62,7 +59,7 @@ captcha | *Yes | Google reCAPTCHA response token
 > Example Request
 
 ```http
-POST /repoman/verify HTTP/1.1
+POST /teamspaces/repoman/verify HTTP/1.1
 ```
 ```json
 { "token": "1234567890" }
@@ -72,10 +69,10 @@ POST /repoman/verify HTTP/1.1
 > Example Response
 
 ```json
-{ "account": "repoman" }
+{ "teamspace": "repoman" }
 ```
 
-### POST /{accountName}/verify
+### POST /teamspaces/{teamspace}/verify
 
 Verify an account after signing up
 
@@ -90,16 +87,16 @@ token | Yes
 > Example Request
 
 ```http
-GET /repoman.json HTTP/1.1
+GET /teamspaces/repoman.json HTTP/1.1
 ```
 
 > Example Response
 
 ```json
 {
-	"accounts": [
+	"teamspaces": [
 		{
-			"account": "repoman",
+			"teamspace": "repoman",
 			"models": [
 				{
 					"permissions": [
@@ -134,7 +131,7 @@ GET /repoman.json HTTP/1.1
 			"projects": []
 		},
 		{
-			"account": "breakingbad",
+			"teamspace": "breakingbad",
 			"models": [
 				{
 					"permissions": [
@@ -234,30 +231,30 @@ GET /repoman.json HTTP/1.1
 }
 ```
 
-### GET /{accountName}.json
+### GET /teamspaces/{teamspace}.json
 
-Return account information and list of projects and models grouped by teamspace (account) this account have access to.
+Return teamspace information and list of projects and models grouped by teamspace this user have access to.
 
 ### Return body
 
 Attribute |  Format | Description
 --------- | ------- | ---------------
-accounts | | list of account object
+teamspaces | | list of teamspace object
 email | | 
 billingInfo ||
-hasAvatar | boolean | whether the account has an avatar
+hasAvatar | boolean | whether the teamspace has an avatar
 jobs | | list of [job objects](#job-object)
 
-### Account object
+### Teamspace object
 
 Attribute |  Format | Description
 --------- | ------- | ---------------
-account   | | account name
+teamspace   | | teamspace name
 models  | | list of [model objects](#model-object), listed here if they do not belongs to any project
 fedModels | | list of federated [model objects](#model-object), listed here if they do not belongs to any project
-projects | | list of [projects (folders) objects](#project-object-in-account-info)
-isAdmin `deprecated` | | is user an account admin of this account
-permissions | list of [account level permission](#account-level)  | list of permissions user has on this account
+projects | | list of [projects (folders) objects](#project-object-in-teamspace-info)
+isAdmin `deprecated` | | is user an teamspace admin of this teamspace
+permissions | list of [teamspace level permission](#teamspace-level)  | list of permissions user has in this teamspace
 firstName ||
 lastName ||
 quota | [quota object](#quota-object) | 
@@ -266,11 +263,11 @@ quota | [quota object](#quota-object) |
 
 Attribute           |  Description                  | Format
 ------------------- | ----------------------------- | ---------------
-spaceLimit          | account space limit           | integer, size in byte
-collaboratorLimit   | account collaborator limit    | integer, size in byte
-spaceUsed           | account space limit           | integer, size in byte
+spaceLimit          | teamspace space limit           | integer, size in byte
+collaboratorLimit   | teamspace collaborator limit    | integer, size in byte
+spaceUsed           | teamspace space limit           | integer, size in byte
 
-### Project Object (in account info)
+### Project Object (in teamspace info)
 Attribute           |  Description                  
 ------------------- | ----------------------------- 
 _id |
@@ -303,7 +300,7 @@ GET /repoman/avatar HTTP/1.1
 <binary image>
 ```
 
-### GET /{accountName}/avatar
+### GET /teamspaces/{teamspace}/avatar
 
 Return avatar if user has one.
 
@@ -313,7 +310,7 @@ Return avatar if user has one.
 > Example Request
 
 ```http
-POST /repoman/avatar HTTP/1.1
+POST /teamspaces/repoman/avatar HTTP/1.1
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryN8dwXAkcO1frCHLf
 
 ------WebKitFormBoundaryN8dwXAkcO1frCHLf
@@ -333,7 +330,7 @@ Content-Type: image/png
 }
 ```
 
-### POST /{accountName}/avatar
+### POST /teamspaces/{teamspace}/avatar
 
 Upload an image. Only multipart form data content type will be accepted.
 
@@ -344,12 +341,12 @@ Attribute           |  Description
 file             |  The image to be uploaded                          
 
 
-## Update account info
+## Update teamspace info
 
 > Example request
 
 ```http
-PUT /repoman HTTP/1.1
+PUT /teamspaces/repoman HTTP/1.1
 ```
 ```json
 {
@@ -363,13 +360,13 @@ PUT /repoman HTTP/1.1
 
 ```json
 {
-	"account":"repoman"
+	"teamspace":"repoman"
 }
 ```
 
-### PUT /{accountName}
+### PUT /teamspace/{teamspace}
 
-Update account information.
+Update teamspace information.
 
 ### Request body
 
@@ -385,7 +382,7 @@ lastName | No
 > Example request
 
 ```http
-PUT /repoman HTTP/1.1
+PUT /teamspaces/repoman HTTP/1.1
 ```
 ```json
 {
@@ -400,11 +397,11 @@ PUT /repoman HTTP/1.1
 
 ```json
 {
-	"account":"repoman"
+	"teamspace":"repoman"
 }
 ```
 
-### PUT /{accountName}
+### PUT /teamspaces/{teamspace}
 
 Reset password. New password must be different.
 
@@ -417,7 +414,7 @@ newPassword | Yes
 
 
 
-### PUT /{accountName}/password
+### PUT /teamspaces/{teamspace}/password
 
 Reset password by token.
 
@@ -432,7 +429,7 @@ newPassword | Yes
 > Example Request
 
 ```http
-POST /repoman/forgot-password HTTP/1.1
+POST /teamspaces/repoman/forgot-password HTTP/1.1
 ```
 ```json
 	{ "email": "repoman@3drepo.org"}
@@ -444,11 +441,11 @@ POST /repoman/forgot-password HTTP/1.1
 {}
 ```
 
-### POST /{accountName}/forgot-password
+### POST /teamspaces/{teamspace}/forgot-password
 
 ### Request body
 
-Send a reset password link to account's email.
+Send a reset password link to user's email.
 
 Attribute | Required 
 --------- | ------- 

@@ -174,7 +174,7 @@ function createAndAssignRole(modelName, account, username, data) {
 	}).then(setting => {
 
 		let modelData = {
-			account,
+			teamspace: account,
 			model:  model.toString(),
 			name: modelName,
 			permissions: C.MODEL_PERM_LIST

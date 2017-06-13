@@ -253,7 +253,7 @@ schema.statics.createUser = function(logger, username, password, customData, tok
 	}
 
 
-	if(!this.usernameRegExp.test(username)){
+	if(!username || !this.usernameRegExp.test(username)){
 		return Promise.reject({ resCode: responseCodes.INVALID_USERNAME});
 	}
 

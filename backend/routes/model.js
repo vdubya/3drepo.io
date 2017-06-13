@@ -228,7 +228,7 @@ function updateModel(req, res, next){
 	}
 
 	promise.then(() => {
-		responseCodes.respond(responsePlace, req, res, next, responseCodes.OK, { account, model });
+		responseCodes.respond(responsePlace, req, res, next, responseCodes.OK, { teamspace: account, model });
 	}).catch( err => {
 		responseCodes.respond(responsePlace, req, res, next, err.resCode || utils.mongoErrorToResCode(err), err.resCode ? {} : err);
 	});
@@ -243,7 +243,7 @@ function deleteModel(req, res, next){
 
 	//delete
 	ModelHelpers.removeModel(account, model).then(() => {
-		responseCodes.respond(responsePlace, req, res, next, responseCodes.OK, { account, model });
+		responseCodes.respond(responsePlace, req, res, next, responseCodes.OK, { teamspace: account, model });
 	}).catch( err => {
 		responseCodes.respond(responsePlace, req, res, next, err.resCode || err, err.resCode ? {} : err);
 	});
