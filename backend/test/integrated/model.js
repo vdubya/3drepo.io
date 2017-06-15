@@ -103,10 +103,10 @@ describe('Model', function () {
 				agent.get(`/teamspaces/${username}.json`)
 				.expect(200, function(err, res){
 
-					const account = res.body.teamspaces.find(account => account.teamspace === username);
-					expect(account).to.exist;
+					const teamspace = res.body.teamspaces.find(teamspace => teamspace.teamspace === username);
+					expect(teamspace).to.exist;
 
-					const pg = account.projects.find(pg => pg.name === project);
+					const pg = teamspace.projects.find(pg => pg.name === project);
 					expect(pg).to.exist;
 
 					const myModel = pg.models.find(_model => _model.model === modelId);
@@ -125,13 +125,13 @@ describe('Model', function () {
 		agent.get(`/teamspaces/${username}.json`)
 		.expect(200, function(err, res){
 
-			const account = res.body.teamspaces.find(account => account.teamspace === username);
-			expect(account).to.exist;
+			const teamspace = res.body.teamspaces.find(teamspace => teamspace.teamspace === username);
+			expect(teamspace).to.exist;
 
-			let myModel = account.models.find(_model => _model.model === modelId);
+			let myModel = teamspace.models.find(_model => _model.model === modelId);
 			expect(myModel).to.not.exist;
 
-			myModel = account.fedModels.find(_model => _model.model === modelId);
+			myModel = teamspace.fedModels.find(_model => _model.model === modelId);
 			expect(myModel).to.not.exist;
 
 			done(err);
@@ -395,7 +395,7 @@ describe('Model', function () {
 		// });
 
 		it('should remove setting in settings collection', function() {
-			return ModelSetting.findById({account: username, model: model}, model).then(setting => {
+			return ModelSetting.findById({teamspace: username, model: model}, model).then(setting => {
 				expect(setting).to.be.null;
 			});
 		});
@@ -417,10 +417,10 @@ describe('Model', function () {
 				callback => {
 					agent2.get(`/teamspaces/testing.json`).expect(200, function(err, res){
 						
-						const account = res.body.teamspaces.find(account => account.teamspace === username);
-						expect(account).to.not.exist;
+						const teamspace = res.body.teamspaces.find(teamspace => teamspace.teamspace === username);
+						expect(teamspace).to.not.exist;
 
-						// const mm = account.models.find(m => m.model === model);
+						// const mm = teamspace.models.find(m => m.model === model);
 						// expect(mm).to.not.exist;
 
 						callback(err);
@@ -434,10 +434,10 @@ describe('Model', function () {
 		it('should be removed from model group', function(done){
 			agent.get(`/teamspaces/${username}.json`).expect(200, function(err, res){
 				
-				const account = res.body.teamspaces.find(account => account.teamspace === username);
-				expect(account).to.exist;
+				const teamspace = res.body.teamspaces.find(teamspace => teamspace.teamspace === username);
+				expect(teamspace).to.exist;
 
-				const pg = account.projects.find(pg => pg.name === 'project1');
+				const pg = teamspace.projects.find(pg => pg.name === 'project1');
 				expect(pg).to.exist;
 
 				const myModel = pg.models.find(_model => _model.model === 'sample_project');

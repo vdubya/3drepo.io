@@ -68,7 +68,7 @@
 	//role templates for model
 	let modelRoleTemplateLists = [C.COLLABORATOR_TEMPLATE, C.COMMENTER_TEMPLATE, C.VIEWER_TEMPLATE];
 
-	let createRoleFromTemplate = function (account, model, template, roleName) {
+	let createRoleFromTemplate = function (teamspace, model, template, roleName) {
 		if (!(template in roleTemplates)) {
 			return Promise.reject(responseCodes.INVALID_ROLE_TEMPLATE);
 		}
@@ -82,7 +82,7 @@
 			createRoleCmd = {
 				'createRole' : roleName,
 				'privileges': [],
-				roles: [{ role: 'readWrite', db: account}]
+				roles: [{ role: 'readWrite', db: teamspace}]
 			};
 
 		} else {
@@ -135,7 +135,7 @@
 
 				privileges.push({
 					"resource": {
-						"db": account,
+						"db": teamspace,
 						"collection": `${model}.${coll}`
 					},
 					"actions": dbPermissions[coll]
@@ -146,9 +146,9 @@
 			createRoleCmd.roles = [];
 		}
 
-		return ModelFactory.db.db(account)
+		return ModelFactory.db.db(teamspace)
 			.command(createRoleCmd).then(() => {
-				return { role: roleName, db: account};
+				return { role: roleName, db: teamspace};
 			});
 	};
 

@@ -78,7 +78,7 @@ module.exports.createApp = function (server, serverConfig){
 		//consume event queue and fire msg to clients if they have subscribed related event
 		queue.consumeEventMessage(msg => {
 
-			if(msg.event && msg.account){
+			if(msg.event && msg.teamspace){
 				//it is to avoid emitter getting its own message
 				let emitter = userToSocket[msg.emitter] && userToSocket[msg.emitter].broadcast || io;
 				
@@ -91,8 +91,8 @@ module.exports.createApp = function (server, serverConfig){
 					});
 				}
 
-				let eventName = `${msg.account}${modelNameSpace}${extraPrefix}::${msg.event}`;
-				emitter.to(`${msg.account}${modelNameSpace}`).emit(eventName, msg.data);
+				let eventName = `${msg.teamspace}${modelNameSpace}${extraPrefix}::${msg.event}`;
+				emitter.to(`${msg.teamspace}${modelNameSpace}`).emit(eventName, msg.data);
 			}
 		});
 
@@ -122,28 +122,28 @@ module.exports.createApp = function (server, serverConfig){
 
 			socket.on('join', data => {
 				//check permission if the user have permission to join room
-				let auth = data.model ? middlewares.hasReadAccessToModelHelper : middlewares.isAccountAdminHelper;
+				let auth = data.model ? middlewares.hasReadAccessToModelHelper : middlewares.isTeamspaceAdminHelper;
 				
-				auth(username, data.account, data.model).then(hasAccess => {
+				auth(username, data.teamspace, data.model).then(hasAccess => {
 
 					let modelNameSpace = data.model ?  `::${data.model}` : '';
 
 					if(hasAccess){
 
-						socket.join(`${data.account}${modelNameSpace}`);
-						socket.emit(joinedEventName, { account: data.account, model: data.model});
+						socket.join(`${data.teamspace}${modelNameSpace}`);
+						socket.emit(joinedEventName, { teamspace: data.teamspace, model: data.model});
 
-						systemLogger.logInfo(`${username} - ${sessionId} - ${socket.client.id} has joined room ${data.account}${modelNameSpace}`, { 
+						systemLogger.logInfo(`${username} - ${sessionId} - ${socket.client.id} has joined room ${data.teamspace}${modelNameSpace}`, { 
 							username, 
-							account: data.account, 
+							teamspace: data.teamspace, 
 							model: data.model 
 						});
 						
 					} else {
-						socket.emit(credentialErrorEventName, { message: `You have no access to join room ${data.account}${modelNameSpace}`});
-						systemLogger.logError(`${username} - ${sessionId} - ${socket.client.id} has no access to join room ${data.account}${modelNameSpace}`, { 
+						socket.emit(credentialErrorEventName, { message: `You have no access to join room ${data.teamspace}${modelNameSpace}`});
+						systemLogger.logError(`${username} - ${sessionId} - ${socket.client.id} has no access to join room ${data.teamspace}${modelNameSpace}`, { 
 							username, 
-							account: data.account, 
+							teamspace: data.teamspace, 
 							model: data.model
 						});
 					}
@@ -155,10 +155,10 @@ module.exports.createApp = function (server, serverConfig){
 
 				let modelNameSpace = data.model ?  `::${data.model}` : '';
 
-				socket.leave(`${data.account}${modelNameSpace}`);
-				systemLogger.logInfo(`${username} - ${sessionId} - ${socket.client.id} has left room ${data.account}${modelNameSpace}`, { 
+				socket.leave(`${data.teamspace}${modelNameSpace}`);
+				systemLogger.logInfo(`${username} - ${sessionId} - ${socket.client.id} has left room ${data.teamspace}${modelNameSpace}`, { 
 					username, 
-					account: data.account, 
+					teamspace: data.teamspace, 
 					model: data.model 
 				});
 			});

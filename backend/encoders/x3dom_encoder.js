@@ -268,11 +268,11 @@ function matVecMult(mat, vec)
  * @param {JSON} node - The node loaded from repoGraphScene
  * @param {Matrix} matrix - Current transformation matrix
  * @param {Array} globalCoordOffset - New origin for federated models
- * @param {string} account - Name of the account containing the project
- * @param {string} project - Name of the project
+ * @param {string} teamspace - Name of the teamspace containing the model
+ * @param {string} model - Name of the model
  * @param {string} mode - Type of X3D being rendered
  *******************************************************************************/
-function X3D_AddChildren(xmlDoc, xmlNode, node, matrix, globalCoordOffset, globalCoordPromise, account, project, mode, logger)
+function X3D_AddChildren(xmlDoc, xmlNode, node, matrix, globalCoordOffset, globalCoordPromise, teamspace, model, mode, logger)
 {
 	if (!node.hasOwnProperty("children")) {
 		return globalCoordOffset;
@@ -289,7 +289,7 @@ function X3D_AddChildren(xmlDoc, xmlNode, node, matrix, globalCoordOffset, globa
 
 		if (child.type === "ref")
 		{
-			var childRefAccount = child.hasOwnProperty("owner") ? child.owner : account;
+			var childRefTeamspace = child.hasOwnProperty("owner") ? child.owner : teamspace;
 
 			if (!globalCoordOffset)
 			{
@@ -306,9 +306,9 @@ function X3D_AddChildren(xmlDoc, xmlNode, node, matrix, globalCoordOffset, globa
 				var url_str = child.project + "." + mode + ".x3d";
 
 				if (child.hasOwnProperty("revision")) {
-					url_str = config.api_server.url + "/" + childRefAccount + "/" + child.project + "/revision/" + child.revision + ".x3d." + mode;
+					url_str = config.api_server.url + "/teamspaces/" + childRefTeamspace + "/models/" + child.project + "/revision/" + child.revision + ".x3d." + mode;
 				} else {
-					url_str = config.api_server.url + "/" + childRefAccount + "/" + child.project + "/revision/master/head.x3d." + mode;
+					url_str = config.api_server.url + "/teamspaces/" + childRefTeamspace + "/models/" + child.project + "/revision/master/head.x3d." + mode;
 				}
 
 				inlineNode.setAttribute("onload", "onLoaded(event);");
@@ -316,7 +316,7 @@ function X3D_AddChildren(xmlDoc, xmlNode, node, matrix, globalCoordOffset, globa
 				inlineNode.setAttribute("url", url_str);
 				inlineNode.setAttribute("id", child.id);
 				inlineNode.setAttribute("DEF", utils.uuidToString(child.shared_id));
-				inlineNode.setAttribute("nameSpaceName", account + "__" + child.project);
+				inlineNode.setAttribute("nameSpaceName", teamspace + "__" + child.project);
 
 				if (child.hasOwnProperty("bounding_box"))
 				{
@@ -329,13 +329,13 @@ function X3D_AddChildren(xmlDoc, xmlNode, node, matrix, globalCoordOffset, globa
 
 				var groupNode = xmlDoc.createElement("Group");
 				groupNode.setAttribute("onload", "onLoaded(event);");
-				groupNode.setAttribute("id", account + "__"+child.project);
+				groupNode.setAttribute("id", teamspace + "__"+child.project);
 				groupNode.appendChild(federateTransformNode);
 				xmlNode.appendChild(groupNode);
 
 				var childGlobalCoordPromise = deferred();
 
-				X3D_AddChildren(xmlDoc, inlineNode, child, matrix, null, childGlobalCoordPromise, account, project, mode, logger);
+				X3D_AddChildren(xmlDoc, inlineNode, child, matrix, null, childGlobalCoordPromise, teamspace, model, mode, logger);
 			});
 		}
 		else if (child.type == "camera")
@@ -402,7 +402,7 @@ function X3D_AddChildren(xmlDoc, xmlNode, node, matrix, globalCoordOffset, globa
 			newNode.setAttribute("orientation", orientation.join(' '));
 
 			xmlNode.appendChild(newNode);
-			globalCoordOffset = X3D_AddChildren(xmlDoc, newNode, child, matrix, globalCoordOffset, globalCoordPromise, account, project, mode, logger);
+			globalCoordOffset = X3D_AddChildren(xmlDoc, newNode, child, matrix, globalCoordOffset, globalCoordPromise, teamspace, model, mode, logger);
 		}
 		else if (child.type == "transformation")
 		{
@@ -436,7 +436,7 @@ function X3D_AddChildren(xmlDoc, xmlNode, node, matrix, globalCoordOffset, globa
 
 
 			var hadOffset = !globalCoordOffset;
-			globalCoordOffset = X3D_AddChildren(xmlDoc, newNode, child, newMatrix, globalCoordOffset, globalCoordPromise, account, project, mode, logger);
+			globalCoordOffset = X3D_AddChildren(xmlDoc, newNode, child, newMatrix, globalCoordOffset, globalCoordPromise, teamspace, model, mode, logger);
 
 			if(!hadOffset && globalCoordOffset)
 			{
@@ -507,10 +507,10 @@ function X3D_AddChildren(xmlDoc, xmlNode, node, matrix, globalCoordOffset, globa
 				newNode.setAttribute('DEF', utils.uuidToString(child["shared_id"]));
 				appearance.appendChild(newNode);
 				xmlNode.appendChild(appearance);
-				globalCoordOffset = X3D_AddChildren(xmlDoc, appearance, child, matrix, globalCoordOffset, globalCoordPromise, account, project, mode, logger);
+				globalCoordOffset = X3D_AddChildren(xmlDoc, appearance, child, matrix, globalCoordOffset, globalCoordPromise, teamspace, model, mode, logger);
 		} else if (child['type'] == 'texture') {
 			newNode = xmlDoc.createElement('ImageTexture');
-			newNode.setAttribute('url', config.api_server.url + '/' + account + '/' + project + '/' + child['id'] + '.' + child['extension']);
+			newNode.setAttribute('url', config.api_server.url + '/teamspaces/' + teamspace + '/models/' + model + '/' + child['id'] + '.' + child['extension']);
 			newNode.textContent = ' ';
 			newNode.setAttribute("id", child['id']);
 			newNode.setAttribute('DEF', utils.uuidToString(child["shared_id"]));
@@ -521,7 +521,7 @@ function X3D_AddChildren(xmlDoc, xmlNode, node, matrix, globalCoordOffset, globa
 			texProperties.setAttribute('generateMipMaps', 'true');
 			newNode.appendChild(texProperties);
 
-			globalCoordOffset = X3D_AddChildren(xmlDoc, newNode, child, matrix, globalCoordOffset, globalCoordPromise, account, project, mode, logger);
+			globalCoordOffset = X3D_AddChildren(xmlDoc, newNode, child, matrix, globalCoordOffset, globalCoordPromise, teamspace, model, mode, logger);
 		} else if (child['type'] == 'map') {
 			if(!child['maptype'])
 				child['maptype'] = 'satellite';
@@ -560,8 +560,8 @@ function X3D_AddChildren(xmlDoc, xmlNode, node, matrix, globalCoordOffset, globa
 				mp.setAttribute('onmousemove', 'onMouseMove(event);');
 				mp.setAttribute('onmouseover', 'onMouseOver(event);');
 				mp.setAttribute('id', child['id']);
-				mp.setAttribute('url', config.api_server.url + '/' + account + '/' + project + '/' + child['id'] + '.x3d.mpc');
-				mp.setAttribute('urlIDMap', config.api_server.url + '/' + account + '/' + project + '/' + child['id'] + '.json.mpc');
+				mp.setAttribute('url', config.api_server.url + '/teamspaces/' + teamspace + '/models/' + model + '/' + child['id'] + '.x3d.mpc');
+				mp.setAttribute('urlIDMap', config.api_server.url + '/teamspaces/' + teamspace + '/models/' + model + '/' + child['id'] + '.json.mpc');
 				mp.setAttribute('solid', 'true');
 				mp.setAttribute('nameSpaceName', child['id']);
 
@@ -591,9 +591,9 @@ function X3D_AddChildren(xmlDoc, xmlNode, node, matrix, globalCoordOffset, globa
 						shape.setAttribute('bboxSize', bbox.size);
 					}
 
-					globalCoordOffset = X3D_AddChildren(xmlDoc, shape, child, matrix, globalCoordOffset, globalCoordPromise, account, project, mode, logger);
+					globalCoordOffset = X3D_AddChildren(xmlDoc, shape, child, matrix, globalCoordOffset, globalCoordPromise, teamspace, model, mode, logger);
 
-					X3D_AddToShape(xmlDoc, shape, account, project, child, subMeshKeys[i],mode, logger);
+					X3D_AddToShape(xmlDoc, shape, teamspace, model, child, subMeshKeys[i],mode, logger);
 
 					xmlNode.appendChild(shape);
 				}
@@ -611,13 +611,13 @@ function X3D_AddChildren(xmlDoc, xmlNode, node, matrix, globalCoordOffset, globa
  * @param {xmlNode} shape - The shape node to append the children to
  * @param {JSON} node - The node loaded from repoGraphScene
  * @param {dbInterface} dbInterface - Database interface object
- * @param {string} account - Name of the account containing the project
- * @param {string} project - Name of the project
+ * @param {string} teamspace - Name of the teamspace containing the model
+ * @param {string} model - Name of the model
  * @param {RepoNodeMesh} mesh - Mesh to render
  * @param {integer} subMeshID - sub mesh ID to render
  * @param {string} mode - Type of X3D being rendered
  *******************************************************************************/
-function X3D_AddToShape(xmlDoc, shape, account, project, mesh, subMeshID, mode, logger) {
+function X3D_AddToShape(xmlDoc, shape, teamspace, model, mesh, subMeshID, mode, logger) {
 	var meshId = mesh['id'];
 	var mat = getChild(mesh, 'material')
 
@@ -691,7 +691,7 @@ function X3D_AddToShape(xmlDoc, shape, account, project, mesh, subMeshID, mode, 
 				}
 			}
 
-			externalGeometry.setAttribute('url', config.api_server.url + '/' + account + '/' + project + '/' + meshId + '.src' + suffix);
+			externalGeometry.setAttribute('url', config.api_server.url + '/teamspaces/' + teamspace + '/models/' + model + '/' + meshId + '.src' + suffix);
 
 			shape.appendChild(externalGeometry);
 			break;
@@ -701,14 +701,14 @@ function X3D_AddToShape(xmlDoc, shape, account, project, mesh, subMeshID, mode, 
 
 			var binaryGeometry = xmlDoc.createElement('binaryGeometry');
 
-			binaryGeometry.setAttribute('normal', config.api_server.url + '/' + account + '/' + project + '/' + meshId + '.bin?mode=normals');
+			binaryGeometry.setAttribute('normal', config.api_server.url + '/teamspaces/' + teamspace + '/models/' + model + '/' + meshId + '.bin?mode=normals');
 
 			if ('children' in mat) {
-				binaryGeometry.setAttribute('texCoord', config.api_server.url + '/' + account + '/' + project + '/' + meshId + '.bin?mode=texcoords');
+				binaryGeometry.setAttribute('texCoord', config.api_server.url + '/teamspaces/' + teamspace + '/models/' + model + '/' + meshId + '.bin?mode=texcoords');
 			}
 
-			binaryGeometry.setAttribute('index', config.api_server.url + '/' + account + '/' + project + '/' + meshId + '.bin?mode=indices');
-			binaryGeometry.setAttribute('coord', config.api_server.url + '/' + account + '/' + project + '/' + meshId + '.bin?mode=coords');
+			binaryGeometry.setAttribute('index', config.api_server.url + '/teamspaces/' + teamspace + '/models/' + model + '/' + meshId + '.bin?mode=indices');
+			binaryGeometry.setAttribute('coord', config.api_server.url + '/teamspaces/' + teamspace + '/models/' + model + '/' + meshId + '.bin?mode=coords');
 			//binaryGeometry.setAttribute('vertexCount', mesh.vertices_count);
 			binaryGeometry.textContent = ' ';
 
@@ -718,7 +718,7 @@ function X3D_AddToShape(xmlDoc, shape, account, project, mesh, subMeshID, mode, 
 
 		case "pbf":
 			var popGeometry = xmlDoc.createElement('PopGeometry');
-			popCache.getPopCache(dbInterface, project, false, null, mesh['id'], function(err, cacheObj) {
+			popCache.getPopCache(dbInterface, model, false, null, mesh['id'], function(err, cacheObj) {
 				if (mesh['id'] in GLOBAL.pbfCache) {
 					var cacheMesh = GLOBAL.pbfCache[mesh['id']];
 
@@ -748,7 +748,7 @@ function X3D_AddToShape(xmlDoc, shape, account, project, mesh, subMeshID, mode, 
 					for (var lvl = 0; lvl < cacheMesh.num_levels; lvl++) {
 						var popGeometryLevel = xmlDoc.createElement('PopGeometryLevel');
 
-						popGeometryLevel.setAttribute('src', config.api_server.url + '/' + account + '/' + project + '/' + meshId + '.pbf?level=' + lvl);
+						popGeometryLevel.setAttribute('src', config.api_server.url + '/teamspaces/' + teamspace + '/models/' + model + '/' + meshId + '.pbf?level=' + lvl);
 						popGeometryLevel.setAttribute('numIndices', cacheMesh[lvl].numIdx);
 						popGeometryLevel.setAttribute('vertexDataBufferOffset', cacheMesh[lvl].numVertices);
 
@@ -839,11 +839,11 @@ function X3D_AddMeasurer(xmlDoc) {
  *
  * @param {xmlDom} xmlDoc - The XML document to create the viewpoint
  * @param {Object} root - The root group element
- * @param {String} account - contains the account name
- * @param {String} project - contains the project name
+ * @param {String} teamspace - contains the teamspace name
+ * @param {String} model - contains the model name
  * @param {JSON} bbox - Bounding used to compute the position of the viewpoint
  *******************************************************************************/
-function X3D_AddViewpoint(xmlDoc, root, account, project, bbox)
+function X3D_AddViewpoint(xmlDoc, root, teamspace, model, bbox)
 {
 	var vpos = [0,0,0];
 
@@ -860,7 +860,7 @@ function X3D_AddViewpoint(xmlDoc, root, account, project, bbox)
 	vpos[2] += bbox.size[2] * 0.5 + max_dim / Math.tan(0.5 * fov);
 
 	var vpoint = xmlDoc.createElement('Viewpoint');
-	vpoint.setAttribute('id', account + '_' + project + '_' + 'origin');
+	vpoint.setAttribute('id', teamspace + '_' + model + '_' + 'origin');
 	vpoint.setAttribute('position', vpos.join(' '));
 	vpoint.setAttribute('centerOfRotation', bbox.center.join(' '));
 
@@ -915,7 +915,7 @@ function X3D_AddGroundPlane(xmlDoc, bbox)
 	scene.appendChild(flipMat);
 }
 
-exports.render = function (account, project, doc, logger){
+exports.render = function (teamspace, model, doc, logger){
 
 	var xmlDoc = X3D_Header();
 
@@ -937,7 +937,7 @@ exports.render = function (account, project, doc, logger){
 	var dbInterface = {};
 
 	var groupNode = xmlDoc.createElement("Group");
-	groupNode.setAttribute("id", account + "__" + project);
+	groupNode.setAttribute("id", teamspace + "__" + model);
 	groupNode.setAttribute('onload', 'onLoaded(event);');
 	var projOffset = null;
 	projOffset = doc.mRootNode.coordOffset;
@@ -952,7 +952,7 @@ exports.render = function (account, project, doc, logger){
       	var offsetTransform2 = xmlDoc.createElement("Transform");
         offsetTransform2.setAttribute("translation", projOffset.join(" "));
 
-   	   	globalCoordOffset = X3D_AddChildren(xmlDoc, offsetTransform2, dummyRoot, mat, globalCoordOffset, globalCoordPromise, account, project, 'mp', logger);
+   	   	globalCoordOffset = X3D_AddChildren(xmlDoc, offsetTransform2, dummyRoot, mat, globalCoordOffset, globalCoordPromise, teamspace, model, 'mp', logger);
    		groupNode.appendChild(offsetTransform2);
 		offsetTransform.appendChild(groupNode);
 		sceneRoot.root.appendChild(offsetTransform);
@@ -960,7 +960,7 @@ exports.render = function (account, project, doc, logger){
 	}
 	else
 	{
-    	globalCoordOffset = X3D_AddChildren(xmlDoc, groupNode, dummyRoot, mat, globalCoordOffset, globalCoordPromise, account, project, 'mp', logger);
+    	globalCoordOffset = X3D_AddChildren(xmlDoc, groupNode, dummyRoot, mat, globalCoordOffset, globalCoordPromise, teamspace, model, 'mp', logger);
 
 		//A scene with offset should never have a reference node, hence there shoudln't be a global offset otherwise
 		if (globalCoordOffset) {
@@ -981,13 +981,13 @@ exports.render = function (account, project, doc, logger){
 
 	var bbox = repoNodeMesh.extractBoundingBox(doc.mRootNode);
 
-	X3D_AddViewpoint(xmlDoc, sceneRoot.scene, account, project, bbox);
+	X3D_AddViewpoint(xmlDoc, sceneRoot.scene, teamspace, model, bbox);
 
 	return new xmlSerial().serializeToString(xmlDoc);
 
 }
 
-exports.generateMPC = function(account, project, uid, objs){
+exports.generateMPC = function(teamspace, model, uid, objs){
 
 	function addMeshToBoundingBox(bbox, currentMeshBBox)
 	{
@@ -1130,9 +1130,9 @@ exports.generateMPC = function(account, project, uid, objs){
 	
 		if (maxSubMeshIDX > 1)
 		{
-			eg.setAttribute('url', config.api_server.url + '/' + account + '/' + project + '/' + uid + '.src.mpc#' + subMeshName);
+			eg.setAttribute('url', config.api_server.url + '/teamspaces/' + teamspace + '/models/' + model + '/' + uid + '.src.mpc#' + subMeshName);
 		} else {
-			eg.setAttribute('url', config.api_server.url + '/' + account + '/' + project + '/' + uid + '.src.mpc');
+			eg.setAttribute('url', config.api_server.url + '/teamspaces/' + teamspace + '/models/' + model + '/' + uid + '.src.mpc');
 		}
 
 		eg.textContent = ' ';
@@ -1143,10 +1143,5 @@ exports.generateMPC = function(account, project, uid, objs){
 	}
 
 	return new xmlSerial().serializeToString(xmlDoc);
-
-}
-
-exports.route = function(router)
-{
 
 }

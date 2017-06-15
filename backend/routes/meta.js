@@ -31,7 +31,7 @@
 
 	function getMetadata(req, res, next){
 
-		ModelHelpers.getMetadata(req.params.account, req.params.model, req.params.id).then(meta => {
+		ModelHelpers.getMetadata(req.params.teamspace, req.params.model, req.params.id).then(meta => {
 
 			responseCodes.respond(utils.APIInfo(req), req, res, next, responseCodes.OK, {meta: [meta]});
 		}).catch(err => {

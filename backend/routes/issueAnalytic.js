@@ -33,7 +33,7 @@
 		const sort = parseInt(req.query.sort) || -1;
 		
 		IssueAnalytic.groupBy(
-			req.params.account, 
+			req.params.teamspace, 
 			req.params.model, 
 			req.query.groupBy, 
 			req.query.secGroupBy, 

@@ -26,18 +26,18 @@
 	const config = require("../config");
 	const utils = require("../utils");
 
-	router.get("/subscriptions", middlewares.isAccountAdmin, listSubscriptions);
-	router.post("/subscriptions", middlewares.isAccountAdmin, createSubscription);
-	router.post("/subscriptions/:sid/assign", middlewares.isAccountAdmin, assignSubscription);
-	router.put("/subscriptions/:sid/assign", middlewares.isAccountAdmin, updateAssignDetail);
-	router.delete("/subscriptions/:sid/assign", middlewares.isAccountAdmin, removeAssignedSubscription);
+	router.get("/subscriptions", middlewares.isTeamspaceAdmin, listSubscriptions);
+	router.post("/subscriptions", middlewares.isTeamspaceAdmin, createSubscription);
+	router.post("/subscriptions/:sid/assign", middlewares.isTeamspaceAdmin, assignSubscription);
+	router.put("/subscriptions/:sid/assign", middlewares.isTeamspaceAdmin, updateAssignDetail);
+	router.delete("/subscriptions/:sid/assign", middlewares.isTeamspaceAdmin, removeAssignedSubscription);
 
 	function createSubscription(req, res, next) {
 
 		let responsePlace = utils.APIInfo(req);
 		let dbUser;
 
-		User.findByUserName(req.params.account)
+		User.findByUserName(req.params.teamspace)
 			.then(_dbUser => {
 
 				dbUser = _dbUser;
@@ -65,7 +65,7 @@
 	function listSubscriptions(req, res, next) {
 
 		let responsePlace = utils.APIInfo(req);
-		User.findByUserName(req.params.account)
+		User.findByUserName(req.params.teamspace)
 			.then(user => {
 				let subscriptions = user.customData.billing.subscriptions.getActiveSubscriptions({ skipBasic: true});
 
@@ -79,7 +79,7 @@
 	function assignSubscription(req, res, next) {
 
 		let responsePlace = utils.APIInfo(req);
-		User.findByUserName(req.params.account)
+		User.findByUserName(req.params.teamspace)
 			.then(dbUser => {
 
 				let userData = {};
@@ -110,7 +110,7 @@
 
 	function updateAssignDetail(req, res, next){
 		let responsePlace = utils.APIInfo(req);
-		User.findByUserName(req.params.account)
+		User.findByUserName(req.params.teamspace)
 			.then(dbUser => {
 
 				return dbUser.updateAssignDetail(req.params.sid, req.body);
@@ -126,7 +126,7 @@
 	function removeAssignedSubscription(req, res, next) {
 
 		let responsePlace = utils.APIInfo(req);
-		User.findByUserName(req.params.account)
+		User.findByUserName(req.params.teamspace)
 			.then(dbUser => {
 
 				return dbUser.removeAssignedSubscriptionFromUser(req.params.sid, req.query.cascadeRemove);

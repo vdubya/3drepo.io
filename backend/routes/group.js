@@ -35,7 +35,7 @@ router.delete('/:id', middlewares.hasWriteAccessToIssue, deleteGroup);
 
 
 var getDbColOptions = function(req){
-	return {account: req.params.account, model: req.params.model, logger: req[C.REQ_REPO].logger};
+	return {teamspace: req.params.teamspace, model: req.params.model, logger: req[C.REQ_REPO].logger};
 };
 
 function listGroups(req, res, next){

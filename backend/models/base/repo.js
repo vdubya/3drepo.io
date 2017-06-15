@@ -45,7 +45,7 @@ var methods = {};
 statics._getGridFSBucket = function(dbCol, format){
 
 	return new GridFSBucket(
-		ModelFactory.db.db(dbCol.account),
+		ModelFactory.db.db(dbCol.teamspace),
 		{ bucketName:  `${dbCol.model}.stash.${format}`}
 	);
 };
@@ -81,7 +81,7 @@ statics.getSharedId = function(dbCol, uid){
 
 	let projection = { shared_id: 1 };
 
-	return ModelFactory.db.db(dbCol.account).collection(`${dbCol.model}.stash.3drepo`).find({_id: stringToUUID(uid)}).limit(1).next().then(obj => {
+	return ModelFactory.db.db(dbCol.teamspace).collection(`${dbCol.model}.stash.3drepo`).find({_id: stringToUUID(uid)}).limit(1).next().then(obj => {
 		if(!obj) {
 			return this.findById(dbCol, stringToUUID(uid), projection);
 		}
@@ -106,7 +106,7 @@ statics.findByUID = function(dbCol, uid, options){
 
 	let projection = options && options.projection || {};
 
-	let _find = () => ModelFactory.db.db(dbCol.account).collection(`${dbCol.model}.stash.3drepo`).find({_id: stringToUUID(uid)}).limit(1).next().then(obj => {
+	let _find = () => ModelFactory.db.db(dbCol.teamspace).collection(`${dbCol.model}.stash.3drepo`).find({_id: stringToUUID(uid)}).limit(1).next().then(obj => {
 		if(!obj) {
 			return this.findById(dbCol, stringToUUID(uid), projection);
 		}

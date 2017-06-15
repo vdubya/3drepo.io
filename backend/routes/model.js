@@ -29,7 +29,7 @@ var createAndAssignRole = ModelHelpers.createAndAssignRole;
 var User = require('../models/user');
 
 var getDbColOptions = function(req){
-	return {account: req.params.account, model: req.params.model};
+	return {teamspace: req.params.teamspace, model: req.params.model};
 };
 
 
@@ -77,7 +77,7 @@ function updateSettings(req, res, next){
 
 
 	let place = utils.APIInfo(req);
-	let dbCol =  {account: req.params.account, model: req.params.model, logger: req[C.REQ_REPO].logger};
+	let dbCol =  {teamspace: req.params.teamspace, model: req.params.model, logger: req[C.REQ_REPO].logger};
 
 	return ModelSetting.findById(dbCol, req.params.model).then(modelSetting => {
 
@@ -113,11 +113,11 @@ function _getModel(req){
 			return ModelHelpers.getModelPermission(
 				req.session.user.username,
 				_setting, 
-				req.params.account
+				req.params.teamspace
 			).then(permissions => {
 
 				setting.permissions = permissions;
-				return ModelHelpers.listSubModels(req.params.account, req.params.model, C.MASTER_BRANCH_NAME);
+				return ModelHelpers.listSubModels(req.params.teamspace, req.params.model, C.MASTER_BRANCH_NAME);
 
 			}).then(subModels => {
 				//console.log('subModels', subModels)
@@ -147,11 +147,11 @@ function getModelSetting(req, res, next){
 		resObj.headRevisions = {};
 		let proj  = {_id : 1, tag: 1, timestamp: 1, desc: 1, author: 1};
 	       	let sort  = {sort: {branch: -1, timestamp: -1}};
-		let account = req.params.account;
+		let teamspace = req.params.teamspace;
 		let model = req.params.model;
 
 		// Calculate revision heads
-		History.find({account, model}, {}, proj, sort).then(histories => {
+		History.find({teamspace, model}, {}, proj, sort).then(histories => {
 			histories = History.clean(histories);
 
 			histories.forEach(history => {
@@ -176,7 +176,7 @@ function createModel(req, res, next){
 	'use strict';
 
 	let responsePlace = utils.APIInfo(req);
-	let account = req.params.account;
+	let teamspace = req.params.teamspace;
 	let username = req.session.user.username;
 
 	let federate;
@@ -196,7 +196,7 @@ function createModel(req, res, next){
 
 	data.sessionId = req.headers[C.HEADER_SOCKET_ID];
 
-	createAndAssignRole(req.body.name, account, username, data).then(data => {
+	createAndAssignRole(req.body.name, teamspace, username, data).then(data => {
 		responseCodes.respond(responsePlace, req, res, next, responseCodes.OK, data.model);
 	}).catch( err => {
 		responseCodes.respond(responsePlace, req, res, next, err.resCode || utils.mongoErrorToResCode(err), err.resCode ? {} : err);
@@ -208,27 +208,27 @@ function updateModel(req, res, next){
 
 	let responsePlace = utils.APIInfo(req);
 	let model = req.params.model;
-	let account = req.params.account;
+	let teamspace = req.params.teamspace;
 
 	let promise = Promise.resolve();
 
 	if(req.body.subModels && req.body.subModels.length > 0){
 
-		promise = ModelSetting.findById({account}, model).then(setting => {
+		promise = ModelSetting.findById({teamspace}, model).then(setting => {
 
 			if(!setting) {
 				return Promise.reject(responseCodes.MODEL_NOT_FOUND);
 			} else if (!setting.federate){
 				return Promise.reject(responseCodes.MODEL_IS_NOT_A_FED);
 			} else {
-				return ModelHelpers.createFederatedModel(account, model, req.body.subModels);
+				return ModelHelpers.createFederatedModel(teamspace, model, req.body.subModels);
 			}
 		});
 
 	}
 
 	promise.then(() => {
-		responseCodes.respond(responsePlace, req, res, next, responseCodes.OK, { teamspace: account, model });
+		responseCodes.respond(responsePlace, req, res, next, responseCodes.OK, { teamspace: teamspace, model });
 	}).catch( err => {
 		responseCodes.respond(responsePlace, req, res, next, err.resCode || utils.mongoErrorToResCode(err), err.resCode ? {} : err);
 	});
@@ -239,11 +239,11 @@ function deleteModel(req, res, next){
 
 	let responsePlace = utils.APIInfo(req);
 	let model = req.params.model;
-	let account = req.params.account;
+	let teamspace = req.params.teamspace;
 
 	//delete
-	ModelHelpers.removeModel(account, model).then(() => {
-		responseCodes.respond(responsePlace, req, res, next, responseCodes.OK, { teamspace: account, model });
+	ModelHelpers.removeModel(teamspace, model).then(() => {
+		responseCodes.respond(responsePlace, req, res, next, responseCodes.OK, { teamspace: teamspace, model });
 	}).catch( err => {
 		responseCodes.respond(responsePlace, req, res, next, err.resCode || err, err.resCode ? {} : err);
 	});
@@ -253,7 +253,7 @@ function getModelTree(req, res, next){
 	'use strict';
 
 	let model = req.params.model;
-	let account = req.params.account;
+	let teamspace = req.params.teamspace;
 	let username = req.session.user.username;
 	let branch;
 
@@ -261,7 +261,7 @@ function getModelTree(req, res, next){
 		branch = C.MASTER_BRANCH_NAME;
 	}
 
-	ModelHelpers.getFullTree(account, model, branch, req.params.rev, username).then(obj => {
+	ModelHelpers.getFullTree(teamspace, model, branch, req.params.rev, username).then(obj => {
 		responseCodes.respond(utils.APIInfo(req), req, res, next, responseCodes.OK, obj);
 	}).catch(err => {
 		responseCodes.respond(utils.APIInfo(req), req, res, next, err, err);
@@ -272,7 +272,7 @@ function getModelProperties(req, res, next) {
 	'use strict';
 
 	let model = req.params.model;
-	let account = req.params.account;
+	let teamspace = req.params.teamspace;
 	let username = req.session.user.username;
 	let branch;
 
@@ -280,7 +280,7 @@ function getModelProperties(req, res, next) {
 		branch = C.MASTER_BRANCH_NAME;
 	}
 
-	ModelHelpers.getModelProperties(account, model, branch, req.params.rev, username).then(properties => {
+	ModelHelpers.getModelProperties(teamspace, model, branch, req.params.rev, username).then(properties => {
 		responseCodes.respond(utils.APIInfo(req), req, res, next, responseCodes.OK, properties);
 	}).catch(err => {
 		responseCodes.respond(utils.APIInfo(req), req, res, next, err, err);
@@ -293,7 +293,7 @@ function searchModelTree(req, res, next){
 	'use strict';
 
 	let model = req.params.model;
-	let account = req.params.account;
+	let teamspace = req.params.teamspace;
 	let username = req.session.user.username;
 	let searchString = req.query.searchString;
 
@@ -303,7 +303,7 @@ function searchModelTree(req, res, next){
 		branch = C.MASTER_BRANCH_NAME;
 	}
 
-	ModelHelpers.searchTree(account, model, branch, req.params.rev, searchString, username).then(items => {
+	ModelHelpers.searchTree(teamspace, model, branch, req.params.rev, searchString, username).then(items => {
 
 		responseCodes.respond(utils.APIInfo(req), req, res, next, responseCodes.OK, items);
 
@@ -315,7 +315,7 @@ function searchModelTree(req, res, next){
 
 function downloadLatest(req, res, next){
 	'use strict';
-	ModelHelpers.downloadLatest(req.params.account, req.params.model).then(file => {
+	ModelHelpers.downloadLatest(req.params.teamspace, req.params.model).then(file => {
 
 		let headers = {
 			'Content-Length': file.meta.length,
@@ -339,12 +339,12 @@ function uploadModel(req, res, next){
 
 	let responsePlace = utils.APIInfo(req);
 	let modelSetting;
-	let account = req.params.account;
+	let teamspace = req.params.teamspace;
 	let username = req.session.user.username;
 	let model = req.params.model;
 
 	//check model exists before upload
-	return ModelSetting.findById({account, model}, model).then(_modelSetting => {
+	return ModelSetting.findById({teamspace, model}, model).then(_modelSetting => {
 		
 		modelSetting = _modelSetting;
 
@@ -369,7 +369,7 @@ function uploadModel(req, res, next){
 		};
 		//do not return this promise!, error will be logged in importModel function
 		//returning this promise may cause sending double http headers
-		ModelHelpers.importModel(account, model, username, modelSetting, source, data);
+		ModelHelpers.importModel(teamspace, model, username, modelSetting, source, data);
 
 	}).catch(err => {
 		err = err.resCode ? err.resCode : err;
@@ -380,10 +380,10 @@ function uploadModel(req, res, next){
 function updatePermissions(req, res, next){
 	'use strict';
 
-	let account = req.params.account;
+	let teamspace = req.params.teamspace;
 	let model = req.params.model;
 
-	return ModelSetting.findById({account, model}, model).then(modelSetting => {
+	return ModelSetting.findById({teamspace, model}, model).then(modelSetting => {
 
 		return modelSetting.changePermissions(req.body);
 
@@ -399,10 +399,10 @@ function updatePermissions(req, res, next){
 function getPermissions(req, res, next){
 	'use strict';
 
-	let account = req.params.account;
+	let teamspace = req.params.teamspace;
 	let model = req.params.model;
 
-	return ModelSetting.findById({account, model}, model).then(setting => {
+	return ModelSetting.findById({teamspace, model}, model).then(setting => {
 
 		if(!setting){
 			return Promise.reject({ resCode: responseCodes.MODEL_INFO_NOT_FOUND});
@@ -418,9 +418,9 @@ function getPermissions(req, res, next){
 function getJobs(req, res, next){
 	'use strict';
 
-	const account = req.params.account;
+	const teamspace = req.params.teamspace;
 
-	User.findByUserName(account).then(dbUser => {
+	User.findByUserName(teamspace).then(dbUser => {
 		if(!dbUser){
 			return Promise.reject(responseCodes.USER_NOT_FOUND);
 		}
@@ -439,10 +439,10 @@ function getJobs(req, res, next){
 function getUserJobForModel(req, res, next){
 	'use strict';
 
-	const account = req.params.account;
+	const teamspace = req.params.teamspace;
 	const username = req.session.user.username;
 
-	User.findByUserName(account).then(dbUser => {
+	User.findByUserName(teamspace).then(dbUser => {
 		if(!dbUser){
 			return Promise.reject(responseCodes.USER_NOT_FOUND);
 		}

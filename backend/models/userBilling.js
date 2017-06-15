@@ -226,7 +226,7 @@
 
 					// create invoice with init state for payment happens right after executing agreement
 					if(data.paymentDate <= startDate.toDate()){
-						let invoice = Invoice.createInstance({ account: user });
+						let invoice = Invoice.createInstance({ teamspace: user });
 
 						invoice.initInvoice({ 
 							changes, 
@@ -356,13 +356,13 @@
 
 			if(!invoice){
 
-				invoice = Invoice.createInstance({ account: user });
+				invoice = Invoice.createInstance({ teamspace: user });
 				return invoice.initInvoice({ 
 					nextPaymentDate: this.nextPaymentDate,
 					billingAgreementId: this.billingAgreementId,
 					billingInfo: this.billingInfo,
 					startDate: this.lastAnniversaryDate,
-					account: user
+					teamspace: user
 				});
 			}
 
@@ -413,7 +413,7 @@
 				return Promise.all([
 					//make a copy to sales
 					Mailer.sendPaymentReceivedEmailToSales({
-						account: user,
+						teamspace: user,
 						amount: `${currency}${amount}`,
 						email: billingUser.customData.email,
 						invoiceNo: invoice.invoiceNo,
@@ -421,7 +421,7 @@
 					}, attachments),
 
 					Mailer.sendPaymentReceivedEmail(billingUser.customData.email, {
-						account: user,
+						teamspace: user,
 						amount: `${currency}${amount}`,
 					}, attachments)
 				]);

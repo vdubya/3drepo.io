@@ -31,18 +31,18 @@
 	const httpsPost = require("../libs/httpsReq").post;
 
 
-	router.get("/:account.json", middlewares.loggedIn, listInfo);
+	router.get("/:teamspace.json", middlewares.loggedIn, listInfo);
 
-	router.get("/:account/avatar", middlewares.isAccountAdmin, getAvatar);
-	router.get("/:account/avatar", middlewares.isAccountAdmin, getAvatar);
-	router.post("/:account/avatar", middlewares.isAccountAdmin, uploadAvatar);
+	router.get("/:teamspace/avatar", middlewares.isTeamspaceAdmin, getAvatar);
+	router.get("/:teamspace/avatar", middlewares.isTeamspaceAdmin, getAvatar);
+	router.post("/:teamspace/avatar", middlewares.isTeamspaceAdmin, uploadAvatar);
 	
 	router.post('/', signUp);
 
-	router.post('/:account/verify', verify);
-	router.post('/:account/forgot-password', forgotPassword);
-	router.put("/:account", middlewares.isAccountAdmin, updateUser);
-	router.put("/:account/password", resetPassword);
+	router.post('/:teamspace/verify', verify);
+	router.post('/:teamspace/forgot-password', forgotPassword);
+	router.put("/:teamspace", middlewares.isTeamspaceAdmin, updateUser);
+	router.put("/:teamspace/password", resetPassword);
 
 
 	function updateUser(req, res, next){
@@ -51,8 +51,8 @@
 		if(req.body.oldPassword){
 
 			// Update password
-			User.updatePassword(req[C.REQ_REPO].logger, req.params[C.REPO_REST_API_ACCOUNT], req.body.oldPassword, null, req.body.newPassword).then(() => {
-				responseCodes.respond(responsePlace, req, res, next, responseCodes.OK, { account: req.params[C.REPO_REST_API_ACCOUNT] });
+			User.updatePassword(req[C.REQ_REPO].logger, req.params.teamspace, req.body.oldPassword, null, req.body.newPassword).then(() => {
+				responseCodes.respond(responsePlace, req, res, next, responseCodes.OK, { teamspace: req.params.teamspace });
 			}).catch(err => {
 				responseCodes.respond(responsePlace, req, res, next, err.resCode ? err.resCode: err, err.resCode ? err.resCode: err);
 			});
@@ -60,10 +60,10 @@
 		} else {
 
 			// Update user info
-			User.findByUserName(req.params[C.REPO_REST_API_ACCOUNT]).then(user => {
+			User.findByUserName(req.params.teamspace).then(user => {
 				return user.updateInfo(req.body);
 			}).then(() => {
-				responseCodes.respond(responsePlace, req, res, next, responseCodes.OK, { account: req.params[C.REPO_REST_API_ACCOUNT] });
+				responseCodes.respond(responsePlace, req, res, next, responseCodes.OK, { teamspace: req.params.teamspace });
 			}).catch(err => {
 				responseCodes.respond(responsePlace, req, res, next, err.resCode || utils.mongoErrorToResCode(err), err.resCode ? {} : err);
 			});
@@ -161,7 +161,7 @@
 
 		let responsePlace = utils.APIInfo(req);
 
-		User.verify(req.params[C.REPO_REST_API_ACCOUNT], req.body.token).then(() => {
+		User.verify(req.params.teamspace, req.body.token).then(() => {
 
 			responseCodes.respond(responsePlace, req, res, next, responseCodes.OK, {});
 
@@ -174,13 +174,13 @@
 	function forgotPassword(req, res, next){
 		let responsePlace = utils.APIInfo(req);
 
-		User.getForgotPasswordToken(req.params[C.REPO_REST_API_ACCOUNT], req.body.email, config.tokenExpiry.forgotPassword).then(data => {
+		User.getForgotPasswordToken(req.params.teamspace, req.body.email, config.tokenExpiry.forgotPassword).then(data => {
 
 			//send forgot password email
 			return Mailer.sendResetPasswordEmail(req.body.email, {
 				token : data.token,
 				email: req.body.email,
-				username: req.params[C.REPO_REST_API_ACCOUNT]
+				username: req.params.teamspace
 			}).catch( err => {
 				// catch email error instead of returning to client
 				req[C.REQ_REPO].logger.logDebug(`Email error - ${err.message}`);
@@ -200,7 +200,7 @@
 		let responsePlace = utils.APIInfo(req);
 
 		// Update user info
-		User.findByUserName(req.params[C.REPO_REST_API_ACCOUNT]).then(user => {
+		User.findByUserName(req.params.teamspace).then(user => {
 
 
 			if(!user.getAvatar()){
@@ -255,7 +255,7 @@
 			if (err) {
 				return responseCodes.respond(responsePlace, req, res, next, err.resCode ? err.resCode : err , err.resCode ?  err.resCode : err);
 			} else {
-				User.findByUserName(req.params[C.REPO_REST_API_ACCOUNT]).then(user => {
+				User.findByUserName(req.params.teamspace).then(user => {
 					user.customData.avatar = { data: req.file.buffer};
 					return user.save();
 				}).then(() => {
@@ -270,8 +270,8 @@
 	function resetPassword(req, res, next){
 		let responsePlace = utils.APIInfo(req);
 
-		User.updatePassword(req[C.REQ_REPO].logger, req.params[C.REPO_REST_API_ACCOUNT], null, req.body.token, req.body.newPassword).then(() => {
-			responseCodes.respond(responsePlace, req, res, next, responseCodes.OK, { teamspace: req.params[C.REPO_REST_API_ACCOUNT] });
+		User.updatePassword(req[C.REQ_REPO].logger, req.params.teamspace, null, req.body.token, req.body.newPassword).then(() => {
+			responseCodes.respond(responsePlace, req, res, next, responseCodes.OK, { teamspace: req.params.teamspace });
 		}).catch(err => {
 			responseCodes.respond(responsePlace, req, res, next, err.resCode ? err.resCode: err, err.resCode ? err.resCode: err);
 		});
@@ -282,14 +282,14 @@
 		let responsePlace = utils.APIInfo(req);
 		let user;
 
-		User.findByUserName(req.params.account).then(_user => {
+		User.findByUserName(req.params.teamspace).then(_user => {
 
 			if(!_user){
 				return Promise.reject({resCode: responseCodes.USER_NOT_FOUND});
 			}
 
 			user = _user;
-			return user.listAccounts();
+			return user.listTeamspaces();
 
 		}).then(teamspaces => {
 
@@ -314,14 +314,14 @@
 
 		let responsePlace = utils.APIInfo(req);
 
-		if(req.session.user.username !== req.params.account){
+		if(req.session.user.username !== req.params.teamspace){
 
 			let getType;
 
-			if(C.REPO_BLACKLIST_USERNAME.indexOf(req.params.account) !== -1){
+			if(C.REPO_BLACKLIST_USERNAME.indexOf(req.params.teamspace) !== -1){
 				getType = Promise.resolve('blacklisted');
 			} else {
-				getType = User.findByUserName(req.params.account).then(_user => {
+				getType = User.findByUserName(req.params.teamspace).then(_user => {
 					if(!_user){
 						return '';
 					} else if(!_user.customData.email){

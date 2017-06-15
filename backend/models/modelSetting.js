@@ -120,12 +120,12 @@ schema.methods.changePermissions = function(permissions){
 	'use strict';
 
 	const User = require('./user');
-	const account = this._dbcolOptions.account;
+	const teamspace = this._dbcolOptions.teamspace;
 
 	//get list of valid permission name
 	permissions = _.uniq(permissions, 'user');
 	
-	return User.findByUserName(account).then(dbUser => {
+	return User.findByUserName(teamspace).then(dbUser => {
 
 		let promises = [];
 
@@ -151,7 +151,7 @@ schema.methods.changePermissions = function(permissions){
 						} else {
 
 							user.customData.models.push({
-								account, 
+								teamspace, 
 								model: this._id
 							});
 
@@ -179,7 +179,7 @@ schema.methods.changePermissions = function(permissions){
 		let removeUserPromises = [];
 
 		usersToRemove.forEach(user => {
-			removeUserPromises.push(User.removeModel(user, account, this._id));
+			removeUserPromises.push(User.removeModel(user, teamspace, this._id));
 		});
 
 		return Promise.all(removeUserPromises);
@@ -199,10 +199,10 @@ schema.methods.findPermissionByUser = function(username){
 };
 
 
-schema.statics.removeProjectFromAllModels = function(account, project){
+schema.statics.removeProjectFromAllModels = function(teamspace, project){
 	'use strict';
 
-	return ModelSetting.update( {account}, {
+	return ModelSetting.update( {teamspace}, {
 		project: project
 	}, {
 		$unset: { 
@@ -211,9 +211,9 @@ schema.statics.removeProjectFromAllModels = function(account, project){
 	}, {'multi': true});
 };
 
-schema.statics.findByProjectAndModelName = function(account, project, name){
+schema.statics.findByProjectAndModelName = function(teamspace, project, name){
 	'use strict';
-	return ModelSetting.findOne({account}, { project, name});
+	return ModelSetting.findOne({teamspace}, { project, name});
 };
 
 var ModelSetting = ModelFactory.createClass(

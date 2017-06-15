@@ -70,46 +70,46 @@ describe('Role templates model', function(){
 	describe('#createRoleFromTemplate', function(){
 
 		it(`should create expected privileges for ${C.ADMIN_TEMPLATE} role`, function(){
-			let account = 'testacct';
+			let teamspace = 'testacct';
 			let model = 'testproject';
-			let createCmd = RoleTemplates.createRoleFromTemplate(account, model, C.ADMIN_TEMPLATE);
+			let createCmd = RoleTemplates.createRoleFromTemplate(teamspace, model, C.ADMIN_TEMPLATE);
 
 			expect(createCmd).to.deep.equal({
 				createRole: C.ADMIN_TEMPLATE,
 				privileges: [],
 				roles: [{
 					role: 'readWrite',
-					db: account
+					db: teamspace
 				}]
 			});
 		});
 
 		it(`should create expected privileges for ${C.ADMIN_TEMPLATE} role with custom role name`, function(){
-			let account = 'testacct';
+			let teamspace = 'testacct';
 			let model = 'testproject';
 			let roleName = 'abc123'
-			let createCmd = RoleTemplates.createRoleFromTemplate(account, model, C.ADMIN_TEMPLATE, roleName);
+			let createCmd = RoleTemplates.createRoleFromTemplate(teamspace, model, C.ADMIN_TEMPLATE, roleName);
 
 			expect(createCmd).to.deep.equal({
 				createRole: roleName,
 				privileges: [],
 				roles: [{
 					role: 'readWrite',
-					db: account
+					db: teamspace
 				}]
 			});
 		});
 
 		it(`should create expected privileges for ${C.VIEWER_TEMPLATE} role`, function(){
-			let account = 'testacct';
+			let teamspace = 'testacct';
 			let model = 'testproject';
-			let createCmd = RoleTemplates.createRoleFromTemplate(account, model, C.VIEWER_TEMPLATE);
+			let createCmd = RoleTemplates.createRoleFromTemplate(teamspace, model, C.VIEWER_TEMPLATE);
 
 			let expectedCreateCmd = {
 				createRole: `${model}.${C.VIEWER_TEMPLATE}`,
 				privileges: [{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.history`
 					},
 					"actions" : [ 
@@ -117,7 +117,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.scene`
 					},
 					"actions" : [ 
@@ -125,7 +125,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.stash.3drepo.chunks`
 					},
 					"actions" : [ 
@@ -133,7 +133,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.stash.3drepo.files`
 					},
 					"actions" : [ 
@@ -141,7 +141,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.stash.3drepo`
 					},
 					"actions" : [ 
@@ -149,7 +149,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.stash.json_mpc.chunks`
 					},
 					"actions" : [ 
@@ -157,7 +157,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.stash.json_mpc.files`
 					},
 					"actions" : [ 
@@ -165,7 +165,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.stash.src.chunks`
 					},
 					"actions" : [ 
@@ -173,7 +173,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.stash.src.files`
 					},
 					"actions" : [ 
@@ -181,7 +181,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.issues`
 					},
 					"actions" : [ 
@@ -200,15 +200,15 @@ describe('Role templates model', function(){
 
 
 		it(`should create expected privileges for ${C.COMMENTER_TEMPLATE} role`, function(){
-			let account = 'testacct';
+			let teamspace = 'testacct';
 			let model = 'testproject';
-			let createCmd = RoleTemplates.createRoleFromTemplate(account, model, C.COMMENTER_TEMPLATE);
+			let createCmd = RoleTemplates.createRoleFromTemplate(teamspace, model, C.COMMENTER_TEMPLATE);
 
 			let expectedCreateCmd = {
 				createRole: `${model}.${C.COMMENTER_TEMPLATE}`,
 				privileges: [{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.history`
 					},
 					"actions" : [ 
@@ -216,7 +216,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.scene`
 					},
 					"actions" : [ 
@@ -224,7 +224,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.stash.3drepo.chunks`
 					},
 					"actions" : [ 
@@ -232,7 +232,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.stash.3drepo.files`
 					},
 					"actions" : [ 
@@ -240,7 +240,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.stash.3drepo`
 					},
 					"actions" : [ 
@@ -248,7 +248,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.stash.json_mpc.chunks`
 					},
 					"actions" : [ 
@@ -256,7 +256,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.stash.json_mpc.files`
 					},
 					"actions" : [ 
@@ -264,7 +264,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.stash.src.chunks`
 					},
 					"actions" : [ 
@@ -272,7 +272,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.stash.src.files`
 					},
 					"actions" : [ 
@@ -280,7 +280,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.issues`
 					},
 					"actions" : [ 
@@ -297,15 +297,15 @@ describe('Role templates model', function(){
 		});
 
 		it(`should create expected privileges for ${C.COLLABORATOR_TEMPLATE} role`, function(){
-			let account = 'testacct';
+			let teamspace = 'testacct';
 			let model = 'testproject';
-			let createCmd = RoleTemplates.createRoleFromTemplate(account, model, C.COLLABORATOR_TEMPLATE);
+			let createCmd = RoleTemplates.createRoleFromTemplate(teamspace, model, C.COLLABORATOR_TEMPLATE);
 
 			let expectedCreateCmd = {
 				createRole: `${model}.${C.COLLABORATOR_TEMPLATE}`,
 				privileges: [{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.history`
 					},
 					"actions" : [ 
@@ -313,7 +313,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.scene`
 					},
 					"actions" : [ 
@@ -321,7 +321,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.stash.3drepo.chunks`
 					},
 					"actions" : [ 
@@ -329,7 +329,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.stash.3drepo.files`
 					},
 					"actions" : [ 
@@ -337,7 +337,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.stash.3drepo`
 					},
 					"actions" : [ 
@@ -345,7 +345,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.stash.json_mpc.chunks`
 					},
 					"actions" : [ 
@@ -353,7 +353,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.stash.json_mpc.files`
 					},
 					"actions" : [ 
@@ -361,7 +361,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.stash.src.chunks`
 					},
 					"actions" : [ 
@@ -369,7 +369,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.stash.src.files`
 					},
 					"actions" : [ 
@@ -377,7 +377,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.history.chunks`
 					},
 					"actions" : [ 
@@ -385,7 +385,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.history.files`
 					},
 					"actions" : [ 
@@ -393,7 +393,7 @@ describe('Role templates model', function(){
 					]
 				},{
 					"resource" : {
-						"db" : account,
+						"db" : teamspace,
 						"collection" : `${model}.issues`
 					},
 					"actions" : [ 
@@ -415,17 +415,17 @@ describe('Role templates model', function(){
 
 describe('Role model', function(){
 
-	function createViewerRole(roleName, account, models){
+	function createViewerRole(roleName, teamspace, models){
 		let role = {
 			role: roleName,
-			db: account,
+			db: teamspace,
 			inheritedPrivileges: []
 		}
 
 		models.forEach(model => {
 			role.inheritedPrivileges.push({
 				"resource" : {
-					"db" : account,
+					"db" : teamspace,
 					"collection" : `${model}.history`
 				},
 				"actions" : [ 
@@ -433,7 +433,7 @@ describe('Role model', function(){
 				]
 			},{
 				"resource" : {
-					"db" : account,
+					"db" : teamspace,
 					"collection" : `${model}.scene`
 				},
 				"actions" : [ 
@@ -441,7 +441,7 @@ describe('Role model', function(){
 				]
 			},{
 				"resource" : {
-					"db" : account,
+					"db" : teamspace,
 					"collection" : `${model}.stash.3drepo.chunks`
 				},
 				"actions" : [ 
@@ -449,7 +449,7 @@ describe('Role model', function(){
 				]
 			},{
 				"resource" : {
-					"db" : account,
+					"db" : teamspace,
 					"collection" : `${model}.stash.3drepo.files`
 				},
 				"actions" : [ 
@@ -457,7 +457,7 @@ describe('Role model', function(){
 				]
 			},{
 				"resource" : {
-					"db" : account,
+					"db" : teamspace,
 					"collection" : `${model}.stash.3drepo`
 				},
 				"actions" : [ 
@@ -465,7 +465,7 @@ describe('Role model', function(){
 				]
 			},{
 				"resource" : {
-					"db" : account,
+					"db" : teamspace,
 					"collection" : `${model}.stash.json_mpc.chunks`
 				},
 				"actions" : [ 
@@ -473,7 +473,7 @@ describe('Role model', function(){
 				]
 			},{
 				"resource" : {
-					"db" : account,
+					"db" : teamspace,
 					"collection" : `${model}.stash.json_mpc.files`
 				},
 				"actions" : [ 
@@ -481,7 +481,7 @@ describe('Role model', function(){
 				]
 			},{
 				"resource" : {
-					"db" : account,
+					"db" : teamspace,
 					"collection" : `${model}.stash.src.chunks`
 				},
 				"actions" : [ 
@@ -489,7 +489,7 @@ describe('Role model', function(){
 				]
 			},{
 				"resource" : {
-					"db" : account,
+					"db" : teamspace,
 					"collection" : `${model}.stash.src.files`
 				},
 				"actions" : [ 
@@ -497,7 +497,7 @@ describe('Role model', function(){
 				]
 			},{
 				"resource" : {
-					"db" : account,
+					"db" : teamspace,
 					"collection" : `${model}.issues`
 				},
 				"actions" : [ 

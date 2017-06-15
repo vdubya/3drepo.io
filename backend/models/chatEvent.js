@@ -17,13 +17,13 @@
 
 var Queue = require('../services/queue');
 
-function insertEventQueue(event, emitter, account, model, extraKeys, data){
+function insertEventQueue(event, emitter, teamspace, model, extraKeys, data){
 	'use strict';
 
 	let msg = {
 		event,
 		emitter,
-		account,
+		teamspace,
 		model,
 		extraKeys,
 		data
@@ -33,45 +33,45 @@ function insertEventQueue(event, emitter, account, model, extraKeys, data){
 	return Queue.insertEventMessage(msg);
 }
 
-function newIssues(emitter, account, model, data){
+function newIssues(emitter, teamspace, model, data){
 	'use strict';
-	return insertEventQueue('newIssues', emitter, account, model, null, data);
+	return insertEventQueue('newIssues', emitter, teamspace, model, null, data);
 }
 
-function newComment(emitter, account, model, issueId, data){
+function newComment(emitter, teamspace, model, issueId, data){
 	'use strict';
-	return insertEventQueue('newComment', emitter, account, model, [issueId], data);
+	return insertEventQueue('newComment', emitter, teamspace, model, [issueId], data);
 }
 
-function commentChanged(emitter, account, model, issueId, data){
+function commentChanged(emitter, teamspace, model, issueId, data){
 	'use strict';
-	return insertEventQueue('commentChanged', emitter, account, model, [issueId], data);
+	return insertEventQueue('commentChanged', emitter, teamspace, model, [issueId], data);
 }
 
-function commentDeleted(emitter, account, model, issueId, data){
+function commentDeleted(emitter, teamspace, model, issueId, data){
 	'use strict';
-	return insertEventQueue('commentDeleted', emitter, account, model, [issueId], data);
+	return insertEventQueue('commentDeleted', emitter, teamspace, model, [issueId], data);
 }
 
 
-function modelStatusChanged(emitter, account, model, data){
+function modelStatusChanged(emitter, teamspace, model, data){
 	'use strict';
-	return insertEventQueue('modelStatusChanged', emitter, account, model, null, data);
+	return insertEventQueue('modelStatusChanged', emitter, teamspace, model, null, data);
 }
 
-function issueChanged(emitter, account, model, issueId, data){
+function issueChanged(emitter, teamspace, model, issueId, data){
 	'use strict';
 
 	//send event to single issue changed listener and any issues changed listener
 	return Promise.all([
-		insertEventQueue('issueChanged', emitter, account, model, [issueId], data),
-		insertEventQueue('issueChanged', emitter, account, model, null, data)
+		insertEventQueue('issueChanged', emitter, teamspace, model, [issueId], data),
+		insertEventQueue('issueChanged', emitter, teamspace, model, null, data)
 	]);
 }
 
-function newModel(emitter, account, data){
+function newModel(emitter, teamspace, data){
 	'use strict';
-	return insertEventQueue('newModel', emitter, account, null, null, data);
+	return insertEventQueue('newModel', emitter, teamspace, null, null, data);
 }
 
 module.exports = {

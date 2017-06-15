@@ -225,7 +225,7 @@
 
 			this.billingAgreementId = data.billingAgreementId;
 			//copy items from last completed invoice with same agreement id
-			return Invoice.findLatestCompleteByAgreementId(data.account, data.billingAgreementId).then(lastGoodInvoice => {
+			return Invoice.findLatestCompleteByAgreementId(data.teamspace, data.billingAgreementId).then(lastGoodInvoice => {
 				if(!lastGoodInvoice){
 					return Promise.reject(responseCodes.MISSING_LAST_INVOICE);
 				}
@@ -252,44 +252,44 @@
 
 	};
 	
-	schema.statics.findByAccount = function (account) {
-		return this.find({ account }, {state: {'$in': [C.INV_PENDING, C.INV_COMPLETE] }}, { raw: 0, pdf: 0 }, { sort: { createdAt: -1 } });
+	schema.statics.findByTeamspace = function (teamspace) {
+		return this.find({ teamspace }, {state: {'$in': [C.INV_PENDING, C.INV_COMPLETE] }}, { raw: 0, pdf: 0 }, { sort: { createdAt: -1 } });
 	};
 	
-	schema.statics.findByPaypalPaymentToken = function(account, paypalPaymentToken) {
-		return this.findOne({ account }, { paypalPaymentToken }, { raw: 0, pdf: 0});
+	schema.statics.findByPaypalPaymentToken = function(teamspace, paypalPaymentToken) {
+		return this.findOne({ teamspace }, { paypalPaymentToken }, { raw: 0, pdf: 0});
 	};
 
-	schema.statics.findByAgreementId = function(account, billingAgreementId) {
-		return this.find({ account }, { billingAgreementId }, { raw: 0, pdf: 0});
+	schema.statics.findByAgreementId = function(teamspace, billingAgreementId) {
+		return this.find({ teamspace }, { billingAgreementId }, { raw: 0, pdf: 0});
 	};
 
-	schema.statics.findLatestCompleteByAgreementId = function (account, billingAgreementId) {
-		return this.findOne({ account }, { billingAgreementId, state: C.INV_COMPLETE}, { raw: 0, pdf: 0 });
+	schema.statics.findLatestCompleteByAgreementId = function (teamspace, billingAgreementId) {
+		return this.findOne({ teamspace }, { billingAgreementId, state: C.INV_COMPLETE}, { raw: 0, pdf: 0 });
 	};
 
-	schema.statics.findByInvoiceNo = function (account, invoiceNo) {
-		return this.findOne({ account }, { invoiceNo });
+	schema.statics.findByInvoiceNo = function (teamspace, invoiceNo) {
+		return this.findOne({ teamspace }, { invoiceNo });
 	};
 
-	schema.statics.findByTransactionId = function (account, transactionId) {
-		return this.findOne({ account }, { transactionId }, { raw: 0, pdf: 0 });
+	schema.statics.findByTransactionId = function (teamspace, transactionId) {
+		return this.findOne({ teamspace }, { transactionId }, { raw: 0, pdf: 0 });
 	};
 
-	schema.statics.hasPendingBill = function (account, billingAgreementId) {
-		return this.count({ account }, { billingAgreementId: billingAgreementId, pending: true })
+	schema.statics.hasPendingBill = function (teamspace, billingAgreementId) {
+		return this.count({ teamspace }, { billingAgreementId: billingAgreementId, pending: true })
 			.then(count => {
 				return Promise.resolve(count > 0);
 			});
 	};
 
-	schema.statics.findPendingInvoice = function(account, billingAgreementId){
-		//console.log(account, { billingAgreementId, state: C.INV_PENDING });
-		return this.findOne({ account }, { billingAgreementId, state: C.INV_PENDING });
+	schema.statics.findPendingInvoice = function(teamspace, billingAgreementId){
+		//console.log(teamspace, { billingAgreementId, state: C.INV_PENDING });
+		return this.findOne({ teamspace }, { billingAgreementId, state: C.INV_PENDING });
 	};
 
-	schema.statics.findAndRemovePendingBill = function (account, billingAgreementId) {
-		return this.findOne({ account }, { billingAgreementId: billingAgreementId, pending: true })
+	schema.statics.findAndRemovePendingBill = function (teamspace, billingAgreementId) {
+		return this.findOne({ teamspace }, { billingAgreementId: billingAgreementId, pending: true })
 			.then(billing => {
 				if (billing) {
 					return billing.remove()
@@ -306,7 +306,7 @@
 
 		let invoice;
 
-		invoice = Invoice.createInstance({ account: user.user });
+		invoice = Invoice.createInstance({ teamspace: user.user });
 
 		invoice.info = user.customData.billing.billingInfo;
 		invoice.raw = data.raw;
@@ -349,7 +349,7 @@
 
 				//make a copy to sales
 				Mailer.sendPaymentReceivedEmailToSales({
-					account: user.user,
+					teamspace: user.user,
 					amount: `${data.currency}${data.amount}`,
 					email: billingUser.customData.email,
 					invoiceNo: invoice.invoiceNo,

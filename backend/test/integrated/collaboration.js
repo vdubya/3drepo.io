@@ -168,9 +168,9 @@ describe('Sharing/Unsharing a model', function () {
 					.expect(200, function(err, res){
 
 						expect(res.body).to.have.property('teamspaces').that.is.an('array');
-						const account = res.body.teamspaces.find( a => a.teamspace === username);
-						expect(account).to.have.property('models').that.is.an('array');
-						const modelObj = account.models.find( _model => _model.model === model);
+						const teamspace = res.body.teamspaces.find( a => a.teamspace === username);
+						expect(teamspace).to.have.property('models').that.is.an('array');
+						const modelObj = teamspace.models.find( _model => _model.model === model);
 						expect(modelObj).to.have.property('model', model);
 						expect(modelObj.permissions).to.deep.equal(C.VIEWER_TEMPLATE_PERMISSIONS);
 
@@ -302,8 +302,8 @@ describe('Sharing/Unsharing a model', function () {
 						.expect(200, function(err, res){
 
 							expect(res.body).to.have.property('teamspaces').that.is.an('array');
-							let account = res.body.teamspaces.find( a => a.teamspace === username);
-							expect(account).to.be.undefined;
+							let teamspace = res.body.teamspaces.find( a => a.teamspace === username);
+							expect(teamspace).to.be.undefined;
 
 							done(err);
 						});
@@ -387,9 +387,9 @@ describe('Sharing/Unsharing a model', function () {
 					.expect(200, function(err, res){
 
 						expect(res.body).to.have.property('teamspaces').that.is.an('array');
-						let account = res.body.teamspaces.find( a => a.teamspace === username);
-						expect(account).to.have.property('models').that.is.an('array');
-						let modelObj = account.models.find( _model => _model.model === model);
+						let teamspace = res.body.teamspaces.find( a => a.teamspace === username);
+						expect(teamspace).to.have.property('models').that.is.an('array');
+						let modelObj = teamspace.models.find( _model => _model.model === model);
 						expect(modelObj).to.have.property('model', model);
 						expect(modelObj.permissions).to.deep.equal(C.COMMENTER_TEMPLATE_PERMISSIONS);
 
@@ -543,8 +543,8 @@ describe('Sharing/Unsharing a model', function () {
 						.expect(200, function(err, res){
 
 							expect(res.body).to.have.property('teamspaces').that.is.an('array');
-							let account = res.body.teamspaces.find( a => a.teamspace === username);
-							expect(account).to.be.undefined;
+							let teamspace = res.body.teamspaces.find( a => a.teamspace === username);
+							expect(teamspace).to.be.undefined;
 
 							done(err);
 						});
@@ -627,9 +627,9 @@ describe('Sharing/Unsharing a model', function () {
 					.expect(200, function(err, res){
 
 						expect(res.body).to.have.property('teamspaces').that.is.an('array');
-						let account = res.body.teamspaces.find( a => a.teamspace === username);
-						expect(account).to.have.property('models').that.is.an('array');
-						let modelObj = account.models.find( _model => _model.model === model);
+						let teamspace = res.body.teamspaces.find( a => a.teamspace === username);
+						expect(teamspace).to.have.property('models').that.is.an('array');
+						let modelObj = teamspace.models.find( _model => _model.model === model);
 						expect(modelObj).to.have.property('model', model);
 						expect(modelObj.permissions).to.deep.equal(C.COLLABORATOR_TEMPLATE_PERMISSIONS);
 
@@ -785,8 +785,8 @@ describe('Sharing/Unsharing a model', function () {
 						.expect(200, function(err, res){
 
 							expect(res.body).to.have.property('teamspaces').that.is.an('array');
-							let account = res.body.teamspaces.find( a => a.teamspace === username);
-							expect(account).to.be.undefined;
+							let teamspace = res.body.teamspaces.find( a => a.teamspace === username);
+							expect(teamspace).to.be.undefined;
 
 							done(err);
 						});

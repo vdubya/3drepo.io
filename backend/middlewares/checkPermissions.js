@@ -22,20 +22,20 @@
 	const _ = require('lodash');
 	const C	= require("../constants");
 	
-	function checkPermissions(username, account, project, model, permsRequest, getPermissions){
+	function checkPermissions(username, teamspace, project, model, permsRequest, getPermissions){
 
 		let getPermPromises = [];
 
-		getPermPromises.push(getPermissions(account).accountLevel(username));
+		getPermPromises.push(getPermissions(teamspace).teamspaceLevel(username));
 
 		// check what kind of permissions is requested before making db calls to save unnecessary db calls
 		if(_.intersection(C.PROJECT_PERM_LIST, permsRequest).length > 0){
-			getPermPromises.push(getPermissions(account).projectLevel(username, project));
+			getPermPromises.push(getPermissions(teamspace).projectLevel(username, project));
 		}
 
 		if(_.intersection(C.MODEL_PERM_LIST, permsRequest).length > 0){
 
-			getPermPromises.push(getPermissions(account).modelLevel(username, model));
+			getPermPromises.push(getPermissions(teamspace).modelLevel(username, model));
 
 		}
 

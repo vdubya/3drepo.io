@@ -79,10 +79,10 @@ describe('Projects', function () {
 				agent.get(`/teamspaces/${username}.json`)
 				.expect(200, function(err, res){
 
-					const account = res.body.teamspaces.find(account => account.teamspace === username);
-					expect(account).to.exist;
+					const teamspace = res.body.teamspaces.find(teamspace => teamspace.teamspace === username);
+					expect(teamspace).to.exist;
 
-					const pg = account.projects.find(pg => pg.name === project.name);
+					const pg = teamspace.projects.find(pg => pg.name === project.name);
 					expect(pg).to.exist;
 
 					callback(err);
@@ -144,10 +144,10 @@ describe('Projects', function () {
 				.expect(200, function(err, res){
 
 
-					const account = res.body.teamspaces.find(account => account.teamspace === username);
-					expect(account).to.exist;
+					const teamspace = res.body.teamspaces.find(teamspace => teamspace.teamspace === username);
+					expect(teamspace).to.exist;
 
-					const pg = account.projects.find(pg => pg.name === project.name);
+					const pg = teamspace.projects.find(pg => pg.name === project.name);
 					expect(pg).to.exist;
 
 					expect(pg.permissions).to.deep.equal(project.permissions);
@@ -181,10 +181,10 @@ describe('Projects', function () {
 				.expect(200, function(err, res){
 
 
-					const account = res.body.teamspaces.find(account => account.teamspace === username);
-					expect(account).to.exist;
+					const teamspace = res.body.teamspaces.find(teamspace => teamspace.teamspace === username);
+					expect(teamspace).to.exist;
 
-					const pg = account.projects.find(pg => pg.name === project.name);
+					const pg = teamspace.projects.find(pg => pg.name === project.name);
 					expect(pg).to.exist;
 
 					callback(err);
@@ -233,14 +233,14 @@ describe('Projects', function () {
 				agent.get(`/teamspaces/${username}.json`)
 				.expect(200, function(err, res){
 
-					const account = res.body.teamspaces.find(account => account.teamspace === username);
-					expect(account).to.exist;
+					const teamspace = res.body.teamspaces.find(teamspace => teamspace.teamspace === username);
+					expect(teamspace).to.exist;
 
-					const model = account.models.find(model => model.model === modelIdInProject);
+					const model = teamspace.models.find(model => model.model === modelIdInProject);
 					expect(model).to.exist;
 					expect(model.project).to.not.exist;
 					
-					const pg = account.projects.find(pg => pg.name === project.name);
+					const pg = teamspace.projects.find(pg => pg.name === project.name);
 					expect(pg).to.not.exist;
 
 					callback(err);

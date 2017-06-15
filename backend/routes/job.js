@@ -33,7 +33,7 @@
 
 	function createJob(req, res, next){
 
-		User.findByUserName(req.params.account).then(user => {
+		User.findByUserName(req.params.teamspace).then(user => {
 
 			if(!user){
 				return Promise.reject(responseCodes.USER_NOT_FOUND);
@@ -56,7 +56,7 @@
 
 	function deleteJob(req, res, next){
 
-		User.findByUserName(req.params.account).then(user => {
+		User.findByUserName(req.params.teamspace).then(user => {
 
 			if(!user){
 				return Promise.reject(responseCodes.USER_NOT_FOUND);
@@ -76,9 +76,9 @@
 
 	function listJobs(req, res, next){
 
-		const account = req.params.account;
+		const teamspace = req.params.teamspace;
 
-		User.findByUserName(account).then(user => {
+		User.findByUserName(teamspace).then(user => {
 
 			if(!user){
 				return Promise.reject(responseCodes.USER_NOT_FOUND);

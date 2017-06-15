@@ -201,7 +201,7 @@ function sendPaymentErrorEmail(data){
 function sendModelInvitation(to, data){
 	'use strict';
 
-	data.url = getURL('model', { account: data.account, model: data.model });
+	data.url = getURL('model', { teamspace: data.teamspace, model: data.model });
 
 	if(!data.url){
 		return rejectNoUrl('model');

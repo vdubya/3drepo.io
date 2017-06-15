@@ -150,10 +150,10 @@
 
 	/*******************************************************************************
 	 * Dispatch work to queue to create a federated model
-	 * @param {account} account - username
+	 * @param {teamspace} teamspace - username
 	 * @param {defObj} defObj - object to describe the federated model like submodels and transformation
 	 *******************************************************************************/
-	ImportQueue.prototype.createFederatedModel = function (account, defObj) {
+	ImportQueue.prototype.createFederatedModel = function (teamspace, defObj) {
 		let corID = uuid.v1();
 		let newFileDir = this.sharedSpacePath + "/" + corID;
 		let filename = `${newFileDir}/obj.json`;
@@ -191,7 +191,7 @@
 			});
 		})
 		.then(() => {
-			let msg = `genFed ${filename} ${account}`;
+			let msg = `genFed ${filename} ${teamspace}`;
 			return this._dispatchWork(corID, msg);
 		})
 		.then(() => {

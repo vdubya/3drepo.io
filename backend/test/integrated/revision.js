@@ -125,6 +125,14 @@ describe('Revision', function () {
 	});
 
 
+	it('get tree from head of master should success', function(done){
+		agent.get(`/teamspaces/${username}/models/${model}/revision/master/head/fulltree.json`)
+		.expect(200, function(err, res){
+			expect(JSON.parse(res.body.mainTree).nodes.name).to.equal('3DrepoBIM.obj');
+			done(err);
+		});
+	});
+
 	it('get tree by revision tag should success', function(done){
 		agent.get(`/teamspaces/${username}/models/${model}/revision/original/fulltree.json`)
 		.expect(200, function(err, res){
@@ -146,16 +154,6 @@ describe('Revision', function () {
 		agent.get(`/teamspaces/${username}/models/${model}/revision/000/fulltree.json`)
 		.expect(404, function(err, res){
 			expect(res.body.value).to.equal(responseCodes.TREE_NOT_FOUND.value);
-			done(err);
-		});
-	});
-
-
-
-	it('get tree of head of master should success', function(done){
-		agent.get(`/teamspaces/${username}/models/${model}/revision/master/head/fulltree.json`)
-		.expect(200, function(err, res){
-			expect(JSON.parse(res.body.mainTree).nodes.name).to.equal('3DrepoBIM.obj');
 			done(err);
 		});
 	});

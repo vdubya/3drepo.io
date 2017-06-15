@@ -83,7 +83,7 @@ function convertToErrorCode(errCode){
 }
 
 
-function createAndAssignRole(modelName, account, username, data) {
+function createAndAssignRole(modelName, teamspace, username, data) {
 	'use strict';
 
 	let project;
@@ -109,7 +109,7 @@ function createAndAssignRole(modelName, account, username, data) {
 	let promise = Promise.resolve();
 
 	if(data.project){
-		promise = Project.findOne({account}, {name: data.project}).then(_project => {
+		promise = Project.findOne({teamspace}, {name: data.project}).then(_project => {
 
 			if(!_project){
 				return Promise.reject(responseCodes.PROJECT_NOT_FOUND);
@@ -122,7 +122,7 @@ function createAndAssignRole(modelName, account, username, data) {
 
 	return promise.then(() => {
 		
-		return ModelSetting.count({account, model}, {name: modelName});
+		return ModelSetting.count({teamspace, model}, {name: modelName});
 
 	}).then(count => {
 
@@ -130,24 +130,24 @@ function createAndAssignRole(modelName, account, username, data) {
 			return Promise.reject({resCode: responseCodes.MODEL_EXIST});
 		}
 
-		return (data.federate ? createFederatedModel(account, model, data.subModels) : Promise.resolve());
+		return (data.federate ? createFederatedModel(teamspace, model, data.subModels) : Promise.resolve());
 
 	}).then(() => {
 
-		return Role.createStandardRoles(account, model);
+		return Role.createStandardRoles(teamspace, model);
 
 	}).then(() => {
 
-		return Role.grantModelRoleToUser(username, account, model, C.COLLABORATOR_TEMPLATE);
+		return Role.grantModelRoleToUser(username, teamspace, model, C.COLLABORATOR_TEMPLATE);
 
 	}).then(() => {
 
-		return ModelSetting.findById({account, model}, model);
+		return ModelSetting.findById({teamspace, model}, model);
 
 	}).then(setting => {
 
 		setting = setting || ModelSetting.createInstance({
-			account: account,
+			teamspace: teamspace,
 			model: model
 		});
 
@@ -174,13 +174,13 @@ function createAndAssignRole(modelName, account, username, data) {
 	}).then(setting => {
 
 		let modelData = {
-			teamspace: account,
+			teamspace: teamspace,
 			model:  model.toString(),
 			name: modelName,
 			permissions: C.MODEL_PERM_LIST
 		};
 
-		ChatEvent.newModel(data.sessionId, account, modelData);
+		ChatEvent.newModel(data.sessionId, teamspace, modelData);
 
 		// this is true if only admin can create project
 		return {
@@ -196,7 +196,7 @@ function importToyModel(username){
 	'use strict';
 
 	let modelName = 'sample_project';
-	let account = username;
+	let teamspace = username;
 	let desc = '';
 	let type = 'sample';
 
@@ -207,14 +207,14 @@ function importToyModel(username){
 		desc, type, unit: 'm'
 	};
 
-	return createAndAssignRole(modelName, account, username, data).then(data => {
+	return createAndAssignRole(modelName, teamspace, username, data).then(data => {
 		return Promise.resolve(data.setting);
 	}).then(setting => {
-		return importModel(account, model, username, setting, {type: 'toy' });
+		return importModel(teamspace, model, username, setting, {type: 'toy' });
 	}).catch(err => {
 
 		Mailer.sendImportError({
- 			account,
+ 			teamspace,
  			model,
  			username,
  			err: err.message,
@@ -226,11 +226,11 @@ function importToyModel(username){
 	});
 }
 
-function createFederatedModel(account, model, subModels){
+function createFederatedModel(teamspace, model, subModels){
 	'use strict';
 
 	let federatedJSON = {
-		database: account,
+		database: teamspace,
 		project: model,
 		subProjects: []
 	};
@@ -248,11 +248,11 @@ function createFederatedModel(account, model, subModels){
 
 	subModels.forEach(subModel => {
 
-		if(subModel.database !== account){
+		if(subModel.database !== teamspace){
 			error = responseCodes.FED_MODEL_IN_OTHER_DB;
 		}
 
-		addSubModels.push(ModelSetting.findById({account, model: subModel.model}, subModel.model).then(setting => {
+		addSubModels.push(ModelSetting.findById({teamspace, model: subModel.model}, subModel.model).then(setting => {
 			if(setting && setting.federate){
 				return Promise.reject(responseCodes.FED_MODEL_IS_A_FED);
 
@@ -277,7 +277,7 @@ function createFederatedModel(account, model, subModels){
 	//console.log(federatedJSON);
 	return Promise.all(addSubModels).then(() => {
 
-		return importQueue.createFederatedModel(account, federatedJSON).catch(err => {
+		return importQueue.createFederatedModel(teamspace, federatedJSON).catch(err => {
 			_deleteFiles(files(err));
 			return;
 		});
@@ -300,7 +300,7 @@ function createFederatedModel(account, model, subModels){
 
 }
 
-function getModelProperties(account, model, branch, rev, username){
+function getModelProperties(teamspace, model, branch, rev, username){
 	'use strict';
 
 	let subProperties;
@@ -309,16 +309,16 @@ function getModelProperties(account, model, branch, rev, username){
 	let status;
 
 	if(rev && utils.isUUID(rev)){
-		getHistory = History.findByUID({ account, model }, rev);
+		getHistory = History.findByUID({ teamspace, model }, rev);
 	} else if (rev && !utils.isUUID(rev)) {
-		getHistory = History.findByTag({ account, model }, rev);
+		getHistory = History.findByTag({ teamspace, model }, rev);
 	} else if (branch) {
-		getHistory = History.findByBranch({ account, model }, branch);
+		getHistory = History.findByBranch({ teamspace, model }, branch);
 	}
 
 	return getHistory.then(_history => {
 		history = _history;
-		return middlewares.hasReadAccessToModelHelper(username, account, model);
+		return middlewares.hasReadAccessToModelHelper(username, teamspace, model);
 	}).then(granted => {
 		if(!history){
 			status = 'NOT_FOUND';
@@ -328,13 +328,13 @@ function getModelProperties(account, model, branch, rev, username){
 			return Promise.resolve([]);
 		} else {
 			revId = utils.uuidToString(history._id);
-			modelPropertiesFileName = `/${account}/${model}/revision/${revId}/modelProperties.json`;
+			modelPropertiesFileName = `/teamspaces/${teamspace}/models/${model}/revision/${revId}/modelProperties.json`;
 
 			let filter = {
 				type: "ref",
 				_id: { $in: history.current }
 			};
-			return Ref.find({ account, model }, filter);
+			return Ref.find({ teamspace, model }, filter);
 		}
 	}).then(refs => {
 
@@ -367,7 +367,7 @@ function getModelProperties(account, model, branch, rev, username){
 	}).then(_subProperties => {
 
 		subProperties = _subProperties;
-		return stash.findStashByFilename({ account, model }, 'json_mpc', modelPropertiesFileName);
+		return stash.findStashByFilename({ teamspace, model }, 'json_mpc', modelPropertiesFileName);
 
 	}).then(buf => {
 		let properties = { hiddenNodes : null };
@@ -398,7 +398,7 @@ function getModelProperties(account, model, branch, rev, username){
 }
 
 // more efficient, no json parsing, no idToPath generation for fed model, but only support 1 level of fed
-function getFullTree(account, model, branch, rev, username){
+function getFullTree(teamspace, model, branch, rev, username){
 	'use strict';
 
 	let getHistory;
@@ -408,15 +408,15 @@ function getFullTree(account, model, branch, rev, username){
 
 	if(rev && utils.isUUID(rev)){
 
-		getHistory = History.findByUID({ account, model }, rev);
+		getHistory = History.findByUID({ teamspace, model }, rev);
 
 	} else if (rev && !utils.isUUID(rev)) {
 
-		getHistory = History.findByTag({ account, model }, rev);
+		getHistory = History.findByTag({ teamspace, model }, rev);
 
 	} else if (branch) {
 
-		getHistory = History.findByBranch({ account, model }, branch);
+		getHistory = History.findByBranch({ teamspace, model }, branch);
 	}
 
 	return getHistory.then(_history => {
@@ -428,9 +428,9 @@ function getFullTree(account, model, branch, rev, username){
 		}
 
 		let revId = utils.uuidToString(history._id);
-		let treeFileName = `/${account}/${model}/revision/${revId}/fulltree.json`;
+		let treeFileName = `/teamspaces/${teamspace}/models/${model}/revision/${revId}/fulltree.json`;
 
-		return stash.findStashByFilename({ account, model }, 'json_mpc', treeFileName);
+		return stash.findStashByFilename({ teamspace, model }, 'json_mpc', treeFileName);
 
 	}).then(buf => {
 
@@ -441,7 +441,7 @@ function getFullTree(account, model, branch, rev, username){
 			_id: { $in: history.current }
 		};
 
-		return Ref.find({ account, model }, filter);
+		return Ref.find({ teamspace, model }, filter);
 
 	}).then(refs => {
 
@@ -454,7 +454,7 @@ function getFullTree(account, model, branch, rev, username){
 
 			if (utils.uuidToString(ref._rid) === C.MASTER_BRANCH){
 
-				getRefId = History.findByBranch({ account: ref.owner, model: ref.project }, C.MASTER_BRANCH_NAME).then(_history => {
+				getRefId = History.findByBranch({ teamspace: ref.owner, model: ref.project }, C.MASTER_BRANCH_NAME).then(_history => {
 					return _history ? utils.uuidToString(_history._id) : null;
 				});
 
@@ -477,8 +477,8 @@ function getFullTree(account, model, branch, rev, username){
 						return;
 					}
 
-					let treeFileName = `/${ref.owner}/${ref.project}/revision/${revId}/fulltree.json`;
-					return stash.findStashByFilename({ account: ref.owner, model: ref.project }, 'json_mpc', treeFileName);
+					let treeFileName = `/teamspaces/${ref.owner}/models/${ref.project}/revision/${revId}/fulltree.json`;
+					return stash.findStashByFilename({ teamspace: ref.owner, model: ref.project }, 'json_mpc', treeFileName);
 				});
 
 			}).then(buf => {
@@ -501,7 +501,7 @@ function getFullTree(account, model, branch, rev, username){
 	});
 }
 
-function searchTree(account, model, branch, rev, searchString, username){
+function searchTree(teamspace, model, branch, rev, searchString, username){
 	'use strict';
 
 	let items = [];
@@ -513,12 +513,12 @@ function searchTree(account, model, branch, rev, searchString, username){
 			name: new RegExp(searchString, 'i')
 		};
 
-		return Scene.find({account, model}, filter, { name: 1 }).then(objs => {
+		return Scene.find({teamspace, model}, filter, { name: 1 }).then(objs => {
 
 			objs.forEach((obj, i) => {
 
 				objs[i] = obj.toJSON();
-				objs[i].account = account;
+				objs[i].teamspace = teamspace;
 				objs[i].model = model;
 				items.push(objs[i]);
 
@@ -529,7 +529,7 @@ function searchTree(account, model, branch, rev, searchString, username){
 				type: 'ref'
 			};
 
-			return Ref.find({account, model}, filter);
+			return Ref.find({teamspace, model}, filter);
 
 		}).then(refs => {
 
@@ -561,18 +561,18 @@ function searchTree(account, model, branch, rev, searchString, username){
 		});
 	};
 
-	return middlewares.hasReadAccessToModelHelper(username, account, model).then(granted => {
+	return middlewares.hasReadAccessToModelHelper(username, teamspace, model).then(granted => {
 
 		if(granted){
 
 			let getHistory;
 
 			if(rev && utils.isUUID(rev)){
-				getHistory = History.findByUID({account, model}, rev);
+				getHistory = History.findByUID({teamspace, model}, rev);
 			} else if (rev && !utils.isUUID(rev)){
-				getHistory = History.findByTag({account, model}, rev);
+				getHistory = History.findByTag({teamspace, model}, rev);
 			} else {
-				getHistory = History.findByBranch({account, model}, branch);
+				getHistory = History.findByBranch({teamspace, model}, branch);
 			}
 
 			return getHistory.then(history => {
@@ -590,12 +590,12 @@ function searchTree(account, model, branch, rev, searchString, username){
 
 }
 
-function listSubModels(account, model, branch){
+function listSubModels(teamspace, model, branch){
 	'use strict';
 
 	let subModels = [];
 
-	return History.findByBranch({ account, model }, branch).then(history => {
+	return History.findByBranch({ teamspace, model }, branch).then(history => {
 
 
 		if(history){
@@ -604,7 +604,7 @@ function listSubModels(account, model, branch){
 				_id: { $in: history.current }
 			};
 
-			return Ref.find({ account, model }, filter);
+			return Ref.find({ teamspace, model }, filter);
 		} else {
 			return [];
 		}
@@ -625,10 +625,10 @@ function listSubModels(account, model, branch){
 }
 
 
-function downloadLatest(account, model){
+function downloadLatest(teamspace, model){
 	'use strict';
 
-	let bucket =  stash.getGridFSBucket(account, `${model}.history`);
+	let bucket =  stash.getGridFSBucket(teamspace, `${model}.history`);
 
 	return bucket.find({}, {sort: { uploadDate: -1}}).next().then(file => {
 
@@ -662,17 +662,17 @@ function uploadFile(req){
 		return Promise.reject(responseCodes.QUEUE_NO_CONFIG);
 	}
 
-	let account = req.params.account;
+	let teamspace = req.params.teamspace;
 	let model = req.params.model;
 
-	ChatEvent.modelStatusChanged(null, account, model, { status: 'uploading' });
+	ChatEvent.modelStatusChanged(null, teamspace, model, { status: 'uploading' });
 	//upload model with tag
 	let checkTag = tag => {
 		if(!tag){
 			return Promise.resolve();
 		} else {
 			return (tag.match(History.tagRegExp) ? Promise.resolve() : Promise.reject(responseCodes.INVALID_TAG_NAME)).then(() => {
-				return History.findByTag({account, model}, tag, {_id: 1});
+				return History.findByTag({teamspace, model}, tag, {_id: 1});
 			}).then(tag => {
 				if (!tag){
 					return Promise.resolve();
@@ -708,7 +708,7 @@ function uploadFile(req){
 					return cb({ resCode: responseCodes.SIZE_LIMIT });
 				}
 
-				middlewares.freeSpace(account).then(space => {
+				middlewares.freeSpace(teamspace).then(space => {
 
 					if(size > space){
 						cb({ resCode: responseCodes.SIZE_LIMIT_PAY });
@@ -727,7 +727,7 @@ function uploadFile(req){
 				return reject(responseCodes.FILE_FORMAT_NOT_SUPPORTED);
 
 			} else {
-				ChatEvent.modelStatusChanged(null, account, model, { status: 'uploaded' });
+				ChatEvent.modelStatusChanged(null, teamspace, model, { status: 'uploaded' });
 				return resolve(req.file);
 			}
 		});
@@ -761,7 +761,7 @@ function _deleteFiles(files){
 	});
 }
 
-function _handleUpload(account, model, username, file, data){
+function _handleUpload(teamspace, model, username, file, data){
 	'use strict';
 
 
@@ -776,7 +776,7 @@ function _handleUpload(account, model, username, file, data){
 	return importQueue.importFile(
 		file.path,
 		file.originalname,
-		account,
+		teamspace,
 		model,
 		username,
 		null,
@@ -787,7 +787,7 @@ function _handleUpload(account, model, username, file, data){
 		let corID = obj.corID;
 
 		systemLogger.logInfo(`Job ${corID} imported without error`,{
-			account,
+			teamspace,
 			model,
 			username
 		});
@@ -802,27 +802,27 @@ function _handleUpload(account, model, username, file, data){
 
 }
 
-function importModel(account, model, username, modelSetting, source, data){
+function importModel(teamspace, model, username, modelSetting, source, data){
 	'use strict';
 
 	if(!modelSetting){
 		return Promise.reject({ message: `modelSetting is ${modelSetting}`});
 	}
 
-	ChatEvent.modelStatusChanged(null, account, model, { status: 'processing' });
+	ChatEvent.modelStatusChanged(null, teamspace, model, { status: 'processing' });
 
 	modelSetting.status = 'processing';
 
 	return modelSetting.save().then(() => {
 
 		if (source.type === 'upload'){
-			return _handleUpload(account, model, username, source.file, data);
+			return _handleUpload(teamspace, model, username, source.file, data);
 
 		} else if (source.type === 'toy'){
 
-			return importQueue.importToyModel(account, model).then(obj => {
+			return importQueue.importToyModel(teamspace, model).then(obj => {
 				let corID = obj.corID;
-				systemLogger.logInfo(`Job ${corID} imported without error`,{account, model, username});
+				systemLogger.logInfo(`Job ${corID} imported without error`,{teamspace, model, username});
 			});
 		}
 
@@ -832,14 +832,14 @@ function importModel(account, model, username, modelSetting, source, data){
 		modelSetting.errorReason = undefined;
 		modelSetting.markModified('errorReason');
 
-		ChatEvent.modelStatusChanged(null, account, model, modelSetting);
+		ChatEvent.modelStatusChanged(null, teamspace, model, modelSetting);
 
 		return modelSetting.save();
 
 	}).then(() => {
 
 		systemLogger.logInfo(`Model from source ${source.type} has imported successfully`, {
-			account,
+			teamspace,
 			model,
 			username
 		});
@@ -854,7 +854,7 @@ function importModel(account, model, username, modelSetting, source, data){
 		systemLogger.logError(`Error while importing model from source ${source.type}`, {
 			stack : err.stack,
 			err: err,
-			account,
+			teamspace,
 			model,
 			username
 		});
@@ -864,7 +864,7 @@ function importModel(account, model, username, modelSetting, source, data){
 		modelSetting.markModified('errorReason');
 		modelSetting.save();
 
-		ChatEvent.modelStatusChanged(null, account, model, modelSetting);
+		ChatEvent.modelStatusChanged(null, teamspace, model, modelSetting);
 
 
 		return Promise.reject(err);
@@ -872,11 +872,11 @@ function importModel(account, model, username, modelSetting, source, data){
 	});
 }
 
-function removeModel(account, model){
+function removeModel(teamspace, model){
 	'use strict';
 
 	let setting;
-	return ModelSetting.findById({account, model}, model).then(_setting => {
+	return ModelSetting.findById({teamspace, model}, model).then(_setting => {
 
 		setting = _setting;
 
@@ -885,7 +885,7 @@ function removeModel(account, model){
 		}
 
 	}).then(() => {
-		return ModelFactory.db.db(account).listCollections().toArray();
+		return ModelFactory.db.db(teamspace).listCollections().toArray();
 
 	}).then(collections => {
 		//remove model collections
@@ -894,7 +894,7 @@ function removeModel(account, model){
 
 		collections.forEach(collection => {
 			if(collection.name.startsWith(model + '.')){
-				promises.push(ModelFactory.db.db(account).dropCollection(collection.name));
+				promises.push(ModelFactory.db.db(teamspace).dropCollection(collection.name));
 			}
 		});
 
@@ -909,37 +909,37 @@ function removeModel(account, model){
 		let promises = [];
 
 		RoleTemplates.modelRoleTemplateLists.forEach(role => {
-			promises.push(Role.dropRole(account, `${model}.${role}`));
+			promises.push(Role.dropRole(teamspace, `${model}.${role}`));
 		});
 
 		return Promise.all(promises);
 	// }).then(() => {
 
 	// 	//remove model from all project
-	// 	return Project.removeModel(account, model);
+	// 	return Project.removeModel(teamspace, model);
 	}).then(() => {
 
 		//remove model from collaborator.customData.models
-		return User.removeModelFromAllUser(account, model);
+		return User.removeModelFromAllUser(teamspace, model);
 	});
 
 }
 
-function getModelPermission(username, setting, account){
+function getModelPermission(username, setting, teamspace){
 	'use strict';
 
 	if(!setting){
 		return Promise.resolve([]);
 	}
 
-	return User.findByUserName(account).then(dbUser => {
+	return User.findByUserName(teamspace).then(dbUser => {
 		if(!dbUser){
 			return [];
 		}
 
-		const accountPerm = dbUser.customData.permissions.findByUser(username);
+		const teamspacePerm = dbUser.customData.permissions.findByUser(username);
 
-		if(accountPerm && accountPerm.permissions.indexOf(C.PERM_TEAMSPACE_ADMIN) !== -1){
+		if(teamspacePerm && teamspacePerm.permissions.indexOf(C.PERM_TEAMSPACE_ADMIN) !== -1){
 			return C.MODEL_PERM_LIST;
 		}
 
@@ -959,7 +959,7 @@ function getModelPermission(username, setting, account){
 	});
 }
 
-function getMetadata(account, model, id){
+function getMetadata(teamspace, model, id){
 	'use strict';
 
 	let projection = {
@@ -970,7 +970,7 @@ function getMetadata(account, model, id){
 		parents: 0
 	};
 
-	return Scene.findOne({account, model}, { _id: utils.stringToUUID(id) }, projection).then(obj => {
+	return Scene.findOne({teamspace, model}, { _id: utils.stringToUUID(id) }, projection).then(obj => {
 		if(obj){
 			return obj;
 		} else {

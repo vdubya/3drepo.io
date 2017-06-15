@@ -25,13 +25,13 @@
 	const User = require("../models/user");
 	const utils = require("../utils");
 
-	router.post("/permission-templates", middlewares.isAccountAdmin, createTemplate);
-	router.get("/permission-templates", middlewares.isAccountAdmin, listTemplates);
-	router.delete("/permission-templates/:permissionId", middlewares.isAccountAdmin, deleteTemplate);
+	router.post("/permission-templates", middlewares.isTeamspaceAdmin, createTemplate);
+	router.get("/permission-templates", middlewares.isTeamspaceAdmin, listTemplates);
+	router.delete("/permission-templates/:permissionId", middlewares.isTeamspaceAdmin, deleteTemplate);
 
 	function listTemplates(req, res, next){
 
-		User.findByUserName(req.params.account).then(user => {
+		User.findByUserName(req.params.teamspace).then(user => {
 
 			responseCodes.respond(utils.APIInfo(req), req, res, next, responseCodes.OK, user.customData.permissionTemplates.get());
 			
@@ -43,7 +43,7 @@
 
 	function createTemplate(req, res, next){
 
-		User.findByUserName(req.params.account).then(user => {
+		User.findByUserName(req.params.teamspace).then(user => {
 
 			let permission = {
 				_id: req.body._id,
@@ -64,7 +64,7 @@
 
 	function deleteTemplate(req, res, next){
 
-		User.findByUserName(req.params.account).then(user => {
+		User.findByUserName(req.params.teamspace).then(user => {
 
 			return user.customData.permissionTemplates.remove(req.params.permissionId);
 

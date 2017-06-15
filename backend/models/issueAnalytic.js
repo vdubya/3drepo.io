@@ -32,9 +32,9 @@
 
 	module.exports = {
 		
-		groupBy: (account, model, firstField, secondField, sort, format) => {
+		groupBy: (teamspace, model, firstField, secondField, sort, format) => {
 
-			const collection = ModelFactory.db.db(account).collection(`${model}.issues`);
+			const collection = ModelFactory.db.db(teamspace).collection(`${model}.issues`);
 
 			let fields = {firstField: getField(firstField)};
 

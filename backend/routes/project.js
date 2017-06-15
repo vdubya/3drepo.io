@@ -17,7 +17,7 @@
 
 
 	function createProject(req, res, next){
-		Project.createProject(req.params.account, req.body.name).then(project => {
+		Project.createProject(req.params.teamspace, req.body.name).then(project => {
 			responseCodes.respond(utils.APIInfo(req), req, res, next, responseCodes.OK, project);
 		}).catch(err => {
 			responseCodes.respond(utils.APIInfo(req), req, res, next, err, err);
@@ -27,7 +27,7 @@
 
 	function updateProject(req, res, next){
 
-		Project.findOne({ account: req.params.account }, {name: req.params.project}).then(project => {
+		Project.findOne({ teamspace: req.params.teamspace }, {name: req.params.project}).then(project => {
 			if(!project){
 				return Promise.reject(responseCodes.PROJECT_NOT_FOUND);
 			} else {
@@ -42,7 +42,7 @@
 
 	function deleteProject(req, res, next){
 		
-		Project.delete(req.params.account, req.params.project).then(project => {
+		Project.delete(req.params.teamspace, req.params.project).then(project => {
 			responseCodes.respond(utils.APIInfo(req), req, res, next, responseCodes.OK, project);
 		}).catch(err => {
 			responseCodes.respond(utils.APIInfo(req), req, res, next, err, err);

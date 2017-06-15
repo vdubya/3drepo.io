@@ -19,7 +19,7 @@ var html = data => `
 	Hi there,<br>
 	<br>
 	Your payment of ${data.amount} is confirmed and you can start uploading models in your 
-	${data.account} repository.
+	${data.teamspace} teamspace.
 	<br><br>
 	Best,<br>
 	3D Repo

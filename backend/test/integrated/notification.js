@@ -128,10 +128,10 @@ describe('Notification', function () {
 		socket = io(config.chat_server.chat_host, {path: '/' + config.chat_server.subdirectory});
 		socket.on('connect', function(data){
 
-			socket.emit('join', {account: username, model: model});
+			socket.emit('join', {teamspace: username, model: model});
 			
 			socket.on('joined', function(data){
-				if(data.account === username && data.model === model){
+				if(data.teamspace === username && data.model === model){
 					done();
 				}
 			});
@@ -154,7 +154,7 @@ describe('Notification', function () {
 
 		mySocket.on('connect', function(data){
 			console.log('on connect')
-			mySocket.emit('join', {account: 'someaccount', model: 'someproject'});
+			mySocket.emit('join', {teamspace: 'someaccount', model: 'someproject'});
 
 			mySocket.on('credentialError', function(err){
 				expect(err).to.exist

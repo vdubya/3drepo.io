@@ -24,21 +24,21 @@
 	const User = require('../models/user');
 
 	// get permissions adapter
-	function getPermissionsAdapter(account) {
+	function getPermissionsAdapter(teamspace) {
 
 		return {
 			getUser: function(){
 				if(this.dbUser){
 					return Promise.resolve(this.dbUser);
 				} else {
-					return User.findByUserName(account).then(user => {
+					return User.findByUserName(teamspace).then(user => {
 						this.dbUser = user;
 						return this.dbUser;
 					});
 				}
 			},
 
-			accountLevel: function(username){
+			teamspaceLevel: function(username){
 
 				return this.getUser().then(user => {
 
@@ -58,7 +58,7 @@
 
 			projectLevel: function(username, project){
 
-				return Project.findOne({account}, { name: project}).then(project => {
+				return Project.findOne({teamspace}, { name: project}).then(project => {
 
 					if(!project){
 						return [];
@@ -81,7 +81,7 @@
 
 				return this.getUser().then(_user => {
 					user = _user;
-					return ModelSetting.findById({account, model}, model);
+					return ModelSetting.findById({teamspace, model}, model);
 
 				}).then(setting => {
 

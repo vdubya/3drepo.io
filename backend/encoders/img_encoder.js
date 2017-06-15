@@ -18,9 +18,6 @@
 var child_process = require("child_process");
 var supportedFormats = ["gif", "jpg", "jpeg", "tiff", "png", "pdf"];
 var responseCodes = require("../response_codes.js");
-
-var dbInterface = require("../db/db_interface.js");
-
 var C           = require("../constants.js");
 
 module.exports.isImage = function(format)
@@ -76,25 +73,5 @@ var createHeightMap = function(format, buffer, callback) {
 
 module.exports.createHeightMap = createHeightMap;
 
-module.exports.route = function(router)
-{
-	"use strict";
-
-	router.get("pdf", "/:account/:project/:uid", function(req, res, params, err_callback) {
-		dbInterface(req[C.REQ_REPO].logger).getObject(params.account, params.project, params.uid, null, null, true, {}, function(err, type, uid, fromStash, obj)
-		{
-			if (err.value) {
-				return err_callback(err);
-			}
-
-			if (obj.metas[uid])
-			{
-				res.write(obj.metas[uid].data.buffer);
-				res.end();
-			}
-		});
-	});
-
-};
 
 

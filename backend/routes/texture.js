@@ -36,7 +36,7 @@ function findByUID(format, req, res, next){
 	'use strict';
 
 
-	let dbCol =  {account: req.params.account, model: req.params.model, logger: req[C.REQ_REPO].logger};
+	let dbCol =  {teamspace: req.params.teamspace, model: req.params.model, logger: req[C.REQ_REPO].logger};
 	let place = utils.APIInfo(req);
 	let options = {};
 

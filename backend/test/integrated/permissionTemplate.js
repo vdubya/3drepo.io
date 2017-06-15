@@ -162,11 +162,11 @@ describe('Permission templates', function () {
 			callback => {
 				agent2.get(`/teamspaces/testing.json`)
 				.expect(200, function(err, res){
-					const account = res.body.teamspaces.find(account => account.teamspace === username);
-					expect(account).to.exist;
+					const teamspace = res.body.teamspaces.find(teamspace => teamspace.teamspace === username);
+					expect(teamspace).to.exist;
 
-					const accountModel = account.models.find(m => m.model === model);
-					expect(accountModel).to.exist;
+					const teamspaceModel = teamspace.models.find(m => m.model === model);
+					expect(teamspaceModel).to.exist;
 
 					callback(err);
 				});
@@ -231,11 +231,11 @@ describe('Permission templates', function () {
 				agent2.get(`/teamspaces/testing.json`)
 				.expect(200, function(err, res){
 
-					const account = res.body.teamspaces.find(account => account.teamspace === username);
-					expect(account).to.exist;
+					const teamspace = res.body.teamspaces.find(teamspace => teamspace.teamspace === username);
+					expect(teamspace).to.exist;
 
-					const accountModel = account.models.find(m => m.model === 'model2');
-					expect(accountModel).to.not.exist;
+					const teamspaceModel = teamspace.models.find(m => m.model === 'model2');
+					expect(teamspaceModel).to.not.exist;
 
 					callback(err);
 				});

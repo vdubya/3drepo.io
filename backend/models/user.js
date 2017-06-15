@@ -36,7 +36,7 @@ var C = require('../constants');
 var userBilling = require("./userBilling");
 var job = require('./job');
 var permissionTemplate = require('./permissionTemplate');
-var accountPermission = require('./accountPermission');
+var teamspacePermission = require('./teamspacePermission');
 var Project = require('./project');
 
 var schema = mongoose.Schema({
@@ -83,15 +83,15 @@ var schema = mongoose.Schema({
 		},
 		//teamspace level permissions
 		permissions: {
-			type: [accountPermission.schema],
+			type: [teamspacePermission.schema],
 			get: function(permissions){
-				return accountPermission.methods.init(this, permissions);
+				return teamspacePermission.methods.init(this, permissions);
 			}
 		},
 		// fields to speed up listing all projects and models the user has access to
 		models: [{
 			_id: false,
-			account: String,
+			teamspace: String,
 			model: String
 		}]
 	},
@@ -150,15 +150,15 @@ schema.statics.authenticate = function(logger, username, password){
 // };
 
 schema.statics.findByUserName = function(user){
-	return this.findOne({account: 'admin'}, { user });
+	return this.findOne({teamspace: 'admin'}, { user });
 };
 
 schema.statics.findByEmail = function(email){
-	return this.findOne({account: 'admin'}, { 'customData.email': email });
+	return this.findOne({teamspace: 'admin'}, { 'customData.email': email });
 };
 
 schema.statics.findByPaypalPaymentToken = function(token){
-	return this.findOne({account: 'admin'}, { 'customData.billing.paypalPaymentToken': token });
+	return this.findOne({teamspace: 'admin'}, { 'customData.billing.paypalPaymentToken': token });
 };
 
 schema.statics.isEmailTaken = function(email, exceptUser){
@@ -170,12 +170,12 @@ schema.statics.isEmailTaken = function(email, exceptUser){
 		query = { 'customData.email': email, 'user': { '$ne': exceptUser }};
 	}
 
-	return this.count({account: 'admin'}, query);
+	return this.count({teamspace: 'admin'}, query);
 };
 
 
 schema.statics.findUserByBillingId = function(billingAgreementId){
-	return this.findOne({account: 'admin'}, { 'customData.billing.billingAgreementId': billingAgreementId });
+	return this.findOne({teamspace: 'admin'}, { 'customData.billing.billingAgreementId': billingAgreementId });
 };
 
 
@@ -496,7 +496,7 @@ schema.statics.revokeRolesFromUser = function(username, db, role){
 	return ModelFactory.db.admin().command(cmd);
 };
 
-function _fillInModelDetails(accountName, setting, permissions){
+function _fillInModelDetails(teamspaceName, setting, permissions){
 	'use strict';
 
 	//console.log('permissions', permissions)
@@ -511,7 +511,7 @@ function _fillInModelDetails(accountName, setting, permissions){
 		project: setting.project
 	};
 
-	return History.findByBranch({account: accountName, model: model.model}, C.MASTER_BRANCH_NAME).then(history => {
+	return History.findByBranch({teamspace: teamspaceName, model: model.model}, C.MASTER_BRANCH_NAME).then(history => {
 
 		if(history){
 			model.timestamp = history.timestamp;
@@ -522,7 +522,7 @@ function _fillInModelDetails(accountName, setting, permissions){
 		if(setting.federate){
 		
 			//list all sub models of a fed model
-			return ModelHelper.listSubModels(accountName, model.model, C.MASTER_BRANCH_NAME).then(subModels => {
+			return ModelHelper.listSubModels(teamspaceName, model.model, C.MASTER_BRANCH_NAME).then(subModels => {
 				model.subModels = subModels;
 			}).then(() => model);
 
@@ -532,20 +532,20 @@ function _fillInModelDetails(accountName, setting, permissions){
 	});
 
 }
-//list all models in an account
-function _getAllModels(accountName, permissions){
+//list all models in a teamspace
+function _getAllModels(teamspaceName, permissions){
 	'use strict';
 
 	let models = [];
 	let fedModels = [];
 
-	return ModelSetting.find({account: accountName}).then(settings => {
+	return ModelSetting.find({teamspace: teamspaceName}).then(settings => {
 
 		let promises = [];
 
 		settings.forEach(setting => {
 			promises.push(
-				_fillInModelDetails(accountName, setting, permissions).then(model => {
+				_fillInModelDetails(teamspaceName, setting, permissions).then(model => {
 					setting.federate ? fedModels.push(model) : models.push(model);
 				})
 			);
@@ -567,10 +567,10 @@ function _getAllModels(accountName, permissions){
 }
 
 // find projects and put models into project
-function _addProjects(account){
+function _addProjects(teamspace){
 	'use strict';
 
-	return Project.find({account: account.teamspace}, {}).then(projects => {
+	return Project.find({teamspace: teamspace.teamspace}, {}).then(projects => {
 
 		projects.forEach((project, i) => {
 		
@@ -586,14 +586,14 @@ function _addProjects(account){
 				}
 			};
 
-			account.models.reduceRight(findModel, 0);
-			account.fedModels.reduceRight(findModel, 0);
+			teamspace.models.reduceRight(findModel, 0);
+			teamspace.fedModels.reduceRight(findModel, 0);
 
 			//project.models = _.compact(project.models);
 
 		});
 
-		account.projects = projects;
+		teamspace.projects = projects;
 	});
 }
 
@@ -604,18 +604,18 @@ function _findModelDetails(dbUserCache, username, model){
 	let getUser;
 	let dbUser;
 
-	if(dbUserCache[model.account]){
-		getUser = Promise.resolve(dbUserCache[model.account]);
+	if(dbUserCache[model.teamspace]){
+		getUser = Promise.resolve(dbUserCache[model.teamspace]);
 	} else {
-		getUser = User.findByUserName(model.account).then(user => {
-			dbUserCache[model.account] = user;
-			return dbUserCache[model.account];
+		getUser = User.findByUserName(model.teamspace).then(user => {
+			dbUserCache[model.teamspace] = user;
+			return dbUserCache[model.teamspace];
 		});
 	}
 
 	return getUser.then(_user => {
 		dbUser = _user;
-		return ModelSetting.findById({account: model.account}, model.model);
+		return ModelSetting.findById({teamspace: model.teamspace}, model.model);
 
 	}).then(setting => {
 
@@ -658,11 +658,11 @@ function _calSpace(user){
 
 }
 
-function _sortAccountsAndModels(accounts){
+function _sortTeamspacesAndModels(teamspaces){
 	'use strict';
 
-	accounts.forEach(account => {
-		account.models.sort((a, b) => {
+	teamspaces.forEach(teamspace => {
+		teamspace.models.sort((a, b) => {
 			if(a.timestamp < b.timestamp){
 				return 1;
 			} else if (a.timestamp > b.timestamp){
@@ -673,7 +673,7 @@ function _sortAccountsAndModels(accounts){
 		});
 	});
 
-	accounts.sort((a, b) => {
+	teamspaces.sort((a, b) => {
 		if (a.teamspace.toLowerCase() < b.teamspace.toLowerCase()){
 			return -1;
 		} else if (a.teamspace.toLowerCase() > b.teamspace.toLowerCase()) {
@@ -684,19 +684,19 @@ function _sortAccountsAndModels(accounts){
 	});
 }
 
-schema.methods.listAccounts = function(){
+schema.methods.listTeamspaces = function(){
 	'use strict';
 
-	let accounts = [];
+	let teamspaces = [];
 
 	// team space level permission
-	return User.findAccountsUserHasAccess(this.user).then(dbUsers => {
+	return User.findTeamspacesUserHasAccess(this.user).then(dbUsers => {
 
-		let addAccountPromises = [];
+		let addTeamspacePromises = [];
 
 		dbUsers.forEach(user => {
 			
-			let account = {
+			let teamspace = {
 				teamspace: user.user,
 				models: [],
 				fedModels: [],
@@ -704,21 +704,21 @@ schema.methods.listAccounts = function(){
 				permissions: user.toObject().customData.permissions[0].permissions
 			};
 
-			accounts.push(account);
+			teamspaces.push(teamspace);
 
-			addAccountPromises.push(
-				// list all models under this account as they have full access
-				_getAllModels(account.teamspace, C.MODEL_PERM_LIST).then(data => {
-					account.models = data.models;
-					account.fedModels = data.fedModels;
+			addTeamspacePromises.push(
+				// list all models under this teamspace as they have full access
+				_getAllModels(teamspace.teamspace, C.MODEL_PERM_LIST).then(data => {
+					teamspace.models = data.models;
+					teamspace.fedModels = data.fedModels;
 				}),
-				// add space usage stat info into account object
-				_calSpace(user).then(quota => account.quota = quota)
+				// add space usage stat info into teamspace object
+				_calSpace(user).then(quota => teamspace.quota = quota)
 			);
 			
 		});
 
-		return Promise.all(addAccountPromises);
+		return Promise.all(addTeamspacePromises);
 
 	// model level permission
 	}).then(() => {
@@ -729,30 +729,30 @@ schema.methods.listAccounts = function(){
 
 		this.customData.models.forEach(model => {
 
-			const findModel = accounts.find(account => {
-				return account.models.find(_model => _model.model === model.model) || 
-				account.fedModels.find(_model => _model.model === model.model);
+			const findModel = teamspaces.find(teamspace => {
+				return teamspace.models.find(_model => _model.model === model.model) || 
+				teamspace.fedModels.find(_model => _model.model === model.model);
 			});
 
 			//add project to list if not covered previously
 			if(!findModel){
 
-				let account = accounts.find(account => account.teamspace === model.account);
+				let teamspace = teamspaces.find(teamspace => teamspace.teamspace === model.teamspace);
 				
-				if(!account){
-					account = {teamspace: model.account, models: [], fedModels: []};
-					accounts.push(account);
+				if(!teamspace){
+					teamspace = {teamspace: model.teamspace, models: [], fedModels: []};
+					teamspaces.push(teamspace);
 				}
 
 				addModelPromises.push(
 					_findModelDetails(dbUserCache, this.user, { 
-						account: model.account, model: model.model 
+						teamspace: model.teamspace, model: model.model 
 					}).then(data => {
 						//console.log('data', JSON.stringify(data, null ,2))
-						return _fillInModelDetails(account.teamspace, data.setting, data.permissions);
+						return _fillInModelDetails(teamspace.teamspace, data.setting, data.permissions);
 					}).then(_model => {
-						//push result to account object
-						_model.federate ? account.fedModels.push(_model) : account.models.push(_model);
+						//push result to teamspace object
+						_model.federate ? teamspace.fedModels.push(_model) : teamspace.models.push(_model);
 					})
 				);
 			}
@@ -761,22 +761,22 @@ schema.methods.listAccounts = function(){
 
 		return Promise.all(addModelPromises);
 
-	//add projects and put models into projects for each account
+	//add projects and put models into projects for each teamspace
 	}).then(() => {
 
 		//sorting models
-		_sortAccountsAndModels(accounts);
+		_sortTeamspacesAndModels(teamspaces);
 
 		// own acconut always ranks top of the list
-		let myAccountIndex = accounts.findIndex(account => account.account === this.user);
-		if(myAccountIndex > -1){
-			let myAccount = accounts[myAccountIndex];
-			accounts.splice(myAccountIndex, 1);
-			accounts.unshift(myAccount);
+		let myTeamspaceIndex = teamspaces.findIndex(teamspace => teamspace.teamspace === this.user);
+		if(myTeamspaceIndex > -1){
+			let myTeamspace = teamspaces[myTeamspaceIndex];
+			teamspaces.splice(myTeamspaceIndex, 1);
+			teamspaces.unshift(myTeamspace);
 		}
 
-		return Promise.all(accounts.map(account => _addProjects(account)))
-			.then(() => accounts);
+		return Promise.all(teamspaces.map(teamspace => _addProjects(teamspace)))
+			.then(() => teamspaces);
 
 	});
 
@@ -800,10 +800,10 @@ schema.methods.buySubscriptions = function(plans, billingUser, billingAddress){
 	});
 };
 
-schema.statics.findAccountsUserHasAccess = function(user){
-	//find all team spaces (accounts) user has access to
+schema.statics.findTeamspacesUserHasAccess = function(user){
+	//find all team spaces (teamspaces) user has access to
 	return User.find( 
-		{account: 'admin'},
+		{teamspace: 'admin'},
 		{ 'customData.permissions': { 
 			$elemMatch: {
 				user: user, 
@@ -833,7 +833,7 @@ schema.statics.activateSubscription = function(billingAgreementId, paymentInfo, 
 	}).then(() => {
 		return dbUser.save();
 	}).then(() => {
-		return Promise.resolve({subscriptions: dbUser.customData.billing.subscriptions, account: dbUser, payment: paymentInfo});
+		return Promise.resolve({subscriptions: dbUser.customData.billing.subscriptions, teamspace: dbUser, payment: paymentInfo});
 	});
 
 };
@@ -886,33 +886,33 @@ schema.methods.createSubscription = function(plan, billingUser, active, expiredA
 };
 
 // remove model record for models list
-schema.statics.removeModel = function(user, account, model){
+schema.statics.removeModel = function(user, teamspace, model){
 	'use strict';
 
-	return User.update( {account: 'admin'}, {user}, {
+	return User.update( {teamspace: 'admin'}, {user}, {
 		$pull: { 
 			'customData.models' : {
-				account: account,
+				teamspace: teamspace,
 				model: model
 			} 
 		} 
 	});
 };
 
-schema.statics.removeModelFromAllUser = function(account, model){
+schema.statics.removeModelFromAllUser = function(teamspace, model){
 	'use strict';
 
-	return User.update( {account: 'admin'}, {
+	return User.update( {teamspace: 'admin'}, {
 		'customData.models':{
 			'$elemMatch':{
-				account: account,
+				teamspace: teamspace,
 				model: model
 			}
 		}
 	}, {
 		$pull: { 
 			'customData.models' : {
-				account: account,
+				teamspace: teamspace,
 				model: model
 			} 
 		} 

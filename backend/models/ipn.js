@@ -37,7 +37,7 @@
 
 	schema.statics.save = function(ipnMessage){
 		
-		let ipn = IPN.createInstance({ account: 'admin' });
+		let ipn = IPN.createInstance({ teamspace: 'admin' });
 		ipn.message = ipnMessage;
 		ipn.markModified('message');
 

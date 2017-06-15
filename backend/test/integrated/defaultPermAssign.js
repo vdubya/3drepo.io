@@ -65,9 +65,9 @@ describe('Default permission assignment', function () {
 		agent.get(`/teamspaces/${username}.json`)
 		.expect(200, function(err, res){
 			
-			const account = res.body.teamspaces.find(account => account.teamspace === username);
-			expect(account).to.exist;
-			expect(account.permissions).include('teamspace_admin');
+			const teamspace = res.body.teamspaces.find(teamspace => teamspace.teamspace === username);
+			expect(teamspace).to.exist;
+			expect(teamspace.permissions).include('teamspace_admin');
 			done(err);
 		});
 	});
@@ -94,14 +94,14 @@ describe('Default permission assignment', function () {
 		});
 	});
 
-	it('the model created should filled with correct permissions (account listing)', function(done){
+	it('the model created should filled with correct permissions (teamspace listing)', function(done){
 		agent.get(`/teamspaces/${username}.json`)
 		.expect(200, function(err, res){
 			
-			const account = res.body.teamspaces.find(account => account.teamspace === username);
-			expect(account).to.exist;
+			const teamspace = res.body.teamspaces.find(teamspace => teamspace.teamspace === username);
+			expect(teamspace).to.exist;
 			
-			const model = account.models.find(model => model.model === modelId);
+			const model = teamspace.models.find(model => model.model === modelId);
 			expect(model).to.exist;
 			expect(model.permissions).to.deep.equal(C.MODEL_PERM_LIST);
 			done(err);

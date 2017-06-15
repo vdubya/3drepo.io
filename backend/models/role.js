@@ -30,24 +30,24 @@
 		roles: []
 	});
 
-	schema.statics.createStandardRoles = function (account, model) {
+	schema.statics.createStandardRoles = function (teamspace, model) {
 		let rolePromises = [];
 
 		RoleTemplates.modelRoleTemplateLists.forEach(role =>
 			{
-				rolePromises.push(this.createRole(account, model, role));
+				rolePromises.push(this.createRole(teamspace, model, role));
 			}
 		);
 
 		return Promise.all(rolePromises);
 	};
 
-	schema.statics.createRole = function (account, model, role) {
+	schema.statics.createRole = function (teamspace, model, role) {
 		
-		let roleId = `${account}.${model}.${role}`;
+		let roleId = `${teamspace}.${model}.${role}`;
 		
 		if(!model){
-			roleId = `${account}.${role}`;
+			roleId = `${teamspace}.${role}`;
 		}
 		
 		return Role.findByRoleID(roleId).then(roleFound => {
@@ -55,21 +55,21 @@
 				roleFound = roleFound.toObject();
 				return { role: roleFound.role, db: roleFound.db};
 			} else {
-				return RoleTemplates.createRoleFromTemplate(account, model, role);
+				return RoleTemplates.createRoleFromTemplate(teamspace, model, role);
 			}
 		});
 	};
 
-	schema.statics.dropRole = function (account, role) {
+	schema.statics.dropRole = function (teamspace, role) {
 		let dropRoleCmd = {
 			'dropRole' : role
 		};
 
-		return this.findByRoleID(`${account}.${role}`).then(role => {
+		return this.findByRoleID(`${teamspace}.${role}`).then(role => {
 			if(!role){
 				return Promise.resolve();
 			} else {
-				return ModelFactory.db.db(account).command(dropRoleCmd);
+				return ModelFactory.db.db(teamspace).command(dropRoleCmd);
 			}
 		});
 		
@@ -85,7 +85,7 @@
 		return ModelFactory.db.admin().command(grantRoleCmd);
 	};
 
-	schema.statics.grantModelRoleToUser = function (username, account, model, role) {
+	schema.statics.grantModelRoleToUser = function (username, teamspace, model, role) {
 		
 		// lazily create the role from template if the role is not found
 
@@ -93,12 +93,12 @@
 			return Promise.reject(responseCodes.INVALID_ROLE_TEMPLATE);
 		}
 
-		return this.createRole(account, model, role).then(() => {
+		return this.createRole(teamspace, model, role).then(() => {
 
 			let grantRoleCmd = {
 				grantRolesToUser: username,
 				roles: [{
-					db: account,
+					db: teamspace,
 					role: `${model}.${role}`
 				}]
 			};
@@ -109,7 +109,7 @@
 	};
 
 	schema.statics.findByRoleID = function(id){
-		return this.findOne({ account: 'admin'}, { _id: id});
+		return this.findOne({ teamspace: 'admin'}, { _id: id});
 	};
 
 	schema.statics.revokeRolesFromUser = function(username, roles){

@@ -23,11 +23,11 @@ var GridFSBucket = require('mongodb').GridFSBucket;
 var systemLogger = require("../../logger.js").systemLogger;
 
 
-function getGridFSBucket (account, bucketName){
+function getGridFSBucket (teamspace, bucketName){
 	'use strict';
 
 	return new GridFSBucket(
-		ModelFactory.db.db(account),
+		ModelFactory.db.db(teamspace),
 		{ bucketName:  bucketName}
 	);
 }
@@ -37,7 +37,7 @@ function _getGridFSBucket (dbCol, format){
 	'use strict';
 
 	return new GridFSBucket(
-		ModelFactory.db.db(dbCol.account),
+		ModelFactory.db.db(dbCol.teamspace),
 		{ bucketName:  `${dbCol.model}.stash.${format}`}
 	);
 }

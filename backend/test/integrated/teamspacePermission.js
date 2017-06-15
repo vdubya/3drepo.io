@@ -28,7 +28,7 @@ const responseCodes = require("../../response_codes.js");
 const async = require('async');
 
 
-describe('Account permission', function () {
+describe('Teamspace permission', function () {
 
 	let server;
 	let agent;
@@ -164,7 +164,7 @@ describe('Account permission', function () {
 		agent.post(`/teamspaces/${username}/permissions`)
 		.send({ user: 'user3', permissions: ['create_project']})
 		.expect(400, function(err, res){
-			expect(res.body.value).to.equal(responseCodes.DUP_ACCOUNT_PERM.value);
+			expect(res.body.value).to.equal(responseCodes.DUP_TEAMSPACE_PERM.value);
 			done(err);
 		});
 	});
@@ -173,7 +173,7 @@ describe('Account permission', function () {
 		agent.put(`/teamspaces/${username}/permissions/user4`)
 		.send({ permissions: ['create_project']})
 		.expect(404, function(err, res){
-			expect(res.body.value).to.equal(responseCodes.ACCOUNT_PERM_NOT_FOUND.value);
+			expect(res.body.value).to.equal(responseCodes.TEAMSPACE_PERM_NOT_FOUND.value);
 			done(err);
 		});
 	});
@@ -181,7 +181,7 @@ describe('Account permission', function () {
 	it('should fail to remove permission for an non existing record', function(done){
 		agent.delete(`/teamspaces/${username}/permissions/user4`)
 		.expect(404, function(err, res){
-			expect(res.body.value).to.equal(responseCodes.ACCOUNT_PERM_NOT_FOUND.value);
+			expect(res.body.value).to.equal(responseCodes.TEAMSPACE_PERM_NOT_FOUND.value);
 			done(err);
 		});
 	});

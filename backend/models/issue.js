@@ -266,7 +266,7 @@ schema.statics.getFederatedModelList = function(dbColOptions, username, branch, 
 			var promises = [];
 
 			refs.forEach(ref => {
-				var childDbName  = ref.owner ? ref.owner : dbColOptions.account;
+				var childDbName  = ref.owner ? ref.owner : dbColOptions.teamspace;
 				var childModel = ref.project;
 
 				var unique = ref.unique;
@@ -283,7 +283,7 @@ schema.statics.getFederatedModelList = function(dbColOptions, username, branch, 
 				}
 
 				let dbCol = {
-					account: childDbName,
+					teamspace: childDbName,
 					model: childModel
 				};
 
@@ -416,7 +416,7 @@ schema.statics.findByModelName = function(dbColOptions, username, branch, revId,
 
 			let promises = [];
 			refs.forEach(ref => {
-				let childDbName = ref.owner || dbColOptions.account;
+				let childDbName = ref.owner || dbColOptions.teamspace;
 				let childModel = ref.project;
 
 				promises.push(
@@ -431,7 +431,7 @@ schema.statics.findByModelName = function(dbColOptions, username, branch, revId,
 								};
 							}
 
-							return self._find({account: childDbName, model: childModel}, filter, projection, sort, noClean);
+							return self._find({teamspace: childDbName, model: childModel}, filter, projection, sort, noClean);
 						} else {
 							return Promise.resolve([]);
 						}
@@ -451,7 +451,7 @@ schema.statics.findByModelName = function(dbColOptions, username, branch, revId,
 
 };
 
-schema.statics.getBCFZipReadStream = function(account, model, username, branch, revId){
+schema.statics.getBCFZipReadStream = function(teamspace, model, username, branch, revId){
 	'use strict';
 
 	var zip = archiver.create('zip');
@@ -463,10 +463,10 @@ schema.statics.getBCFZipReadStream = function(account, model, username, branch, 
 	let noClean = true;
 	let settings;
 
-	return ModelSetting.findById({account, model}, model).then(_settings => {
+	return ModelSetting.findById({teamspace, model}, model).then(_settings => {
 
 		settings = _settings;
-		return this.findByModelName({account, model}, username, branch, revId, projection, noClean);
+		return this.findByModelName({teamspace, model}, username, branch, revId, projection, noClean);
 
 	}).then(issues => {
 
@@ -667,7 +667,7 @@ schema.statics.createIssue = function(dbColOptions, data){
 
 			return this.resizeAndCropScreenshot(data.viewpoint.screenshot.content, 120, 120, true).catch(err => {
 				systemLogger.logError('Resize failed as screenshot is not a valid png, no thumbnail will be generated',{
-					account: dbColOptions.account, 
+					teamspace: dbColOptions.teamspace, 
 					model: dbColOptions.model, 
 					issueId: utils.uuidToString(issue._id), 
 					viewpointId: utils.uuidToString(data.viewpoint.guid),
@@ -706,7 +706,7 @@ schema.statics.createIssue = function(dbColOptions, data){
 
 			let cleaned = issue.clean(_.get(settings, 'type', ''), _.get(settings, 'properties.code', ''));
 			
-			ChatEvent.newIssues(data.sessionId, dbColOptions.account, dbColOptions.model, [cleaned]);
+			ChatEvent.newIssues(data.sessionId, dbColOptions.teamspace, dbColOptions.model, [cleaned]);
 
 			return Promise.resolve(cleaned);
 
@@ -911,7 +911,7 @@ schema.methods.updateComment = function(commentIndex, data){
 			let comment = issue.comments.find(c => c.guid === utils.uuidToString(commentGuid));
 			let eventData = comment;
 
-			ChatEvent.newComment(data.sessionId, this._dbcolOptions.account, this._dbcolOptions.model, issue._id, eventData);
+			ChatEvent.newComment(data.sessionId, this._dbcolOptions.teamspace, this._dbcolOptions.model, issue._id, eventData);
 			return comment;
 		});
 
@@ -946,7 +946,7 @@ schema.methods.updateComment = function(commentIndex, data){
 			let comment = issue.comments.find(c => c.guid === utils.uuidToString(commentObj.guid));
 			let eventData = comment;
 
-			ChatEvent.commentChanged(data.sessionId, this._dbcolOptions.account, this._dbcolOptions.model, issue._id, eventData);
+			ChatEvent.commentChanged(data.sessionId, this._dbcolOptions.teamspace, this._dbcolOptions.model, issue._id, eventData);
 			return comment;
 		});
 	}
@@ -988,7 +988,7 @@ schema.methods.removeComment = function(commentIndex, data){
 		let issue = this.clean();
 		ChatEvent.commentDeleted(
 			data.sessionId, 
-			this._dbcolOptions.account, 
+			this._dbcolOptions.teamspace, 
 			this._dbcolOptions.model, 
 			issue._id, comment);
 
@@ -1099,8 +1099,8 @@ schema.methods.updateAttrs = function(data){
 
 		let issue = this.clean(settings.type, settings.properties.code);
 
-		ChatEvent.issueChanged(data.sessionId, this._dbcolOptions.account, this._dbcolOptions.model, issue._id, issue);
-		ChatEvent.newComment(data.sessionId, this._dbcolOptions.account, this._dbcolOptions.model, issue._id, systemComment);
+		ChatEvent.issueChanged(data.sessionId, this._dbcolOptions.teamspace, this._dbcolOptions.model, issue._id, issue);
+		ChatEvent.newComment(data.sessionId, this._dbcolOptions.teamspace, this._dbcolOptions.model, issue._id, systemComment);
 		
 		return issue;
 
@@ -1116,7 +1116,7 @@ schema.methods.clean = function(typePrefix, modelCode){
 	cleaned.typePrefix = typePrefix;
 	cleaned.modelCode = modelCode;
 	cleaned.parent = cleaned.parent ? uuidToString(cleaned.parent) : undefined;
-	cleaned.account = this._dbcolOptions.account;
+	cleaned.teamspace = this._dbcolOptions.teamspace;
 	cleaned.model = this._dbcolOptions.model;
 	cleaned.rev_id && (cleaned.rev_id = uuidToString(cleaned.rev_id));
 	cleaned.group_id = cleaned.group_id ? uuidToString(cleaned.group_id) : undefined;
@@ -1126,8 +1126,8 @@ schema.methods.clean = function(typePrefix, modelCode){
 		cleaned.viewpoints[i].guid = uuidToString(cleaned.viewpoints[i].guid);
 		
 		if(_.get(cleaned, `viewpoints[${i}].screenshot.flag`)){
-			cleaned.viewpoints[i].screenshot = 'teamspaces/' + cleaned.account + '/models/' + cleaned.model +'/issues/' + cleaned._id + '/viewpoints/' + cleaned.viewpoints[i].guid + '/screenshot.png';
-			cleaned.viewpoints[i].screenshotSmall = 'teamspaces/' + cleaned.account + '/models/' + cleaned.model +'/issues/' + cleaned._id + '/viewpoints/' + cleaned.viewpoints[i].guid + '/screenshotSmall.png';
+			cleaned.viewpoints[i].screenshot = 'teamspaces/' + cleaned.teamspace + '/models/' + cleaned.model +'/issues/' + cleaned._id + '/viewpoints/' + cleaned.viewpoints[i].guid + '/screenshot.png';
+			cleaned.viewpoints[i].screenshotSmall = 'teamspaces/' + cleaned.teamspace + '/models/' + cleaned.model +'/issues/' + cleaned._id + '/viewpoints/' + cleaned.viewpoints[i].guid + '/screenshotSmall.png';
 		}
 
 		if(cleaned.viewpoints[i].up.length === 0){
@@ -1147,7 +1147,7 @@ schema.methods.clean = function(typePrefix, modelCode){
 	});
 
 	if(_.get(cleaned, `thumbnail.flag`)){
-		cleaned.thumbnail = 'teamspaces/' + cleaned.account + '/models/' + cleaned.model +'/issues/' + cleaned._id + '/thumbnail.png';
+		cleaned.thumbnail = 'teamspaces/' + cleaned.teamspace + '/models/' + cleaned.model +'/issues/' + cleaned._id + '/thumbnail.png';
 	}
 
 	cleaned.comments && cleaned.comments.forEach( (comment, i) => {
@@ -1430,7 +1430,7 @@ schema.statics.getModelBCF = function(modelId){
 };
 
 
-schema.statics.importBCF = function(requester, account, model, revId, zipPath){
+schema.statics.importBCF = function(requester, teamspace, model, revId, zipPath){
 	'use strict';
 
 	let self = this;
@@ -1439,9 +1439,9 @@ schema.statics.importBCF = function(requester, account, model, revId, zipPath){
 
 	if(revId){
 		getHistory = utils.isUUID(revId) ? History.findByUID : History.findByTag;
-		getHistory = getHistory({account, model}, revId, {_id: 1});
+		getHistory = getHistory({teamspace, model}, revId, {_id: 1});
 	} else {
-		getHistory = History.findByBranch({account, model}, 'master', {_id: 1});
+		getHistory = History.findByBranch({teamspace, model}, 'master', {_id: 1});
 	}
 
 	//assign revId for issue
@@ -1453,7 +1453,7 @@ schema.statics.importBCF = function(requester, account, model, revId, zipPath){
 		}
 	}).then(() => {
 
-		return ModelSetting.findById({account, model}, model);
+		return ModelSetting.findById({teamspace, model}, model);
 
 	}).then(_settings => {
 		settings = _settings;
@@ -1480,7 +1480,7 @@ schema.statics.importBCF = function(requester, account, model, revId, zipPath){
 
 					let issueCounter;
 
-					Issue.count({account, model}).then(count => {
+					Issue.count({teamspace, model}).then(count => {
 
 						issueCounter = count;
 
@@ -1511,7 +1511,7 @@ schema.statics.importBCF = function(requester, account, model, revId, zipPath){
 						issues.forEach(issue => {
 
 							saveIssueProms.push(
-								Issue.count({account, model}, { _id: issue._id}).then(count => {
+								Issue.count({teamspace, model}, { _id: issue._id}).then(count => {
 
 									if(count <= 0) {
 										issue.number = ++issueCounter;
@@ -1539,7 +1539,7 @@ schema.statics.importBCF = function(requester, account, model, revId, zipPath){
 						});
 
 						if(notifications.length){
-							ChatEvent.newIssues(requester, account, model, notifications);
+							ChatEvent.newIssues(requester, teamspace, model, notifications);
 						}
 						
 						resolve();
@@ -1595,7 +1595,7 @@ schema.statics.importBCF = function(requester, account, model, revId, zipPath){
 
 					xml = _xml;
 
-					issue = Issue.createInstance({account, model});
+					issue = Issue.createInstance({teamspace, model});
 					issue._id = stringToUUID(guid);
 					issue.extras = {};
 					issue.rev_id = revId;
@@ -1746,7 +1746,7 @@ schema.statics.importBCF = function(requester, account, model, revId, zipPath){
 						return self.resizeAndCropScreenshot(viewpoints[vpGuids[0]].snapshot, 120, 120, true).catch(err => {
 
 							systemLogger.logError('Resize failed as screenshot is not a valid png, no thumbnail will be generated', {
-								account, 
+								teamspace, 
 								model, 
 								issueId: utils.uuidToString(issue._id), 
 								viewpointId: vpGuids[0],

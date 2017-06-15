@@ -90,8 +90,8 @@ function genglX(format, req, res){
 		'OSGRID': 'osgrid'
 	};
 
-	//TO-DO: hard coded account for stashing 3d building grids
-	let dbCol =  {account: 'ordnancesurvey', model: 'properties_dimensions', logger: req[C.REQ_REPO].logger};
+	//TO-DO: hard coded teamspace for stashing 3d building grids
+	let dbCol =  {teamspace: 'ordnancesurvey', model: 'properties_dimensions', logger: req[C.REQ_REPO].logger};
 
 	var method = req.query.method;
 
@@ -99,11 +99,11 @@ function genglX(format, req, res){
 	let binUrl;
 	
 	if(format === 'gltf'){
-		gltfUrl = `/${dbCol.account}/${dbCol.model}${req.url}`;
+		gltfUrl = `/${dbCol.teamspace}/${dbCol.model}${req.url}`;
 		binUrl  = gltfUrl.replace('gltf', 'bin');
 
 	} else {
-		binUrl = `/${dbCol.account}/${dbCol.model}${req.url}`;
+		binUrl = `/${dbCol.teamspace}/${dbCol.model}${req.url}`;
 		gltfUrl  = binUrl.replace('bin', 'gltf');
 	}
 
@@ -384,8 +384,8 @@ function getMapTiles(req, res){
 	y = req.params.y;
 	z = req.params.z;
 
-	//TO-DO: hard coded account for stashing map images
-	let dbCol =  {account: 'ordnancesurvey', model: 'map_images', logger: req[C.REQ_REPO].logger};
+	//TO-DO: hard coded teamspace for stashing map images
+	let dbCol =  {teamspace: 'ordnancesurvey', model: 'map_images', logger: req[C.REQ_REPO].logger};
 	
 	let filename = `${req.params.style}/${z}/${x}/${y}.png`;
 

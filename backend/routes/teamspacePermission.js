@@ -25,15 +25,15 @@
 	const User = require("../models/user");
 	const utils = require("../utils");
 
-	router.get("/permissions", middlewares.isAccountAdmin, listPermissions);
-	router.post("/permissions", middlewares.isAccountAdmin, createPermission);
-	router.put("/permissions/:user", middlewares.isAccountAdmin, updatePermission);
-	router.delete("/permissions/:user", middlewares.isAccountAdmin, deletePermission);
+	router.get("/permissions", middlewares.isTeamspaceAdmin, listPermissions);
+	router.post("/permissions", middlewares.isTeamspaceAdmin, createPermission);
+	router.put("/permissions/:user", middlewares.isTeamspaceAdmin, updatePermission);
+	router.delete("/permissions/:user", middlewares.isTeamspaceAdmin, deletePermission);
 
 
 	function listPermissions(req, res, next){
 
-		User.findByUserName(req.params.account).then(user => {
+		User.findByUserName(req.params.teamspace).then(user => {
 
 			responseCodes.respond(utils.APIInfo(req), req, res, next, responseCodes.OK, user.toObject().customData.permissions);
 		}).catch(err => {
@@ -45,7 +45,7 @@
 
 	function createPermission(req, res, next){
 
-		User.findByUserName(req.params.account).then(user => {
+		User.findByUserName(req.params.teamspace).then(user => {
 
 			return user.customData.permissions.add(req.body);
 
@@ -61,7 +61,7 @@
 
 	function updatePermission(req, res, next){
 
-		User.findByUserName(req.params.account).then(user => {
+		User.findByUserName(req.params.teamspace).then(user => {
 
 			return user.customData.permissions.update(req.params.user, req.body);
 
@@ -76,7 +76,7 @@
 
 	function deletePermission(req, res, next){
 
-		User.findByUserName(req.params.account).then(user => {
+		User.findByUserName(req.params.teamspace).then(user => {
 
 			return user.customData.permissions.remove(req.params.user);
 

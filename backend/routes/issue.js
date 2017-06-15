@@ -65,11 +65,11 @@ function storeIssue(req, res, next){
 	
 	data.revId = req.params.rid;
 
-	Issue.createIssue({account: req.params.account, model: req.params.model}, data).then(issue => {
+	Issue.createIssue({teamspace: req.params.teamspace, model: req.params.model}, data).then(issue => {
 
 		// let resData = {
 		// 	_id: issue._id,
-		// 	account: req.params.account, 
+		// 	teamspace: req.params.teamspace, 
 		// 	model: req.params.model, 
 		// 	issue_id : issue._id, 
 		// 	number : issue.number, 
@@ -96,7 +96,7 @@ function updateIssue(req, res, next){
 	data.revId = req.params.rid;
 	data.sessionId = req.headers[C.HEADER_SOCKET_ID];
 
-	let dbCol = {account: req.params.account, model: req.params.model};
+	let dbCol = {teamspace: req.params.teamspace, model: req.params.model};
 	let issueId = req.params.issueId;
 	let action;
 
@@ -126,12 +126,12 @@ function updateIssue(req, res, next){
 
 		} else {
 			
-			action = User.findByUserName(req.params.account).then(dbUser => {
+			action = User.findByUserName(req.params.teamspace).then(dbUser => {
 
 				const sub = dbUser.customData.billing.subscriptions.findByAssignedUser(req.session.user.username);
 				const job = sub && sub.job;
-				const accountPerm = dbUser.customData.permissions.findByUser(req.session.user.username);
-				const isAdmin = accountPerm && accountPerm.permissions.indexOf(C.PERM_TEAMSPACE_ADMIN) !== -1;
+				const teamspacePerm = dbUser.customData.permissions.findByUser(req.session.user.username);
+				const isAdmin = teamspacePerm && teamspacePerm.permissions.indexOf(C.PERM_TEAMSPACE_ADMIN) !== -1;
 				
 				const canCloseIssue = (issue.creator_role === job && issue.creator_role && job) || 
 					req.session.user.username === issue.owner ||
@@ -152,7 +152,7 @@ function updateIssue(req, res, next){
 
 		let resData = {
 			_id: issueId,
-			account: req.params.account,
+			teamspace: req.params.teamspace,
 			model: req.params.model,
 			issue: issue,
 			issue_id : issueId,
@@ -174,7 +174,7 @@ function listIssues(req, res, next) {
 
 	//let params = req.params;
 	let place = utils.APIInfo(req);
-	let dbCol =  {account: req.params.account, model: req.params.model, logger: req[C.REQ_REPO].logger};
+	let dbCol =  {teamspace: req.params.teamspace, model: req.params.model, logger: req[C.REQ_REPO].logger};
 	let projection = {
 		extras: 0,
 		'comments': 0,
@@ -206,15 +206,15 @@ function getIssuesBCF(req, res, next) {
 	'use strict';
 	
 	let place = utils.APIInfo(req);
-	let account = req.params.account;
+	let teamspace = req.params.teamspace;
 	let model = req.params.model;
 	
 	let getBCFZipRS;
 
 	if (req.params.rid) {
-		getBCFZipRS = Issue.getBCFZipReadStream(account, model, req.session.user.username, null, req.params.rid);
+		getBCFZipRS = Issue.getBCFZipReadStream(teamspace, model, req.session.user.username, null, req.params.rid);
 	} else {
-		getBCFZipRS = Issue.getBCFZipReadStream(account, model, req.session.user.username, "master", null);
+		getBCFZipRS = Issue.getBCFZipReadStream(teamspace, model, req.session.user.username, "master", null);
 	}
 
 	getBCFZipRS.then(zipRS => {
@@ -237,7 +237,7 @@ function getIssuesBCF(req, res, next) {
 
 // 	let params = req.params;
 // 	let place = utils.APIInfo(req);
-// 	let dbCol =  {account: req.params.account, model: req.params.model};
+// 	let dbCol =  {teamspace: req.params.teamspace, model: req.params.model};
 
 // 	Issue.findBySharedId(dbCol, params.sid, req.query.number).then(issues => {
 // 		responseCodes.respond(place, req, res, next, responseCodes.OK, issues);
@@ -252,7 +252,7 @@ function findIssueById(req, res, next) {
 
 	let params = req.params;
 	let place = utils.APIInfo(req);
-	let dbCol =  {account: req.params.account, model: req.params.model};
+	let dbCol =  {teamspace: req.params.teamspace, model: req.params.model};
 
 	Issue.findByUID(dbCol, params.uid).then(issue => {
 
@@ -269,7 +269,7 @@ function renderIssuesHTML(req, res, next){
 	'use strict';
 
 	let place = utils.APIInfo(req);
-	let dbCol =  {account: req.params.account, model: req.params.model, logger: req[C.REQ_REPO].logger};
+	let dbCol =  {teamspace: req.params.teamspace, model: req.params.model, logger: req[C.REQ_REPO].logger};
 	let findIssue;
 	let noClean = false;
 
@@ -375,7 +375,7 @@ function importBCF(req, res, next){
 		} else {
 
 
-			Issue.importBCF(req.headers[C.HEADER_SOCKET_ID], req.params.account, req.params.model, req.params.rid, req.file.path).then(() => {
+			Issue.importBCF(req.headers[C.HEADER_SOCKET_ID], req.params.teamspace, req.params.model, req.params.rid, req.file.path).then(() => {
 				responseCodes.respond(place, req, res, next, responseCodes.OK, {'status': 'ok'});
 			}).catch(err => {
 				responseCodes.respond(place, req, res, next, err, err);
@@ -388,7 +388,7 @@ function getScreenshot(req, res, next){
 	'use strict';
 
 	let place = utils.APIInfo(req);
-	let dbCol = {account: req.params.account, model: req.params.model};
+	let dbCol = {teamspace: req.params.teamspace, model: req.params.model};
 
 	Issue.getScreenshot(dbCol, req.params.uid, req.params.vid).then(buffer => {
 		responseCodes.respond(place, req, res, next, responseCodes.OK, buffer, 'png');
@@ -402,7 +402,7 @@ function getScreenshotSmall(req, res, next){
 	'use strict';
 
 	let place = utils.APIInfo(req);
-	let dbCol = {account: req.params.account, model: req.params.model};
+	let dbCol = {teamspace: req.params.teamspace, model: req.params.model};
 
 	Issue.getSmallScreenshot(dbCol, req.params.uid, req.params.vid).then(buffer => {
 		responseCodes.respond(place, req, res, next, responseCodes.OK, buffer, 'png');
@@ -416,7 +416,7 @@ function getThumbnail(req, res, next){
 	'use strict';
 
 	let place = utils.APIInfo(req);
-	let dbCol = {account: req.params.account, model: req.params.model};
+	let dbCol = {teamspace: req.params.teamspace, model: req.params.model};
 
 	Issue.getThumbnail(dbCol, req.params.uid).then(buffer => {
 		responseCodes.respond(place, req, res, next, responseCodes.OK, buffer, 'png');

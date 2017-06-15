@@ -32,7 +32,7 @@ var groupSchema = Schema({
 	objects: [{
 		_id : false,
 		shared_id: Object,
-		account: String,
+		teamspace: String,
 		model: String
 	}],
 	issue_id: Object,
@@ -82,7 +82,7 @@ groupSchema.methods.updateAttrs = function(data){
 		let obj = data.objects.find(obj => obj.id === id);
 		addPromises.push(
 			Mesh.addGroup(
-				obj.account,
+				obj.teamspace,
 				obj.model,
 				id,
 				utils.uuidToString(this._id)
@@ -104,7 +104,7 @@ groupSchema.methods.updateAttrs = function(data){
 
 			removePromises.push(
 				Mesh.removeGroup(
-					obj.account,
+					obj.teamspace,
 					obj.model,
 					id,
 					utils.uuidToString(this._id)
@@ -141,7 +141,7 @@ groupSchema.statics.createGroup = function(dbCol, data){
 	'use strict';
 
 	let group = this.model('Group').createInstance({
-		account: dbCol.account, 
+		teamspace: dbCol.teamspace, 
 		model: dbCol.model
 	});
 
@@ -179,7 +179,7 @@ groupSchema.statics.deleteGroup = function(dbCol, id){
 
 		group.objects.forEach(obj => removePromises.push(
 			Mesh.removeGroup(
-				obj.account,
+				obj.teamspace,
 				obj.model,
 				utils.uuidToString(obj.id),
 				id

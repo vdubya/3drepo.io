@@ -414,7 +414,7 @@
 		}
 
 		//check if they are a collaborator
-		return ModelSetting.find({ account: user }, {}).then(models => {
+		return ModelSetting.find({ teamspace: user }, {}).then(models => {
 
 			let foundModels = [];
 			models.forEach(model => {

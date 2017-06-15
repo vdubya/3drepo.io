@@ -142,8 +142,8 @@ describe('Federated Model', function () {
 				done => {
 					agent.get(`/teamspaces/${username}.json`)
 					.expect(200, function(err, res){
-						let account = res.body.teamspaces.find(a => a.teamspace === username);
-						let fed = account.fedModels.find(m => m.model === fedModelId);
+						let teamspace = res.body.teamspaces.find(a => a.teamspace === username);
+						let fed = teamspace.fedModels.find(m => m.model === fedModelId);
 						expect(fed.federate).to.equal(true);
 						done(err);
 					})
@@ -191,8 +191,8 @@ describe('Federated Model', function () {
 				done => {
 					agent.get(`/teamspaces/${username}.json`)
 					.expect(200, function(err, res){
-						let account = res.body.teamspaces.find(a => a.teamspace === username);
-						let fed = account.fedModels.find(p => p.model === emptyFedId);
+						let teamspace = res.body.teamspaces.find(a => a.teamspace === username);
+						let fed = teamspace.fedModels.find(p => p.model === emptyFedId);
 						expect(fed.federate).to.equal(true);
 						done(err);
 					})

@@ -18,7 +18,7 @@
 var html = data => `
 	Toy model failed to import. Please help this user out.
 	<br>
-	account: ${data.account}
+	teamspace: ${data.teamspace}
 	<br>
 	model: ${data.model}
 	<br>

@@ -30,7 +30,7 @@ describe('Check permission function', function(){
 
 			function getPermissionsAdpater(){
 				return {
-					accountLevel: () => Promise.resolve(['create_project']),
+					teamspaceLevel: () => Promise.resolve(['create_project']),
 					projectLevel: () => Promise.resolve([]),
 					modelLevel: () => Promise.resolve([])
 				};
@@ -41,11 +41,11 @@ describe('Check permission function', function(){
 			});
 		});
 
-		it('case #2 - account level permissions', function(){
+		it('case #2 - teamspace level permissions', function(){
 
 			function getPermissionsAdpater(){
 				return {
-					accountLevel: () => Promise.resolve(['create_project']),
+					teamspaceLevel: () => Promise.resolve(['create_project']),
 					projectLevel: () => Promise.resolve([]),
 					modelLevel: () => Promise.resolve([])
 				};
@@ -56,11 +56,11 @@ describe('Check permission function', function(){
 			});
 		});
 
-		it('case #3 - account level permissions', function(){
+		it('case #3 - teamspace level permissions', function(){
 
 			function getPermissionsAdpater(){
 				return {
-					accountLevel: () => Promise.resolve(['create_project', 'assign_licence', 'create_job']),
+					teamspaceLevel: () => Promise.resolve(['create_project', 'assign_licence', 'create_job']),
 					projectLevel: () => Promise.resolve([]),
 					modelLevel: () => Promise.resolve([])
 				};
@@ -75,7 +75,7 @@ describe('Check permission function', function(){
 
 			function getPermissionsAdpater(){
 				return {
-					accountLevel: () => Promise.resolve(['create_project', 'assign_licence', 'create_job']),
+					teamspaceLevel: () => Promise.resolve(['create_project', 'assign_licence', 'create_job']),
 					projectLevel: () => Promise.resolve(['create_model', 'create_federation', 'delete_project']),
 					modelLevel: () => Promise.resolve([])
 				};
@@ -90,7 +90,7 @@ describe('Check permission function', function(){
 
 			function getPermissionsAdpater(){
 				return {
-					accountLevel: () => Promise.resolve(['create_project', 'assign_licence', 'create_job']),
+					teamspaceLevel: () => Promise.resolve(['create_project', 'assign_licence', 'create_job']),
 					projectLevel: () => Promise.resolve(['create_model', 'create_federation', 'delete_project']),
 					modelLevel: () => Promise.resolve([])
 				};
@@ -105,7 +105,7 @@ describe('Check permission function', function(){
 
 			function getPermissionsAdpater(){
 				return {
-					accountLevel: () => Promise.resolve(['create_project', 'assign_licence', 'create_job']),
+					teamspaceLevel: () => Promise.resolve(['create_project', 'assign_licence', 'create_job']),
 					projectLevel: () => Promise.resolve(['create_model', 'create_federation', 'delete_project']),
 					modelLevel: () => Promise.resolve(['view_issue', 'view_model', 'comment_issue'])
 				};
@@ -120,7 +120,7 @@ describe('Check permission function', function(){
 
 			function getPermissionsAdpater(){
 				return {
-					accountLevel: () => Promise.resolve(['create_project', 'assign_licence', 'create_job']),
+					teamspaceLevel: () => Promise.resolve(['create_project', 'assign_licence', 'create_job']),
 					projectLevel: () => Promise.resolve(['create_model', 'create_federation', 'delete_project']),
 					modelLevel: () => Promise.resolve(['view_issue', 'view_model', 'comment_issue'])
 				};
@@ -137,7 +137,7 @@ describe('Check permission function', function(){
 
 			function getPermissionsAdpater(){
 				return {
-					accountLevel: () => Promise.resolve(['create_project', 'assign_licence', 'create_job']),
+					teamspaceLevel: () => Promise.resolve(['create_project', 'assign_licence', 'create_job']),
 					projectLevel: () => Promise.resolve(['create_model', 'create_federation', 'delete_project']),
 					modelLevel: () => Promise.resolve(['view_issue', 'view_model', 'comment_issue'])
 				};
@@ -156,7 +156,7 @@ describe('Check permission function', function(){
 
 			function getPermissionsAdpater(){
 				return {
-					accountLevel: () => Promise.resolve([]),
+					teamspaceLevel: () => Promise.resolve([]),
 					projectLevel: () => Promise.resolve([]),
 					modelLevel: () => Promise.resolve([])
 				};
@@ -171,7 +171,7 @@ describe('Check permission function', function(){
 
 			function getPermissionsAdpater(){
 				return {
-					accountLevel: () => Promise.resolve(['assign_licence']),
+					teamspaceLevel: () => Promise.resolve(['assign_licence']),
 					projectLevel: () => Promise.resolve([]),
 					modelLevel: () => Promise.resolve([])
 				};
@@ -186,7 +186,7 @@ describe('Check permission function', function(){
 
 			function getPermissionsAdpater(){
 				return {
-					accountLevel: () => Promise.resolve(['assign_licence']),
+					teamspaceLevel: () => Promise.resolve(['assign_licence']),
 					projectLevel: () => Promise.resolve(['create_model', 'create_federation']),
 					modelLevel: () => Promise.resolve([])
 				};
@@ -201,7 +201,7 @@ describe('Check permission function', function(){
 
 			function getPermissionsAdpater(){
 				return {
-					accountLevel: () => Promise.resolve(['create_project', 'assign_licence', 'create_job']),
+					teamspaceLevel: () => Promise.resolve(['create_project', 'assign_licence', 'create_job']),
 					projectLevel: () => Promise.resolve(['create_model', 'create_federation', 'delete_project']),
 					modelLevel: () => Promise.resolve(['view_issue', 'view_model'])
 				};
@@ -218,7 +218,7 @@ describe('Check permission function', function(){
 
 			function getPermissionsAdpater(){
 				return {
-					accountLevel: () => Promise.resolve(['teamspace_admin']),
+					teamspaceLevel: () => Promise.resolve(['teamspace_admin']),
 					projectLevel: () => Promise.resolve([]),
 					modelLevel: () => Promise.resolve([])
 				};

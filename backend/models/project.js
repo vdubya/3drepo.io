@@ -69,18 +69,18 @@
 		return next();
 	});
 
-	schema.statics.createProject = function(account, name){
+	schema.statics.createProject = function(teamspace, name){
 
-		let project = Project.createInstance({account});
+		let project = Project.createInstance({teamspace});
 		project.name = name;
 		return project.save();
 
 	};
 
-	schema.statics.delete = function(account, name){
+	schema.statics.delete = function(teamspace, name){
 
-		return ModelSetting.removeProjectFromAllModels(account, name).then(() => {
-			return Project.findOneAndRemove({account}, {name});
+		return ModelSetting.removeProjectFromAllModels(teamspace, name).then(() => {
+			return Project.findOneAndRemove({teamspace}, {name});
 		}).then(project => {
 			if(!project){
 				return Promise.reject(responseCodes.PROJECT_NOT_FOUND);
@@ -90,8 +90,8 @@
 		});
 	};
 
-	// schema.statics.removeModel = function(account, model){
-	// 	return Project.update({account}, { models: model }, { '$pull' : { 'models': model}}, {'multi': true});
+	// schema.statics.removeModel = function(teamspace, model){
+	// 	return Project.update({teamspace}, { models: model }, { '$pull' : { 'models': model}}, {'multi': true});
 	// };
 
 	schema.methods.updateAttrs = function(data){

@@ -28,15 +28,15 @@
 	const Invoice = require("../models/invoice");
 	const moment = require('moment');
 
-	router.get("/invoices", middlewares.isAccountAdmin, listInvoices);
-	router.get("/invoices/:invoiceNo.html", middlewares.isAccountAdmin, renderInvoice);
-	router.get("/invoices/:invoiceNo.pdf", middlewares.isAccountAdmin, renderInvoicePDF);
+	router.get("/invoices", middlewares.isTeamspaceAdmin, listInvoices);
+	router.get("/invoices/:invoiceNo.html", middlewares.isTeamspaceAdmin, renderInvoice);
+	router.get("/invoices/:invoiceNo.pdf", middlewares.isTeamspaceAdmin, renderInvoicePDF);
 
 
 	function listInvoices(req, res, next){
 
 		let responsePlace = utils.APIInfo(req);
-		Invoice.findByAccount(req.params.account).then(invoices => {
+		Invoice.findByTeamspace(req.params.teamspace).then(invoices => {
 
 			responseCodes.respond(responsePlace, req, res, next, responseCodes.OK, invoices);
 		}).catch(err => {
@@ -47,7 +47,7 @@
 	function renderInvoice(req, res, next){
 
 		let responsePlace = utils.APIInfo(req);
-		Invoice.findByInvoiceNo(req.params.account, req.params.invoiceNo).then(invoice => {
+		Invoice.findByInvoiceNo(req.params.teamspace, req.params.invoiceNo).then(invoice => {
 
 			if(!invoice){
 				return Promise.reject(responseCodes.BILLING_NOT_FOUND);
@@ -78,7 +78,7 @@
 			regenerate = req.query.regenerate;
 		}
 
-		Invoice.findByInvoiceNo(req.params.account, req.params.invoiceNo).then(_invoice => {
+		Invoice.findByInvoiceNo(req.params.teamspace, req.params.invoiceNo).then(_invoice => {
 
 			invoice = _invoice;
 			if(!invoice){

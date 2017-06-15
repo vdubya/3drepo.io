@@ -46,7 +46,7 @@ module.exports = {
 
 		let item = new Model(data);
 		
-		item.collection = this.db.db(options.account).collection(this.__collectionName(modelName, options));
+		item.collection = this.db.db(options.teamspace).collection(this.__collectionName(modelName, options));
 
 		item._dbcolOptions = options;
 
@@ -103,11 +103,11 @@ module.exports = {
 				args.shift();
 
 				// resetting the static collection
-				if (!options || !options.account){
-					throw new Error('account name (db) is missing');
+				if (!options || !options.teamspace){
+					throw new Error('teamspace name (db) is missing');
 				}
 
-				let collection = self.db.db(options.account).collection(self.__collectionName(modelName, options));
+				let collection = self.db.db(options.teamspace).collection(self.__collectionName(modelName, options));
 				mongooseModel.collection = collection;
 
 				return staticFunc.apply(this, args).then(items => {
@@ -153,9 +153,9 @@ module.exports = {
 
 		mongooseModel.update = function(options){
 
-			//self.db.db(options.account).collection(self.__collectionName(modelName, options));
+			//self.db.db(options.teamspace).collection(self.__collectionName(modelName, options));
 
-			let collection = self.db.db(options.account).collection(self.__collectionName(modelName, options));
+			let collection = self.db.db(options.teamspace).collection(self.__collectionName(modelName, options));
 			mongooseModel.collection = collection;
 
 			var args = Array.prototype.slice.call(arguments);

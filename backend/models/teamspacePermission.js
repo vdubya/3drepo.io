@@ -51,7 +51,7 @@
 			}).then(() => {
 
 				const isPermissionInvalid = permission.permissions && 
-					_.intersection(permission.permissions, C.ACCOUNT_PERM_LIST).length !== permission.permissions.length;
+					_.intersection(permission.permissions, C.TEAMSPACE_PERM_LIST).length !== permission.permissions.length;
 
 				if (isPermissionInvalid) {
 					return Promise.reject(responseCodes.INVALID_PERM);
@@ -64,7 +64,7 @@
 			return this._check(permission.user, permission).then(() => {
 				
 				if(this.findByUser(permission.user)){
-					return Promise.reject(responseCodes.DUP_ACCOUNT_PERM);
+					return Promise.reject(responseCodes.DUP_TEAMSPACE_PERM);
 				}
 
 				this.permissions.push(permission);
@@ -82,7 +82,7 @@
 				if(currPermission){
 					currPermission.permissions = permission.permissions;
 				} else {
-					return Promise.reject(responseCodes.ACCOUNT_PERM_NOT_FOUND);
+					return Promise.reject(responseCodes.TEAMSPACE_PERM_NOT_FOUND);
 				}
 
 				return this.user.save().then(() => permission);
@@ -101,7 +101,7 @@
 			});
 
 			if (index === -1) {
-				return Promise.reject(responseCodes.ACCOUNT_PERM_NOT_FOUND);
+				return Promise.reject(responseCodes.TEAMSPACE_PERM_NOT_FOUND);
 			} else {
 				this.permissions.splice(index, 1);
 				return this.user.save();

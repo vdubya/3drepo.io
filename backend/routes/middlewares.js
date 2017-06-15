@@ -45,11 +45,11 @@
 			checkLogin.then(() => {
 
 				const username = req.session.user.username;
-				const account = req.params.account;
+				const teamspace = req.params.teamspace;
 				const model = req.params.model;
 				const project = req.params.project;
 
-				return checkPermissionsHelper(username, account, project, model, permsRequest, getPermissionsAdapter);
+				return checkPermissionsHelper(username, teamspace, project, model, permsRequest, getPermissionsAdapter);
 
 			}).then(granted => {
 
@@ -76,15 +76,15 @@
 		}
 	}
 
-	function freeSpace(account){
+	function freeSpace(teamspace){
 
 		let limits;
 
 		//console.log('checking free space');
-		return User.findByUserName(account).then( dbUser => {
+		return User.findByUserName(teamspace).then( dbUser => {
 
 			limits = dbUser.customData.billing.subscriptions.getSubscriptionLimits();
-			return User.historyChunksStats(account);
+			return User.historyChunksStats(teamspace);
 
 		}).then(stats => {
 
@@ -106,14 +106,14 @@
 
 		let limits;
 
-		let account = req.params.account;
+		let teamspace = req.params.teamspace;
 		let model = req.params.model;
 
-		return User.findByUserName(account).then( dbUser => {
+		return User.findByUserName(teamspace).then( dbUser => {
 
 			limits = dbUser.customData.billing.subscriptions.getSubscriptionLimits();
 
-			return ModelSetting.findById({account}, model);
+			return ModelSetting.findById({teamspace}, model);
 
 		}).then(modelSetting => {
 
@@ -163,10 +163,10 @@
 
 	}
 
-	function hasReadAccessToModelHelper(username, account, model){
+	function hasReadAccessToModelHelper(username, teamspace, model){
 		return checkPermissionsHelper(
 			username, 
-			account, 
+			teamspace, 
 			'',
 			model, 
 			[C.PERM_VIEW_MODEL],
@@ -174,10 +174,10 @@
 		);
 	}
 
-	function isAccountAdminHelper(username, account, model){
+	function isTeamspaceAdminHelper(username, teamspace, model){
 		return checkPermissionsHelper(
 			username, 
-			account, 
+			teamspace, 
 			'',
 			model, 
 			[C.PERM_TEAMSPACE_ADMIN],
@@ -188,7 +188,7 @@
 	function translateToModelId(req, res, next){
 
 		if(req.params.project && req.params.model){
-			return ModelSetting.findByProjectAndModelName(req.params.account, req.params.project, req.params.model).then(setting => {
+			return ModelSetting.findByProjectAndModelName(req.params.teamspace, req.params.project, req.params.model).then(setting => {
 				if(setting){
 
 					req.params.model = setting._id;
@@ -218,7 +218,7 @@
 		hasEditAccessToFedModel: checkPermissions([C.PERM_EDIT_FEDERATION]),
 		hasDeleteAccessToFedModel: checkPermissions([C.PERM_DELETE_FEDERATION]),
 
-		isAccountAdmin: checkPermissions([C.PERM_TEAMSPACE_ADMIN]),
+		isTeamspaceAdmin: checkPermissions([C.PERM_TEAMSPACE_ADMIN]),
 		hasCollaboratorQuota: [loggedIn, hasCollaboratorQuota],
 		connectQueue,
 		loggedIn,
@@ -228,7 +228,7 @@
 		checkPermissions,
 		freeSpace,
 		hasReadAccessToModelHelper,
-		isAccountAdminHelper,
+		isTeamspaceAdminHelper,
 		createQueueInstance,
 		checkPermissionsHelper,
 

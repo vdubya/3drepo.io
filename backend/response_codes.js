@@ -32,7 +32,7 @@
 		USER_NOT_FOUND: { message: "User not found", status: 404 },
 		INCORRECT_USERNAME_OR_PASSWORD: { message: "Incorrect username or password", status: 400 },
 
-		CAN_ONLY_CHANGE_OWN_ACCOUNT: { message: "You can only update your own account", status: 401 },
+		CAN_ONLY_CHANGE_OWN_TEAMSPACE: { message: "You can only update your own teamspace", status: 401 },
 
 		NOT_LOGGED_IN: { message: "You are not logged in", status: 401 },
 
@@ -172,7 +172,7 @@
 		DUPLICATE_TAG: { status: 400, message: "Revision name already exists" },
 		INVALID_TAG_NAME: { value: 109, status: 400, message: "Invalid revision name" },
 
-		FED_MODEL_IN_OTHER_DB: { message: "Models of federation must reside in the same account", status: 400 },
+		FED_MODEL_IN_OTHER_DB: { message: "Models of federation must reside in the same teamspace", status: 400 },
 		FED_MODEL_IS_A_FED: { message: "Models of federation cannot be a federation", status: 400 },
 		MODEL_IS_NOT_A_FED: { message: "Model is not a federation", status: 400 },
 
@@ -211,8 +211,8 @@
 		PERM_NOT_FOUND: {message: 'Permission template not found', status: 404},
 		INVALID_PERM: {message: 'Invalid permission', status: 400},
 		GROUP_BY_FIELD_NOT_SUPPORTED: { message: "Group by field is not supported", status: 400 },
-		DUP_ACCOUNT_PERM: { message: 'Duplicate account permission', status: 400},
-		ACCOUNT_PERM_NOT_FOUND: { message: 'Account permission not found', status: 404}
+		DUP_TEAMSPACE_PERM: { message: 'Duplicate teamspace permission', status: 400},
+		TEAMSPACE_PERM_NOT_FOUND: { message: 'Teamspace permission not found', status: 404}
 
 	};
 

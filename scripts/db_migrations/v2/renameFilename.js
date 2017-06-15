@@ -10,7 +10,7 @@ db.getSiblingDB('admin').adminCommand({listDatabases:1}).databases.forEach(funct
 			myCollection.find().forEach(function(item){
 				if(item.filename){
 					var urls = item.filename.split('/');
-					if(urls.length === 4){
+					if(urls[1] !== 'teamspaces' && urls[3] !== 'models'){
 						urls.splice(1,0,'teamspaces');
 						urls.splice(3,0,'models');
 						myCollection.update({ _id : item._id }, { '$set': { filename: urls.join('/')} });

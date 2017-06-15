@@ -318,7 +318,7 @@
 	]);
 
 	//team space
-	define("ACCOUNT_PERM_LIST", [
+	define("TEAMSPACE_PERM_LIST", [
 		module.exports.PERM_ASSIGN_LICENCE,
 		module.exports.PERM_REVOKE_LICENCE,
 		module.exports.PERM_TEAMSPACE_ADMIN,
@@ -488,7 +488,7 @@
 	define('MAIL_URLS',{
 		'forgotPassword': data => `/passwordChange?username=${data.username}&token=${data.token}`,
 		'verify': data => `/registerVerify?username=${data.username}&token=${data.token}` + (data.pay ? '&pay=true' : ''),
-		'model': data => `/${data.account}/${data.model}`
+		'model': data => `/${data.teamspace}/${data.model}`
 	});
 
 	
