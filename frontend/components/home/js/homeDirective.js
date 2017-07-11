@@ -81,9 +81,53 @@
     function HomeCtrl($scope, $element, $interval, $timeout, $compile, $mdDialog, $window, Auth, StateManager, EventService, UtilsService, serverConfig, $location) {
         var vm = this,
 			homeLoggedOut,
-			notLoggedInElement,
 			element,
-			state, func, i;
+			state, func, i,
+			elementRef, elementScope;
+
+		function clearDirective()
+		{
+			if (elementRef)
+			{
+				elementRef.remove();
+				elementScope.$destroy();
+			}
+		}
+
+		function insertDirective(markup)
+		{
+			var directiveElement = angular.element(markup);
+			homeLoggedOut.append(directiveElement);
+			elementScope = $scope.$new();
+			elementRef = $compile(directiveElement)(elementScope);
+		}
+
+		function getFunctionToInsert() {
+			// Check for static(function) pages to see if we need
+			// render one of them
+			for (i = 0; i < vm.functions.length; i++) {
+				func = vm.functions[i];
+
+				if (vm.state[func]) {
+					return func;
+				}
+			}
+
+			return null;
+		}
+
+		function insertFunctionDirective(func)
+		{
+			var snakeCaseDirectiveName = UtilsService.snake_case(func, "-");
+			// Create element related to function func
+			var directiveMarkup = "<" + snakeCaseDirectiveName +
+				" username='vm.query.username'" +
+				" token='vm.query.token'" +
+				" query='vm.query'>" +
+				"</" + snakeCaseDirectiveName+ ">";
+
+			insertDirective(directiveMarkup);
+		}
 
 		/*
 		 * Init
@@ -96,6 +140,8 @@
 			vm.goToAccount = false;
 			vm.goToUserPage = false;
 			vm.keysDown = [];
+
+			vm.Auth = Auth;
 
 			vm.legalDisplays = [];
 			if (angular.isDefined(serverConfig.legal)) {
@@ -115,8 +161,7 @@
 			];
 
 			$timeout(function () {
-				var login = angular.element("<login></login>");
-				var elementRef, elementScope;
+				var loginMarkup = "<login></login>";
 				homeLoggedOut = angular.element($element[0].querySelector('#homeLoggedOut'));
 				EventService.send(EventService.EVENT.CREATE_VIEWER, {
 					name: "default",
@@ -127,40 +172,29 @@
 				$scope.$watch("vm.state", function (newState, oldState) {
 
 					if (newState !== oldState && !vm.state.changing && vm.state.authInitialized) {
+						clearDirective();
 
-						if (elementRef)
+						var functionToInsert = getFunctionToInsert();
+
+						if (functionToInsert != null)
 						{
-							elementRef.remove();
-							elementScope.$destroy();
-						}
+							insertFunctionDirective(functionToInsert);
+						} else {
+							// If you are not logged in
+							if (!Auth.loggedIn)
+							{
+								insertDirective(loginMarkup);
+							} else {
+								// If you are logged in
+								var accessOwnAccount = (Auth.username === vm.state.account);
+								var viewAModel    = angular.isDefined(vm.state.model);
 
-						vm.goToUserPage = false;
-						for (i = 0; i < vm.functions.length; i++) {
-							func = vm.functions[i];
-
-							if (vm.state[func]) {
-								vm.goToUserPage = true;
-								// Create element
-								element = "<" + UtilsService.snake_case(func, "-") +
-									" username='vm.query.username'" +
-									" token='vm.query.token'" +
-									" query='vm.query'>" +
-									"</" + UtilsService.snake_case(func, "-") + ">";
-
-								notLoggedInElement = angular.element(element);
-								homeLoggedOut.append(notLoggedInElement);
-								elementScope = $scope.$new();
-								elementRef = $compile(notLoggedInElement)(elementScope);
-								break;
+								if (!accessOwnAccount && !viewAModel)
+								{
+									// Return to your own account page
+									EventService.send(EventService.EVENT.SET_STATE, { account: Auth.username });
+								}
 							}
-						}
-
-						if (!vm.state.loggedIn && !vm.goToUserPage) {
-							// Create login element
-							notLoggedInElement = login;
-							homeLoggedOut.append(notLoggedInElement);
-							elementScope = $scope.$new();
-							elementRef = $compile(notLoggedInElement)(elementScope);
 						}
 					}
 				}, true);
@@ -217,17 +251,17 @@
 					var currentPage = $location.path();
 					//console.log("currentPage", currentPage)
 					if (vm.doNotLogout.indexOf(currentPage) === -1) {
-						EventService.send(EventService.EVENT.CLEAR_STATE);
+						//EventService.send(EventService.EVENT.CLEAR_STATE);
 						EventService.send(EventService.EVENT.SET_STATE, { loggedIn: false, account: null });
 					}
 
 				} else if (event.type === EventService.EVENT.SHOW_MODELS) {
-					EventService.send(EventService.EVENT.CLEAR_STATE);
+					//EventService.send(EventService.EVENT.CLEAR_STATE);
 					Auth.init();
 				} else if (event.type === EventService.EVENT.GO_HOME) {
-					EventService.send(EventService.EVENT.CLEAR_STATE);
+					//EventService.send(EventService.EVENT.CLEAR_STATE);
 
-					if (StateManager.state.loggedIn) {
+					if (Auth.loggedIn) {
 						EventService.send(EventService.EVENT.SET_STATE, { account: Auth.username });
 					} else {
 						EventService.send(EventService.EVENT.SET_STATE, {});

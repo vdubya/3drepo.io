@@ -38,7 +38,6 @@
 
 					Auth.init().then(function (loggedIn) {
 						StateManager.state.authInitialized = true;
-						StateManager.state.loggedIn = loggedIn;
 
 						finishedAuth.resolve();
 					});
@@ -348,7 +347,7 @@
 				// If we are not trying to access a function
 				// and yet there is no account set. Then
 				// we need to go back to the account page if possible.
-				if ((functionList.length === 0) && self.state.loggedIn && !self.state.account)
+				if ((functionList.length === 0) && Auth.loggedIn && !self.state.account)
 				{
 					self.setStateVar("account", Auth.username);
 					self.updateState();

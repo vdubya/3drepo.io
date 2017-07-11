@@ -94,7 +94,9 @@
 		 */
 		$scope.$watch(EventService.currentEvent, function(event) {
 
+			
 			if (event.type === EventService.EVENT.USER_LOGGED_IN) {
+				console.log("412: login event", event)
 				// Show an error message for incorrect login
 				if (!event.value.initialiser && event.value.hasOwnProperty("error")) {
 					if (event.value.error.status === 500) {

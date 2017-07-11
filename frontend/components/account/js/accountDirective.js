@@ -41,13 +41,83 @@
 
 	function AccountCtrl($scope, $injector, $location, $timeout, AccountService, Auth, UtilsService) {
 		var vm = this;
-		vm.loadingAccount = true;
+
+		console.log("412: account object")
+		
+		vm.$onInit = function() {
+
+			console.log("412: $onInit") 
+			var authUsername = Auth.getUsername();
+			vm.loadingAccount = true;
+			window.addEventListener("storage", loginStatusListener, false);
+			// Set the logged in status to the account name just once
+			if ((localStorage.getItem("tdrLoggedIn") === "false") && (vm.account !== null)) {
+				localStorage.setItem("tdrLoggedIn", vm.account);
+			}
+
+			// TODO: This is a hack, we should refactor the state manager
+			// if (!vm.username) {
+			// 	if (authUsername) {
+			// 		// If we don't have a username but we have a login user
+			// 		console.log("412: Redirect from $onInit")
+			// 		$location.path(authUsername);
+			// 	}
+			// } else if (authUsername) {
+			// 	// If we don't have a login 
+			// 	$location.path(authUsername);
+			// } else {
+			// 	// This shouldn't happen but if there is some weird state 
+			// 	// log the user out as a fallback
+			// 	Auth.logout();
+			// }
+
+			// console.log("412: Auth username", Auth.getUsername())
+			// console.log("412: vm", vm)
+
+		}
+
+
+		/*
+		 * Init
+		 */
+		function initAccount () {
+			var billingsPromise,
+				subscriptionsPromise,
+				plansPromise;
+
+			getUserInfo();
+			console.log("412: initAccount")
+
+			if (vm.username === Auth.username) {
+				console.log("412: loading billing plans etc")
+
+				billingsPromise = UtilsService.doGet(vm.account + "/invoices");
+				billingsPromise.then(function (response) {
+					vm.billings = response.data;
+				});
+
+				subscriptionsPromise = UtilsService.doGet(vm.account + "/subscriptions");
+				subscriptionsPromise.then(function (response) {
+					vm.subscriptions = response.data;
+				});
+
+				plansPromise = UtilsService.doGet("plans");
+				plansPromise.then(function (response) {
+					if (response.status === 200) {
+						vm.plans = response.data;
+					}
+				});
+			} 
+			
+		}
+
 		/*
 		 * Get the account data
 		 */
-		$scope.$watchGroup(["vm.account", "vm.query.page"], function()
-		{
+		$scope.$watchGroup(["vm.account", "vm.query.page"], function() {
 			var promise;
+
+			// TODO: This is total mess... needs refactor!
 
 			if (vm.account || vm.query.page) {
 				// Go to the correct "page"
@@ -70,7 +140,7 @@
 							$location.search("token", null);
 							$location.search("cancel", null);
 
-							init();
+							initAccount();
 						}
 						else if ($location.search().hasOwnProperty("token")) {
 							// Get initial user info, which may change if returning from PayPal
@@ -92,21 +162,21 @@
 
 								$timeout(function () {
 									UtilsService.closeDialog();
-									init();
+									initAccount();
 								}, 2000);
 							});
 						}
 						else {
-							init();
+							initAccount();
 						}
 					}
 					else {
-						init();
+						initAccount();
 					}
 				}
 				else {
 					vm.itemToShow = "teamspaces";
-					init();
+					initAccount();
 				}
 
 			} else {
@@ -145,36 +215,6 @@
 			if ((event.key === "tdrLoggedIn") && (event.newValue === "false")) {
 				Auth.logout();
 			}
-		}
-		window.addEventListener("storage", loginStatusListener, false);
-		// Set the logged in status to the account name just once
-		if ((localStorage.getItem("tdrLoggedIn") === "false") && (vm.account !== null)) {
-			localStorage.setItem("tdrLoggedIn", vm.account);
-		}
-
-		function init () {
-			var billingsPromise,
-				subscriptionsPromise,
-				plansPromise;
-
-			getUserInfo();
-
-			billingsPromise = UtilsService.doGet(vm.account + "/invoices");
-			billingsPromise.then(function (response) {
-				vm.billings = response.data;
-			});
-
-			subscriptionsPromise = UtilsService.doGet(vm.account + "/subscriptions");
-			subscriptionsPromise.then(function (response) {
-				vm.subscriptions = response.data;
-			});
-
-			plansPromise = UtilsService.doGet("plans");
-			plansPromise.then(function (response) {
-				if (response.status === 200) {
-					vm.plans = response.data;
-				}
-			});
 		}
 
 		function getUserInfo () {
