@@ -854,6 +854,12 @@
 
 		// PROJECT SPECIFIC CODE
 
+		vm.alphabeticProjects = function(account) {
+			return account.projects.sort(function(a, b) {
+				return a.name.toLowerCase() > b.name.toLowerCase();
+			});
+		};
+
 		vm.projectData = {
 			visible : function(project) {
 				if (
