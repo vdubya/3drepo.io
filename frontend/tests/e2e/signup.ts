@@ -52,6 +52,11 @@ describe("Sign up page ", () => {
         expect(error.getText()).to.eventually.equal("Please fill all required fields");
       });
 
+      it("with the login link taking you back to the login page", () => {
+        checkbox.all(by.linkText("Log in")).first().click();
+        expect(element(by.css(".welcome")).isPresent()).to.eventually.equal(true);
+      });
+
   });
 
 });
