@@ -99,7 +99,6 @@
 		}
 
 		function isViewer(permissions) {
-			//console.log("isViewer", permissions);
 			return !AuthService.hasPermission(
 				ClientConfigService.permissions.PERM_COMMENT_ISSUE, 
 				permissions
@@ -107,7 +106,6 @@
 		}
 
 		function isAssignedJob(userJob, issueData, permissions) {
-			//console.log("isAssignedJob", permissions);
 			return (userJob._id && 
 					issueData.assigned_roles[0] && 
 					userJob._id === issueData.assigned_roles[0]) &&
@@ -128,11 +126,10 @@
 		}
 
 		function canChangeStatusToClosed(issueData, userJob, permissions) {
-			console.log("canChangeStatusToClosed");
-			
+
 			var jobOwner = (userJobMatchesCreator(userJob, issueData) &&
 							!isViewer(permissions));
-			console.log("isAdmin, jobOwner", isAdmin(permissions), jobOwner);
+
 			return isAdmin(permissions) || jobOwner;
 					
 		}
