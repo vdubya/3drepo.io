@@ -105,7 +105,7 @@ var Viewer = {};
 		};
 
 		this.logos    = [];
-
+		this.divId = "unityViewer";
 
 		this.prepareViewer = function() {
 			
@@ -122,9 +122,8 @@ var Viewer = {};
 			self.loadingDiv.className += "loadingViewer";
 			self.loadingDivText.className += "loadingViewerText";
 
-			var canvas = document.createElement("canvas");
-			canvas.className = "emscripten";
-			canvas.setAttribute("id", "canvas");
+			var canvas = document.createElement("div");
+			canvas.setAttribute("id", this.divId);
 			canvas.setAttribute("tabindex", "1"); // You need this for canvas to register keyboard events
 			canvas.setAttribute("oncontextmenu", "event.preventDefault()");
 
@@ -142,12 +141,12 @@ var Viewer = {};
 			
 		};
 
-		this.unityLoaderPath = "unity/Release/UnityLoader.js";
+		this.unityLoaderPath = "unity/Build/UnityLoader.js";
 		this.unityScriptInserted = false;
 
 		this.insertUnityLoader = function() {
 			return new Promise(function(resolve, reject) {
-				self.unityLoaderScript.async = true;
+				//self.unityLoaderScript.async = true;
 				self.unityLoaderScript.addEventListener ("load", function() {
 					console.debug("Loaded UnityLoader.js succesfully");
 					resolve();
@@ -183,26 +182,27 @@ var Viewer = {};
 				//Shouldn't need this, but for something it is not being recognised from unitySettings!
 				Module.errorhandler = UnityUtil.onError;
 
-				self.scene = document.createElement("Scene");
-				self.scene.setAttribute("onbackgroundclicked", "bgroundClick(event);");
-				self.viewer.appendChild(self.scene);
+				// self.scene = document.createElement("Scene");
+				// self.scene.setAttribute("onbackgroundclicked", "bgroundClick(event);");
+				// self.viewer.appendChild(self.scene);
 
-		
 				self.bground = null;
 				self.currentNavMode = null;
 
-				self.createBackground();
+				// self.createBackground();
 
-				self.environ = document.createElement("environment");
-				self.environ.setAttribute("frustumCulling", "true");
-				self.environ.setAttribute("smallFeatureCulling", "true");
-				self.environ.setAttribute("smallFeatureThreshold", 5);
-				self.environ.setAttribute("occlusionCulling", "true");
-				self.environ.setAttribute("sorttrans", "true");
-				self.environ.setAttribute("gammaCorrectionDefault", "linear");
-				self.scene.appendChild(self.environ);
+				// self.environ = document.createElement("environment");
+				// self.environ.setAttribute("frustumCulling", "true");
+				// self.environ.setAttribute("smallFeatureCulling", "true");
+				// self.environ.setAttribute("smallFeatureThreshold", 5);
+				// self.environ.setAttribute("occlusionCulling", "true");
+				// self.environ.setAttribute("sorttrans", "true");
+				// self.environ.setAttribute("gammaCorrectionDefault", "linear");
+				// self.scene.appendChild(self.environ);
 
-				self.setAmbientLight();
+				UnityUtil.loadUnity(self.divId);
+
+				//self.setAmbientLight();
 
 				if (self.options && self.options.plugins) {
 					self.plugins = self.options.plugins;

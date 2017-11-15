@@ -32,6 +32,8 @@ var UnityUtil;
 		MODEL_LOADED : 3 //Models
 	};
 
+	var unityInstance;
+
 	var readyPromise;
 	var readyResolve;
 	var loadedPromise;
@@ -43,35 +45,6 @@ var UnityUtil;
 	var objectStatusPromise = null;
 	var loaded = false;
 	var UNITY_GAME_OBJECT = "WebGLInterface";
-
-	var SendMessage_vss, SendMessage_vssn, SendMessage_vsss;
-	
-	UnityUtil.prototype._SendMessage = function(gameObject, func, param) {
-		if (param === undefined) {
-
-			if (!SendMessage_vss) {
-				SendMessage_vss = Module.cwrap("SendMessage", "void", ["string", "string"]);
-			}
-			SendMessage_vss(gameObject, func);
-
-		} else if (typeof param === "string") {
-
-			if (!SendMessage_vsss) {
-				SendMessage_vsss = Module.cwrap("SendMessageString", "void", ["string", "string", "string"]);
-			}
-			SendMessage_vsss(gameObject, func, param);
-
-		} else if (typeof param === "number") {
-
-			if (!SendMessage_vssn) {
-				SendMessage_vssn = Module.cwrap("SendMessageFloat", "void", ["string", "string", "number"]);
-			}
-			SendMessage_vssn(gameObject, func, param);
-
-		} else {
-			throw "" + param + " is does not have a type which is supported by SendMessage.";
-		}
-	};
 
 	UnityUtil.prototype.onError = function(err, url, line) {
 		var conf = "Your browser has failed to load 3D Repo. This may due to insufficient memory. " + 
@@ -90,6 +63,10 @@ var UnityUtil;
 		UnityUtil.userAlert(conf, reload);
 
 		return true;
+	};
+
+	UnityUtil.prototype.loadUnity = function(divId){
+		unityInstance = UnityLoader.instantiate(divId, "unity/Build/unity.json");
 	};
 
 	UnityUtil.prototype.onLoaded = function() {
@@ -153,7 +130,9 @@ var UnityUtil;
 		if(requireStatus == LoadingState.MODEL_LOADED) {
 			//Requires model to be loaded
 			UnityUtil.onLoaded().then(function() {
-				SendMessage(UNITY_GAME_OBJECT, methodName, params);
+				if (unityInstance) {
+					unityInstance.SendMessage(UNITY_GAME_OBJECT, methodName, params);
+				}
 			
 			}).catch(function(error){
 				if (error != "cancel") {
@@ -164,7 +143,9 @@ var UnityUtil;
 		} else if(requireStatus == LoadingState.MODEL_LOADING) {
 			//Requires model to be loading
 			UnityUtil.onLoading().then(function() {
-				SendMessage(UNITY_GAME_OBJECT, methodName, params);
+				if (unityInstance){
+					unityInstance.SendMessage(UNITY_GAME_OBJECT, methodName, params);
+				}
 			}).catch(function(error){
 				if (error !== "cancel") {
 					UnityUtil.userAlert(error, true);
@@ -173,8 +154,9 @@ var UnityUtil;
 			});
 		} else {
 			UnityUtil.onReady().then(function() {
-				SendMessage(UNITY_GAME_OBJECT, methodName, params);
-			
+				if (unityInstance){
+					unityInstance.SendMessage(UNITY_GAME_OBJECT, methodName, params);
+				}
 			}).catch(function(error){
 				if (error != "cancel") {
 					UnityUtil.userAlert(error, true);
@@ -233,7 +215,7 @@ var UnityUtil;
 		//Overwrite the Send Message function to make it run quicker 
 		//This shouldn't need to be done in the future when the
 		//optimisation in added into unity.
-		SendMessage = UnityUtil._SendMessage;
+		//SendMessage = UnityUtil._SendMessage;
 		readyResolve.resolve();
 	};
 	
@@ -301,7 +283,7 @@ var UnityUtil;
 
 	UnityUtil.prototype.enableMeasuringTool = function(){
 		toUnity("StartMeasuringTool", LoadingState.MODEL_LOADING);
-	}
+	};
 
 
 	UnityUtil.prototype.getObjectsStatus = function(account, model, promise) {
