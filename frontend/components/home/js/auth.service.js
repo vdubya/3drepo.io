@@ -121,12 +121,19 @@
 						username: response.data.username, 
 						initialiser: response.data.initialiser 
 					});
+
 					AnalyticService.setUserId(username);
 
 					authPromise.resolve(loggedIn);
 				}
 
 				function loginFailure(response) {
+
+					if (response.data.code === "ALREADY_LOGGED_IN" && username) {
+						$window.location.reload();
+						return;
+					}
+
 					loggedIn = false;
 					username = null;
 
