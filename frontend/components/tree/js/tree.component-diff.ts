@@ -113,21 +113,12 @@ class TreeController implements ng.IController {
 							this.TreeService.expandToSelection(path, 0, undefined);
 							// all these init and expanding unselects the selected, so let's select them again
 							// FIXME: ugly as hell but this is the easiest solution until we refactor this.
-							this.TreeService.getCurrentSelectedNodes().forEach((n) => {
-								n.selected = true;
+							this.TreeService.getCurrentSelectedNodes().forEach((selectedNode) => {
+								selectedNode.selected = true;
 							});
-
-							const selectedNode = this.TreeService.getNodeById(objectID);
-							console.log("OBJECT SELECTED", objectID, selectedNode, this.TreeService.getLastParentWithName());
-							this.selectNode(selectedNode);
-
-							// console.log(this.TreeService.getLastParentWithName());
-
-							// if (this.TreeService.getLastParentWithName()) {
-							// 	this.selectNode(this.TreeService.getLastParentWithName()).then(() => {
-							// 		this.redrawTree(this.currentSelectedIndex, this.currentSelectedId);
-							// 	});
-							// }
+							if (this.TreeService.getLastParentWithName()) {
+								this.TreeService.selectNode(this.TreeService.getLastParentWithName(), this.MultiSelectService.isMultiMode());
+							}
 						}
 					}
 				}
@@ -221,7 +212,7 @@ class TreeController implements ng.IController {
 	}
 
 	public updateViewer() {
-		this.handleHighlightMaps(this.TreeService.highlightMap);
+		// this.handleHighlightMaps();
 		// this.handleVisibility(false);
 		// this.handleVisibility(true);
 	}
@@ -303,23 +294,13 @@ class TreeController implements ng.IController {
 			// Redraw the tree, resize virtual repeater, 
 			// taken from kseamon's comment - https://github.com/angular/material/issues/4314
 			this.$scope.$broadcast("$md-resize");
-			if (selectedIndex) {
-				this.topIndex = selectedIndex;
-			}
-		}).then(() => {
-			this.TreeService.getNodeById(selectedId).selected = true;
-			this.scrollToNode(selectedId);
+			this.topIndex = selectedIndex;
 		});
 
-	}
-
-	public scrollToNode(domId) {
 		this.$timeout(() => {
-			const el = document.getElementById(domId);
-			console.log("element", domId, el);
+			const el = document.getElementById(selectedId);
 			if (el) {
 				el.scrollIntoView();
-				this.$scope.$apply();
 			}
 		});
 	}
@@ -427,7 +408,7 @@ class TreeController implements ng.IController {
 	 * @param node
 	 */
 	public selectNode(node) {
-		return this.TreeService.selectNode(node).then((highlightObject) => {
+		this.TreeService.selectNode(node).then((highlightObject) => {
 			this.handleHighlightMaps(highlightObject.map);
 		});
 	}

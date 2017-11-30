@@ -416,6 +416,8 @@ export class Viewer {
 
 		if (properties) {
 			if (properties.hiddenNodes && properties.hiddenNodes.length > 0) {
+
+				console.log("applyModelProperties", account, model, properties.hiddenNodes);
 				this.switchObjectVisibility(
 					account,
 					model,

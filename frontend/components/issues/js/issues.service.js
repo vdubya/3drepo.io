@@ -555,16 +555,20 @@
 
 			// clear selection
 			EventService.send(EventService.EVENT.RESET_SELECTED_OBJS, []);
-
+			
+			console.log("showIssue");
 			// Show multi objects
 			if ((issue.viewpoint && issue.viewpoint.hasOwnProperty("group_id")) || issue.hasOwnProperty("group_id")) {
-
+				console.log("showIssue has group_id");
 				showMultiIds(issue);
 				
 			}
 		}
 
 		function showMultiIds(issue) {
+
+			console.log("showMultiIds");
+
 			var groupId = (issue.viewpoint && issue.viewpoint.hasOwnProperty("group_id")) ? issue.viewpoint.group_id : issue.group_id;
 			var groupUrl = issue.account + "/" + issue.model + "/groups/" + groupId;
 
@@ -578,7 +582,7 @@
 		}
 
 		function handleTree(response) {
-
+			console.log("handleTree issues");
 			var ids = [];
 			var objectIdsToShow = [];
 			var objectIdsToHide = [];
@@ -613,7 +617,8 @@
 
 							for (var key in objectIdsToHide) {
 
-								objectIdsToHide[key].forEach((obj) => {
+								objectIdsToHide[key].forEach(function(obj) {
+									console.log("objectIdsToHide", obj);
 									TreeService.toggleTreeNodeByUid(obj);
 								});
 							}
