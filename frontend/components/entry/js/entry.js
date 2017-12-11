@@ -3,6 +3,8 @@
         
 		if (!window.ClientConfig) {
 			console.error("ClientConfig has not been provided...");
+			document.getElementById("swOffline").style.display = "initial";
+
 		} else {
 
 			if (window.ClientConfig.VERSION) {
@@ -35,6 +37,7 @@
 						document.querySelector(".connection").innerHTML = "";
 					}, 1000 * 20); // Show it for twenty seconds
 				} else {
+					console.log("User is offline!");
 					offlineDiv.className = "connection offline";
 				}
 			}

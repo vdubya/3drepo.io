@@ -25,7 +25,7 @@
     <!-- Inline CSS if CSS fails, also faster-->
     <style>
 
-      body #notSupported {
+      body #notSupported, body #swOffline {
       	max-width: 100%;
       	max-height: 100%;
       	overflow: hidden;
@@ -41,17 +41,17 @@
       	font-size: 20px;
       }
       
-      body #notSupported a {
+      body #notSupported a, body #swOffline a {
       	color: #289874;
       }
       
-      body #notSupported img {
+      body #notSupported img, body #swOffline img {
       	margin: 4%;
       	width: 90%;
       	max-width: 500px;
       }
       
-      body #notSupported div {
+      body #notSupported div, body #swOffline div {
       	margin: 4%; 
       	text-align: center;
       }
@@ -77,6 +77,14 @@
         <br><br><br>
 
         <input id="notSupportedButton" type="button" value="OK" style="padding:10px 60px; font-size:14px;" onclick="document.getElementById(&quot;notSupported&quot;).style.visibility=&quot;hidden&quot;">
+      </div>
+    </div>
+
+    <div id="swOffline" style="display:none;" aria-label="Offline">
+      <div><img id="notSupportedLogo" src="images/3drepo-logo-white.png"></div>
+      <div>
+        It looks like you're offline. Please try again when your connection becomes available.
+        <br><br><br>
       </div>
     </div>
 
