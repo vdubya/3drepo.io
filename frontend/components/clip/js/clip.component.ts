@@ -31,7 +31,7 @@ class ClipController implements ng.IController {
 	public sliderMin: number;
 	public sliderMax: number;
 	public sliderStep: number;
-	public displayDistance: number;
+	public displayDistance: any;
 	public precision: number;
 	public sliderPosition: number;
 	public axes: string[];
@@ -154,6 +154,25 @@ class ClipController implements ng.IController {
 		this.$scope.$watch(this.EventService.currentEvent, (event: any) => {
 
 			switch (event.type) {
+			case this.EventService.EVENT.VIEWER.UPDATE_CLIPPING_PLANES:
+
+				if (!event.value.fromClipPanel) {
+					const clip = event.value.clippingPlanes[0];
+					if (clip) {
+						this.setDisplayValues(
+							this.determineAxis(clip.normal),
+							clip.distance,
+							false,
+							clip.clipDirection === 1,
+							undefined,
+						);
+						this.updateDisplayedDistance(true, this.visible);
+					} else {
+						this.reset();
+					}
+				}
+				break;
+
 			case this.EventService.EVENT.VIEWER.CLIPPING_PLANE_BROADCAST:
 				this.setDisplayValues(
 					this.determineAxis(event.value.normal),
@@ -217,6 +236,9 @@ class ClipController implements ng.IController {
 			if (currentUnit === "cm") {
 				scaler = 10;
 			}
+			if (currentUnit === "dm") {
+				scaler = 100;
+			}
 			if (currentUnit === "m") {
 				scaler = 1000;
 			}
@@ -225,8 +247,22 @@ class ClipController implements ng.IController {
 			if (currentUnit === "mm") {
 				scaler = 0.1;
 			}
+			if (currentUnit === "dm") {
+				scaler = 10;
+			}
 			if (currentUnit === "m") {
 				scaler = 100;
+			}
+			break;
+		case "dm":
+			if (currentUnit === "mm") {
+				scaler = 0.01;
+			}
+			if (currentUnit === "cm") {
+				scaler = 0.1;
+			}
+			if (currentUnit === "m") {
+				scaler = 10;
 			}
 			break;
 		case "m":
@@ -235,6 +271,9 @@ class ClipController implements ng.IController {
 			}
 			if (currentUnit === "cm") {
 				scaler = 0.01;
+			}
+			if (currentUnit === "dm") {
+				scaler = 0.1;
 			}
 			break;
 		}
@@ -284,11 +323,20 @@ class ClipController implements ng.IController {
 		return res;
 	}
 
+	public reset() {
+
+		const minMax = this.getMinMax();
+		const scaler = this.getScaler(this.units, this.modelUnits);
+		const dist = minMax.max * scaler;
+
+		this.setDisplayValues("X", dist, true, false, undefined);
+	}
+
 	/**
 	 * Initialise display values
 	 * This is called when we know the bounding box of our model
 	 */
-	public setDisplayValues(axis, distance, moveClip, direction, slider) {
+	public setDisplayValues(axis: string, distance: any, moveClip: boolean, direction: boolean, slider: any) {
 		const scaler = this.getScaler(this.units, this.modelUnits);
 		const newDistance = parseFloat(distance) * scaler;
 
@@ -299,8 +347,8 @@ class ClipController implements ng.IController {
 
 		this.displayDistance = newDistance;
 		this.direction = direction;
-
 		this.displayedAxis = axis;
+
 		if (slider != null) {
 			this.sliderPosition = slider;
 			if (moveClip) {
@@ -397,7 +445,7 @@ class ClipController implements ng.IController {
 	}
 
 	public handleMetric(unit) {
-		const metric = ["cm", "mm", "m"];
+		const metric = ["cm", "dm", "mm", "m"];
 		const isMetric = metric.indexOf(unit) !== -1;
 		return unit !== "ft" && isMetric;
 	}
