@@ -51,9 +51,15 @@
       	max-width: 500px;
       }
       
-      body #notSupported div, body #swOffline div {
+      body #notSupported div, body #swOffline div  {
       	margin: 4%; 
       	text-align: center;
+      }
+
+      body #swOffline #swOfflineText {
+        width: 50%;
+        margin: auto;
+        text-align: center;
       }
 
     </style>
@@ -82,8 +88,8 @@
 
     <div id="swOffline" style="display:none;" aria-label="Offline">
       <div><img id="notSupportedLogo" src="images/3drepo-logo-white.png"></div>
-      <div>
-        It looks like you're offline. Please try again when your connection becomes available.
+      <div id="swOfflineText">
+        It looks like you're you're having trouble reaching us. This could be either network problems or  you offline. Please try again when your connection becomes available.
         <br><br><br>
       </div>
     </div>

@@ -1,6 +1,7 @@
 (function(){
+
 	if (window) {
-        
+
 		if (!window.ClientConfig) {
 			console.error("ClientConfig has not been provided...");
 			document.getElementById("swOffline").style.display = "initial";
@@ -19,6 +20,8 @@
 			} else {
 				console.error("ClientConfig does not have any provided Unity settings!");
 			}
+
+			window.TDR = angular.module("3drepo", ["ui.router", "ngMaterial", "ngAnimate", "ngSanitize", "vcRecaptcha"]);
 		}
 
 		// Add some offline UX
@@ -48,5 +51,4 @@
 
 	}
 	
-	window.TDR = angular.module("3drepo", ["ui.router", "ngMaterial", "ngAnimate", "ngSanitize", "vcRecaptcha"]);
 })();
