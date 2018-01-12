@@ -26,6 +26,7 @@ div(ng-show="vm.showPanel")
 
 		.panelButtonGroup(ng-repeat="contentItem in vm.contentItems", layout="column", layout-align="start center")
 			md-button.md-fab.md-primary.md-mini(
+				ng-class="{ panelOpen : contentItem.show }"
 				id="{{contentItem.type + 'LeftButton'}}"
 				ng-click="vm.togglePanel(contentItem.type)"
 				aria-label="{{contentItem.title}}")

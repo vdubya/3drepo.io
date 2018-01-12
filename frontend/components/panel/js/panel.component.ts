@@ -26,15 +26,15 @@ class PanelController implements ng.IController {
 		"EventService",
 	];
 
-	public maxHeightAvailable;
-	public panelTopBottomGap;
-	public contentItems;
-	public showPanel;
-	public activate;
-	public itemGap;
-	public panelToolbarHeight;
-	public contentItemsShown;
-	public position;
+	public maxHeightAvailable: number;
+	public panelTopBottomGap: number;
+	public contentItems: any[];
+	public showPanel: boolean;
+	public activate: boolean;
+	public itemGap: number;
+	public panelToolbarHeight: number;
+	public contentItemsShown: any[];
+	public MAX_PANELS: number;
 
 	constructor(
 		private $window: ng.IWindowService,
@@ -57,6 +57,8 @@ class PanelController implements ng.IController {
 		this.panelToolbarHeight = 40,
 		this.contentItemsShown = [];
 
+		this.MAX_PANELS = 5;
+
 		this.resize(); // We need to set the correct height for the issues
 		this.bindEvents();
 
@@ -71,25 +73,9 @@ class PanelController implements ng.IController {
 
 	public watchers() {
 
-		this.$scope.$watch("vm.contentItems", (newValue: any, oldValue: any) => {
-			if (oldValue.length && newValue.length) {
-				for (let i = 0; i < newValue.length; i ++) {
-
-					if (newValue[i].show !== oldValue[i].show) {
-						this.setupShownCards();
-						// this.getContentItemShownFromType();
-						break;
-					}
-
-				}
-			}
-		}, true);
-
 		this.$scope.$watch(this.EventService.currentEvent, (event: any) => {
 
-			if (event.type === this.EventService.EVENT.TOGGLE_ELEMENTS) {
-				this.showPanel = !this.showPanel;
-			} else if (event.type === this.EventService.EVENT.PANEL_CONTENT_ADD_MENU_ITEMS) {
+			if (event.type === this.EventService.EVENT.PANEL_CONTENT_ADD_MENU_ITEMS) {
 
 				const item = this.contentItems.find((content) => {
 					return content.type === event.value.type;
@@ -173,8 +159,19 @@ class PanelController implements ng.IController {
 
 				// Resize any shown panel contents
 				if (this.contentItems[i].show) {
+
 					this.contentItemsShown.push(this.contentItems[i]);
-					this.calculateContentHeights();
+
+					if (this.contentItemsShown.length > this.MAX_PANELS) {
+
+						// Figure out the first panel that was open and close it
+						const firstShown = this.contentItems.find((c) => {
+							return c.type === this.contentItemsShown[0].type;
+						});
+						firstShown.show = false;
+						this.contentItemsShown.shift();
+					}
+
 				} else {
 					for (let j = (this.contentItemsShown.length - 1); j >= 0; j -= 1) {
 						if (this.contentItemsShown[j].type === contentType) {
@@ -182,12 +179,13 @@ class PanelController implements ng.IController {
 						}
 					}
 					this.contentItems[i].showGap = false;
-					this.calculateContentHeights();
+
 				}
 				break;
 			}
 		}
 
+		this.calculateContentHeights();
 		this.hideLastItemGap();
 	}
 

@@ -75,6 +75,10 @@ panel #buttons .panelButtonGroup label {
   font-size: 14px;
 }
 
+panel .panelOpen {
+  background-color: rgb(15, 63, 114) !important;
+}
+
 /** Panels ************************************************************************************************************/
 
 .active {
@@ -153,6 +157,7 @@ panel-card #panelCardContainer {
   overflow-y: auto;
   width: 100%;
 }
+
 
 panel-card #helpButton {
   position: absolute;
