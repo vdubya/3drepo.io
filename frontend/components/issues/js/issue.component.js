@@ -203,6 +203,8 @@
 
 		vm.setEditIssueData = function(newIssueData) {
 
+			console.log("newIssueData", newIssueData);
+
 			vm.issueData = newIssueData;
 
 			vm.issueData.comments = vm.issueData.comments || [];
@@ -243,6 +245,7 @@
 
 				IssuesService.getIssue(vm.account, vm.model, vm.data._id)
 					.then(function(fetchedIssue){
+						console.log("fetchedIssue", fetchedIssue);
 						vm.setEditIssueData(fetchedIssue);
 						vm.startNotification();
 						vm.issueFailedToLoad = false;
@@ -876,6 +879,8 @@
 			var viewpointPromise = $q.defer();
 			var objectsPromise = $q.defer();
 
+			console.log("saveComment", vm.issueData);	
+
 			//Get selected objects
 			ViewerService.getObjectsStatus({
 				promise: objectsPromise 
@@ -888,12 +893,17 @@
 				
 				// Create a group of hidden objects
 				var hiddenGroupData = createGroupData(objectInfo.hiddenNodes);
-				
+
+				console.log("objectsPromise", vm.issueData);				
+
 				APIService.post(vm.account + "/" + vm.model + "/groups", highlightedGroupData).then(function (highlightedGroupResponse) {
 					APIService.post(vm.account + "/" + vm.model + "/groups", hiddenGroupData).then(function (hiddenGroupResponse) {
 						if (angular.isDefined(vm.commentThumbnail)) {
 							vm.commentViewpoint.highlighted_group_id = highlightedGroupResponse.data._id;
 							vm.commentViewpoint.hidden_group_id = hiddenGroupResponse.data._id;
+
+							console.log("vm.issueData:", vm.issueData);
+
 							IssuesService.saveComment(vm.issueData, vm.comment, vm.commentViewpoint)
 								.then(function (response) {
 									vm.saving = false;
