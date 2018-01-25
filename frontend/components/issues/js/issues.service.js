@@ -699,7 +699,7 @@
 
 			if (response.data.hiddenObjects) {
 				handleHidden(response.data.hiddenObjects);
-			} 
+			}
 
 		}
 
