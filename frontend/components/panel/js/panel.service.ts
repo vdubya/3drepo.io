@@ -198,6 +198,28 @@ export class PanelService {
 		});
 	}
 
+	/*
+	* Get the panel object to manipulate it directly
+	*/
+	public getPanelCard(type) {
+		let panelCard = null;
+
+		this.issuesPanelCard.left.forEach((panel) => {
+			if (panel.type === type) {
+				panelCard = panel;
+			}
+		});
+
+		this.issuesPanelCard.right.forEach((panel) => {
+			if (panel.type === type) {
+				panelCard = panel;
+			}
+		})
+
+		return panelCard;
+	
+	}
+
 	public hideSubModels(issuesCardIndex, hide) {
 
 		this.issuesPanelCard.left[issuesCardIndex].menu

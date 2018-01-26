@@ -27,9 +27,8 @@ export class TreeService {
 	public highlightSelectedViewerObject;
 	public highlightMap;
 	public highlightMapUpdateTime;
-	public selectionDataUpdateTime;
 	public visibilityUpdateTime;
-	public selectionData;
+	public selectedIndex;
 	public treeReady;
 
 	private state;
@@ -655,14 +654,10 @@ export class TreeService {
 
 		if (!noHighlight) {
 			this.selectNode(this.nodesToShow[selectedIndex], multi, true).then(() => {
-				this.selectionData = {
-					selectedIndex,
-				};
+				this.selectedIndex = selectedIndex
 			});
 		} else {
-			this.selectionData = {
-				selectedIndex,
-			};
+			this.selectedIndex = selectedIndex
 		}
 
 	}
@@ -780,7 +775,7 @@ export class TreeService {
 		}
 
 		this.updateParentVisibility(node);
-		
+
 	}
 
 	public checkHiddenByDefaultParents(node) {

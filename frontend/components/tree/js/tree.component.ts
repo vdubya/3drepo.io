@@ -27,6 +27,7 @@ class TreeController implements ng.IController {
 		"EventService",
 		"MultiSelectService",
 		"ViewerService",
+		"PanelService",
 	];
 
 	public showProgress: boolean; // in pug
@@ -64,6 +65,7 @@ class TreeController implements ng.IController {
 		private EventService,
 		private MultiSelectService,
 		private ViewerService,
+		private PanelService,
 	) {
 
 		this.promise = null,
@@ -238,17 +240,18 @@ class TreeController implements ng.IController {
 			(state) => {
 				if (state) {
 					angular.extend(this, state);
+					this.syncIFCVisibilityState()
 				}
 			});
 
-		this.$scope.$watch(() => this.TreeService.selectionData,
-			(selectionData) => {
-				if (selectionData) {
+		this.$scope.$watch(() => this.TreeService.selectedIndex,
+			(selecteIndex) => {
+				if (selecteIndex) {
 
 					this.setContentHeight(this.fetchNodesToShow());
 
 					this.$timeout(() => {}).then(() => {
-						this.topIndex = selectionData.selectedIndex;
+						this.topIndex = selecteIndex;
 					});
 
 				}
@@ -274,6 +277,20 @@ class TreeController implements ng.IController {
 			lastViewerUpdateTime = Date.now();
 
 		}, 150);
+
+	}
+
+	public syncIFCVisibilityState() {
+
+		// Get the panel itself so we can
+		// update selected to match our IFC visibility state
+		let treePanelCard = this.PanelService.getPanelCard("tree");
+		let hideItem = treePanelCard.menu.find((menuItem) => menuItem.value === "hideIfc"); 
+
+		if (this.hideIfc !==  hideItem.selected) {
+			hideItem.selected = this.hideIfc;
+			this.$timeout(() => {}); // Force a digest cycle to update the UI
+		}
 
 	}
 

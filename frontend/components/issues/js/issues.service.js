@@ -535,8 +535,12 @@
 			// Reset object visibility
 			if (issue.viewpoint && issue.viewpoint.hasOwnProperty("hideIfc")) {
 				TreeService.setHideIfc(issue.viewpoint.hideIfc);
-				// TODO: need to propagate state change to UI
+			} else {
+				// Fallback - if there isn't a group, just force set it to hidden
+				// alternative is to keep whats currently selected (do nothing)
+				TreeService.setHideIfc(true);
 			}
+
 			TreeService.showAllTreeNodes();
 
 			// Show multi objects
