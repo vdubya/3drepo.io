@@ -14,6 +14,8 @@ export let config: Config = {
 				"--headless",
 				// "--disable-gpu",
 				// "--deterministic-fetch",
+				"--proxy-server='direct://",
+				"--proxy-bypass-list=*",
 				"--incognito",
 				"--start-maximized",
 				"--window-size=1920x1080",
