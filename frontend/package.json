@@ -9,9 +9,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "gulp": "gulp",
-    "wdm": "yarn run wdm:update --versions.chrome=2.35 && yarn run wdm:start",
+    "wdm": "yarn run wdm:update && yarn run wdm:start",
     "wdm:start": "webdriver-manager start --standalone",
-    "wdm:update": "webdriver-manager update --standalone",
+    "wdm:update": "webdriver-manager update --standalone  --versions.chrome=2.35",
     "e2e:ie": "protractor ./tests/e2e/built/ie/ie-config.js --specs ./tests/e2e/built/ie/ie.js",
     "e2e": "yarn run tsc:tests && protractor ./tests/e2e/built/config/config.js && yarn run e2e:ie",
     "e2e:one": "yarn run tsc:tests && yarn run protractor ./tests/e2e/built/config/config.js --specs ",
