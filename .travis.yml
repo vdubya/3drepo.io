@@ -9,12 +9,15 @@ node_js:
 
 sudo: false
 dist: trusty
+env:
+  - MOZ_HEADLESS=1
 
 addons:
   apt:
    sources:
       - mongodb-3.2-precise
-  chrome: stable
+  firefox: latest
+  firefox: 
   hosts:
     - test.127.0.0.1
 
