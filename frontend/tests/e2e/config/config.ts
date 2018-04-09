@@ -5,7 +5,7 @@ export let config: Config = {
 		"browserName": "firefox",
 			"moz:firefoxOptions": {
 				args : [
-					"--headless",
+					//"--headless",
 				],
 		},
 		// browserName: "chrome",
