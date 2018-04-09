@@ -17,7 +17,6 @@ addons:
    sources:
       - mongodb-3.2-precise
   firefox: latest
-  firefox: 
   hosts:
     - test.127.0.0.1
 
