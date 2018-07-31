@@ -125,7 +125,7 @@ export class PanelService {
 				{
 					hidden: false,
 					value: "showClosed",
-					label: "Show closed issues",
+					label: "Show Closed Issues",
 					toggle: true,
 					selected: false,
 					firstSelected: false,
@@ -135,7 +135,7 @@ export class PanelService {
 				{
 					hidden: false,
 					value: "showSubModels",
-					label: "Show sub model issues",
+					label: "Show Sub-Model Issues",
 					toggle: true,
 					selected: false,
 					firstSelected: false,
