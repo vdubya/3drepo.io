@@ -528,7 +528,7 @@ issue #issueRoleIndicator {
   height: 28px;
 }
 
-/** Issue Screen Shot  ************************************************************************************************/
+/** Issue Screenshot  ************************************************************************************************/
 #issueScreenShotDialog {
   width:80%;
   height: calc(80% + 40px); /* 40px is the height of the dialog toolbar */

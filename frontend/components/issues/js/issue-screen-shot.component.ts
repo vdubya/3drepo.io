@@ -133,7 +133,7 @@ class IssueScreenshotController implements ng.IController {
 
 				this.innerWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 				this.innerHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-				// Set the screen shot canvas to 80% screen size
+				// Set the screenshot canvas to 80% screen size
 				this.scribbleCanvas.width = (this.innerWidth * 80) / 100;
 				this.scribbleCanvas.height = (this.innerHeight * 80) / 100;
 				this.handleResize();
@@ -147,7 +147,7 @@ class IssueScreenshotController implements ng.IController {
 				this.changePenSize();
 				this.actionsPointerEvents = "auto";
 
-				// Get the screen shot
+				// Get the screenshot
 				this.ViewerService.getScreenshot(this.screenShotPromise);
 
 				this.screenShotPromise.promise.then((screenShot) => {

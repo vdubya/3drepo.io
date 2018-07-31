@@ -175,7 +175,7 @@ function Utils() {
 	};
 
 	/**
-	* Create a cropped version of a screen shot.
+	* Create a cropped version of a screenshot.
 	* @param {Object} pngBuffer
 	* @param {Number} destWidth
 	* @param {Number} destHeight

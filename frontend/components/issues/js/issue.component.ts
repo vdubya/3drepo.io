@@ -142,7 +142,7 @@ class IssueController implements ng.IController {
 			screen_shot: {
 				id: "screenshot",
 				icon: "camera_alt",
-				label: "Screen shot",
+				label: "Screenshot",
 				disabled: () => {
 					if (!this.data) {
 						return this.submitDisabled;
@@ -607,7 +607,7 @@ class IssueController implements ng.IController {
 	}
 
 	/**
-	 * Show screen shot
+	 * Show screenshot
 	 * @param event
 	 * @param viewpoint
 	 */
@@ -626,7 +626,7 @@ class IssueController implements ng.IController {
 	}
 
 	/**
-	 * Show screen shot dialog
+	 * Show screenshot dialog
 	 * @param event
 	 */
 	public showScreenshotDialog(event) {
@@ -669,7 +669,7 @@ class IssueController implements ng.IController {
 			// There is no concept of selected in screenshot as there will be a popup once you click the button
 			this.actions[action].selected = false;
 
-			delete this.screenShot; // Remove any clicked on screen shot
+			delete this.screenShot; // Remove any clicked on screenshot
 			this.showScreenshotDialog(event);
 			break;
 
@@ -796,7 +796,7 @@ class IssueController implements ng.IController {
 			}
 
 		} else {
-			// Get a screen shot if not already created
+			// Get a screenshot if not already created
 			this.ViewerService.getScreenshot(screenShotPromise);
 
 			return screenShotPromise.promise
@@ -1113,7 +1113,7 @@ class IssueController implements ng.IController {
 	}
 
 	/**
-	 * A screen shot has been saved
+	 * A screenshot has been saved
 	 * @param data
 	 */
 	public screenShotSave(data) {
@@ -1126,8 +1126,8 @@ class IssueController implements ng.IController {
 			// Comment
 			this.commentThumbnail = data.screenShot;
 
-			// Get the viewpoint and add the screen shot to it
-			// Remove base64 header text from screen shot
+			// Get the viewpoint and add the screenshot to it
+			// Remove base64 header text from screenshot
 			this.ViewerService.getCurrentViewpoint(
 				{promise: viewpointPromise, account: this.issueData.account, model: this.issueData.model}
 			);

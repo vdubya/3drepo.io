@@ -1181,7 +1181,7 @@ export class IssuesService {
 				if (issue.comments[j].action) {
 					issue.comments[j].comment = this.convertActionCommentToText(issue.comments[j], undefined);
 				}
-				// screen shot path
+				// screenshot path
 				if (issue.comments[j].viewpoint && issue.comments[j].viewpoint.screenshot) {
 					issue.comments[j].viewpoint.screenshotPath = this.APIService.getAPIUrl(issue.comments[j].viewpoint.screenshot);
 				}
