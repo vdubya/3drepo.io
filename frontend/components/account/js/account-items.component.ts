@@ -516,7 +516,7 @@ class AccountItemsController implements ng.IController {
 					this.federationData.subModels.length === 0;
 
 		if (this.federationData.name.length > 120) {
-			this.federationErrorMessage = "Federationame can't be over 120 characters";
+			this.federationErrorMessage = "Federation name can't be over 120 characters";
 			this.federationSaveDisabled = true;
 		} else if (this.isDuplicateName()) {
 			this.federationErrorMessage = "Federation name taken";
