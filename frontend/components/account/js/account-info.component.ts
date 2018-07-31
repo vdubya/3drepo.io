@@ -127,7 +127,7 @@ class AccountInfoController implements ng.IController {
 				formData.append("file", file.files[0]);
 				this.postAvatar(formData);
 			} else {
-				this.uploadError("Upload avatar error: File is too big! Must be smaller than " + maxSizeUser, "");
+				this.uploadError("File is too big! Must be smaller than " + maxSizeUser, "");
 			}
 
 		});
